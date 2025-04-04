@@ -13,7 +13,7 @@ export function useN8nWebhook() {
   const { toast } = useToast();
 
   // Die konfigurierte n8n Webhook URL
-  const webhookUrl = "https://vertrags.app.n8n.cloud/webhook-test/c76e0610-0866-42a6-9be3-0e0388528c61";
+  const webhookUrl = "https://vertrags.app.n8n.cloud/webhook-test/Vertrags-analyse";
 
   const sendToN8n = useCallback(async (file: File): Promise<WebhookResponse> => {
     if (!webhookUrl) {
