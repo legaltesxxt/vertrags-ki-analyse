@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { 
   Card,
@@ -14,7 +13,7 @@ import {
   AccordionTrigger
 } from '@/components/ui/accordion';
 import { AlertTriangle, CheckCircle, HelpCircle, ExternalLink } from 'lucide-react';
-import { AnalysisResult } from '@/hooks/useN8nWebhook';
+import { AnalysisResult } from '@/types/analysisTypes';
 
 interface WebhookAnalysisResultProps {
   result: AnalysisResult | null;
