@@ -8,14 +8,6 @@ import {
   CardTitle
 } from '@/components/ui/card';
 import { 
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow
-} from '@/components/ui/table';
-import { 
   Accordion,
   AccordionContent,
   AccordionItem,
@@ -66,6 +58,71 @@ const WebhookAnalysisResult: React.FC<WebhookAnalysisResultProps> = ({ result })
 
   return (
     <div className="space-y-6">
+      {/* Zuerst die Klauselanalyse */}
+      <h3 className="font-semibold text-xl">Klauselanalyse</h3>
+      
+      <Accordion type="single" collapsible className="w-full mb-8">
+        {result.clauses.map((clause) => (
+          <AccordionItem key={clause.id} value={clause.id}>
+            <AccordionTrigger className="hover:bg-gray-50 px-4 rounded-lg">
+              <div className="flex items-center space-x-3 text-left w-full">
+                {getRiskIcon(clause.risk)}
+                <div className="flex-1">
+                  <h4 className="font-medium">{clause.title}</h4>
+                  <p className="text-sm text-gray-500 truncate max-w-md">
+                    {clause.text && clause.text.length > 60 
+                      ? `${clause.text.substring(0, 60)}...` 
+                      : clause.text}
+                  </p>
+                </div>
+                <span className={`risk-pill ${getRiskClass(clause.risk)}`}>
+                  {clause.risk}
+                </span>
+              </div>
+            </AccordionTrigger>
+            <AccordionContent className="px-4 pt-2">
+              <div className="space-y-4">
+                <div className="p-3 bg-gray-50 rounded-lg">
+                  <h5 className="text-sm font-medium text-gray-700 mb-1">Klauseltext:</h5>
+                  <p className="text-sm">{clause.text}</p>
+                </div>
+                
+                <div>
+                  <h5 className="text-sm font-medium text-gray-700 mb-1">Analyse:</h5>
+                  <p className="text-sm">{clause.analysis}</p>
+                </div>
+                
+                {clause.lawReference && clause.lawReference.text && (
+                  <div className="p-3 bg-blue-50 rounded-lg">
+                    <h5 className="text-sm font-medium text-legal-primary mb-1">Gesetzliche Referenz:</h5>
+                    <p className="text-sm">{clause.lawReference.text}</p>
+                    {clause.lawReference.link && (
+                      <a 
+                        href={clause.lawReference.link} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-sm text-legal-secondary hover:underline inline-flex items-center mt-1"
+                      >
+                        Gesetzestext ansehen
+                        <ExternalLink className="ml-1 h-3 w-3" />
+                      </a>
+                    )}
+                  </div>
+                )}
+                
+                {clause.recommendation && (
+                  <div>
+                    <h5 className="text-sm font-medium text-gray-700 mb-1">Empfehlung:</h5>
+                    <p className="text-sm">{clause.recommendation}</p>
+                  </div>
+                )}
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+        ))}
+      </Accordion>
+
+      {/* Danach die Zusammenfassung und Risikobewertung */}
       <Card>
         <CardHeader>
           <div className="flex justify-between items-center">
@@ -104,65 +161,6 @@ const WebhookAnalysisResult: React.FC<WebhookAnalysisResultProps> = ({ result })
           </div>
         </CardContent>
       </Card>
-
-      <h3 className="font-semibold text-xl">Klauselanalyse</h3>
-      
-      <Accordion type="single" collapsible className="w-full">
-        {result.clauses.map((clause) => (
-          <AccordionItem key={clause.id} value={clause.id}>
-            <AccordionTrigger className="hover:bg-gray-50 px-4 rounded-lg">
-              <div className="flex items-center space-x-3 text-left w-full">
-                {getRiskIcon(clause.risk)}
-                <div className="flex-1">
-                  <h4 className="font-medium">{clause.title}</h4>
-                  <p className="text-sm text-gray-500 truncate max-w-md">
-                    {clause.text && clause.text.length > 60 
-                      ? `${clause.text.substring(0, 60)}...` 
-                      : clause.text}
-                  </p>
-                </div>
-                <span className={`risk-pill ${getRiskClass(clause.risk)}`}>
-                  {clause.risk}
-                </span>
-              </div>
-            </AccordionTrigger>
-            <AccordionContent className="px-4 pt-2">
-              <div className="space-y-4">
-                <div className="p-3 bg-gray-50 rounded-lg">
-                  <h5 className="text-sm font-medium text-gray-700 mb-1">Klauseltext:</h5>
-                  <p className="text-sm">{clause.text}</p>
-                </div>
-                
-                <div>
-                  <h5 className="text-sm font-medium text-gray-700 mb-1">Analyse:</h5>
-                  <p className="text-sm">{clause.analysis}</p>
-                </div>
-                
-                {clause.lawReference && (
-                  <div className="p-3 bg-blue-50 rounded-lg">
-                    <h5 className="text-sm font-medium text-legal-primary mb-1">Gesetzliche Referenz:</h5>
-                    <p className="text-sm">{clause.lawReference.text}</p>
-                    <a 
-                      href={clause.lawReference.link} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="text-sm text-legal-secondary hover:underline inline-flex items-center mt-1"
-                    >
-                      Gesetzestext ansehen
-                      <ExternalLink className="ml-1 h-3 w-3" />
-                    </a>
-                  </div>
-                )}
-                
-                <div>
-                  <h5 className="text-sm font-medium text-gray-700 mb-1">Empfehlung:</h5>
-                  <p className="text-sm">{clause.recommendation}</p>
-                </div>
-              </div>
-            </AccordionContent>
-          </AccordionItem>
-        ))}
-      </Accordion>
     </div>
   );
 };
