@@ -8,23 +8,42 @@ import { useMockAnalysis } from '@/hooks/useMockAnalysis';
 import { useN8nWebhook } from '@/hooks/useN8nWebhook';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
+import WebhookAnalysisResult from '@/components/WebhookAnalysisResult';
 
 const Index = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const { startAnalysis, resetAnalysis, isAnalyzing, progress, analysisResult } = useMockAnalysis();
-  const { sendToN8n, isLoading: isSendingToN8n } = useN8nWebhook();
+  const { startAnalysis, resetAnalysis, isAnalyzing, progress, analysisResult: mockResult } = useMockAnalysis();
+  const { sendToN8n, isLoading: isSendingToN8n, analysisResult: webhookResult } = useN8nWebhook();
+  const [useRealAnalysis, setUseRealAnalysis] = useState(true);
   const { toast } = useToast();
+
+  // Bestimme, welche Analyseergebnisse angezeigt werden sollen (Mock oder Webhook)
+  const displayResult = useRealAnalysis ? webhookResult : mockResult;
 
   const handleFileSelected = useCallback((file: File) => {
     setSelectedFile(file);
     
-    // Starte die Analyse
-    startAnalysis(file);
+    // Starte die Mock-Analyse für die Fortschrittsanzeige
+    if (!useRealAnalysis) {
+      startAnalysis(file);
+    }
     
     // Sende die Datei an n8n für die Backend-Verarbeitung
     sendToN8n(file).then(response => {
       if (response.success) {
-        console.log("Datei erfolgreich an n8n gesendet:", response.data);
+        if (response.analysisResult) {
+          console.log("Analyse erfolgreich empfangen:", response.analysisResult);
+          setUseRealAnalysis(true);
+        } else {
+          console.log("Keine Analyseergebnisse erhalten, verwende Mock-Daten");
+          toast({
+            title: "Hinweis",
+            description: "Keine Analyseergebnisse vom Server erhalten. Es werden Beispieldaten angezeigt.",
+            variant: "default",
+          });
+          setUseRealAnalysis(false);
+          startAnalysis(file);
+        }
       } else {
         console.error("Fehler beim Senden der Datei an n8n:", response.error);
         toast({
@@ -32,14 +51,20 @@ const Index = () => {
           description: "Die Datei konnte nicht zur Analyse gesendet werden. Bitte versuchen Sie es später erneut.",
           variant: "destructive",
         });
+        setUseRealAnalysis(false);
+        startAnalysis(file); // Fallback zu Mock-Daten
       }
     });
-  }, [startAnalysis, sendToN8n, toast]);
+  }, [startAnalysis, sendToN8n, toast, useRealAnalysis]);
 
   const handleReset = useCallback(() => {
     setSelectedFile(null);
     resetAnalysis();
+    setUseRealAnalysis(true);
   }, [resetAnalysis]);
+
+  // Status der Analyse, entweder von Mock oder tatsächlich ladend
+  const isCurrentlyAnalyzing = (useRealAnalysis ? isSendingToN8n : isAnalyzing);
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
@@ -51,22 +76,26 @@ const Index = () => {
 
         <div className="bg-white rounded-xl shadow-sm p-6 mb-8">
           <h2 className="text-xl font-semibold mb-4">PDF-Vertrag hochladen</h2>
-          <FileUpload onFileSelected={handleFileSelected} isAnalyzing={isAnalyzing} />
+          <FileUpload onFileSelected={handleFileSelected} isAnalyzing={isCurrentlyAnalyzing} />
         </div>
         
-        {isAnalyzing && (
+        {isCurrentlyAnalyzing && (
           <div className="bg-white rounded-xl shadow-sm p-6 mb-8">
-            <AnalysisProgress progress={progress} />
+            <AnalysisProgress progress={useRealAnalysis ? 50 : progress} />
           </div>
         )}
         
-        {analysisResult && (
+        {displayResult && (
           <div className="bg-white rounded-xl shadow-sm p-6 mb-8">
-            <ClauseAnalysis 
-              clauses={analysisResult.clauses} 
-              overallRisk={analysisResult.overallRisk}
-              summary={analysisResult.summary}
-            />
+            {useRealAnalysis ? (
+              <WebhookAnalysisResult result={webhookResult} />
+            ) : (
+              <ClauseAnalysis 
+                clauses={mockResult!.clauses} 
+                overallRisk={mockResult!.overallRisk}
+                summary={mockResult!.summary}
+              />
+            )}
             
             <div className="mt-8 flex justify-end">
               <Button variant="outline" onClick={handleReset}>
