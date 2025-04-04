@@ -1,3 +1,4 @@
+
 import React, { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
@@ -33,12 +34,21 @@ const Index = () => {
     const response = await sendToN8n(file);
       
     if (response.success) {
-      if (response.analysisResult) {
-        console.log("Analyse erfolgreich empfangen:", response.analysisResult);
+      if (response.data) {
+        console.log("Webhook-Antwort erhalten:", response.data);
         
-        // Bei Erfolg: Zeige entweder Klauselanalyse oder die Markdown-Antwort
-        if (response.data?.rawText) {
-          // Wenn es eine Textantwort gibt, navigiere zur Markdown-Ansicht
+        // Bei Erfolg: Wenn die Antwort ein Array mit einem output-Feld ist, direkt zur Markdown-Ansicht navigieren
+        if (Array.isArray(response.data) && response.data.length > 0 && response.data[0].output) {
+          navigate('/analysis-results', { 
+            state: { 
+              webhookResponse: response.data
+            }
+          });
+          return;
+        }
+        
+        // Alternativ, wenn es eine Textantwort gibt
+        if (response.data.rawText) {
           navigate('/analysis-results', { 
             state: { 
               analysisOutput: response.data.rawText 
@@ -47,7 +57,10 @@ const Index = () => {
           return;
         }
         
-        setUseRealAnalysis(true);
+        if (response.analysisResult) {
+          console.log("Analyse erfolgreich empfangen:", response.analysisResult);
+          setUseRealAnalysis(true);
+        }
       } else {
         console.log("Keine Analyseergebnisse erhalten, verwende Mock-Daten");
         toast({

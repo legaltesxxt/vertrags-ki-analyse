@@ -1,15 +1,35 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import MarkdownRenderer from '@/components/MarkdownRenderer';
 
+interface WebhookResponseItem {
+  output: string;
+}
+
 const AnalysisResults = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { analysisOutput } = location.state || { analysisOutput: '' };
+  const [analysisOutput, setAnalysisOutput] = useState('');
+
+  // Extract analysis output from location state or raw webhook response
+  useEffect(() => {
+    if (location.state) {
+      if (location.state.analysisOutput) {
+        // Direct string output from state
+        setAnalysisOutput(location.state.analysisOutput);
+      } else if (location.state.webhookResponse) {
+        // Array response from webhook
+        const response = location.state.webhookResponse;
+        if (Array.isArray(response) && response.length > 0 && response[0].output) {
+          setAnalysisOutput(response[0].output);
+        }
+      }
+    }
+  }, [location.state]);
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">

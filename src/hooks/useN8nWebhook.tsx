@@ -34,56 +34,36 @@ export function useN8nWebhook() {
       const response = await fetch(webhookUrl, {
         method: 'POST',
         body: formData,
-        // Bei Bedarf können hier weitere Header hinzugefügt werden
       });
       
       if (!response.ok) {
         throw new Error(`HTTP Error: ${response.status}`);
       }
       
-      // Prüfe, ob die Antwort JSON oder Text ist
+      // Prüfe, ob die Antwort JSON ist
       const contentType = response.headers.get('content-type');
-      let data: any;
       
       if (contentType && contentType.includes('application/json')) {
         // Wenn es JSON ist, parsen wir es als JSON
-        data = await response.json();
+        const data = await response.json();
         console.log("JSON-Antwort vom Webhook erhalten:", data);
         
-        // Wenn eine Analyse-Antwort vorhanden ist, verarbeiten wir diese
-        if (data.analysisResult) {
-          setAnalysisResult(data.analysisResult);
-          return { 
-            success: true, 
-            data, 
-            analysisResult: data.analysisResult 
-          };
-        }
+        // Direkte Weiterleitung der unveränderten Response
+        return { 
+          success: true, 
+          data, 
+        };
       } else {
         // Andernfalls versuchen wir, die Antwort als Text zu behandeln
         const responseText = await response.text();
         console.log("Text-Antwort vom Webhook erhalten:", responseText);
         
-        // Text-Antwort in ein strukturiertes Format umwandeln
-        if (responseText) {
-          try {
-            const parsedResult = parseClausesFromText(responseText);
-            console.log("Geparste Analyse-Ergebnisse:", parsedResult);
-            setAnalysisResult(parsedResult);
-            return {
-              success: true,
-              data: { rawText: responseText },
-              analysisResult: parsedResult
-            };
-          } catch (parseError) {
-            console.error("Fehler beim Parsen der Webhook-Antwort:", parseError);
-            return { success: false, error: "Konnte die Antwort nicht verarbeiten" };
-          }
-        }
+        // Text-Antwort in ein strukturiertes Format umwandeln oder direkt zurückgeben
+        return {
+          success: true,
+          data: { rawText: responseText },
+        };
       }
-      
-      // Fallback, wenn keine Ergebnisse geparst werden konnten
-      return { success: true, data: data || {} };
       
     } catch (error) {
       console.error("Fehler beim Senden zum n8n Webhook:", error);
