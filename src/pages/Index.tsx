@@ -1,5 +1,5 @@
-
 import React, { useState, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import FileUpload from '@/components/FileUpload';
 import AnalysisProgress from '@/components/AnalysisProgress';
@@ -11,6 +11,7 @@ import { useToast } from '@/components/ui/use-toast';
 import WebhookAnalysisResult from '@/components/WebhookAnalysisResult';
 
 const Index = () => {
+  const navigate = useNavigate();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const { startAnalysis, resetAnalysis, isAnalyzing, progress, analysisResult: mockResult } = useMockAnalysis();
   const { sendToN8n, isLoading: isSendingToN8n, analysisResult: webhookResult } = useN8nWebhook();
@@ -20,7 +21,7 @@ const Index = () => {
   // Bestimme, welche Analyseergebnisse angezeigt werden sollen (Mock oder Webhook)
   const displayResult = useRealAnalysis ? webhookResult : mockResult;
 
-  const handleFileSelected = useCallback((file: File) => {
+  const handleFileSelected = useCallback(async (file: File) => {
     setSelectedFile(file);
     
     // Starte die Mock-Analyse für die Fortschrittsanzeige
@@ -29,33 +30,45 @@ const Index = () => {
     }
     
     // Sende die Datei an n8n für die Backend-Verarbeitung
-    sendToN8n(file).then(response => {
-      if (response.success) {
-        if (response.analysisResult) {
-          console.log("Analyse erfolgreich empfangen:", response.analysisResult);
-          setUseRealAnalysis(true);
-        } else {
-          console.log("Keine Analyseergebnisse erhalten, verwende Mock-Daten");
-          toast({
-            title: "Hinweis",
-            description: "Keine Analyseergebnisse vom Server erhalten. Es werden Beispieldaten angezeigt.",
-            variant: "default",
+    const response = await sendToN8n(file);
+      
+    if (response.success) {
+      if (response.analysisResult) {
+        console.log("Analyse erfolgreich empfangen:", response.analysisResult);
+        
+        // Bei Erfolg: Zeige entweder Klauselanalyse oder die Markdown-Antwort
+        if (response.data?.rawText) {
+          // Wenn es eine Textantwort gibt, navigiere zur Markdown-Ansicht
+          navigate('/analysis-results', { 
+            state: { 
+              analysisOutput: response.data.rawText 
+            }
           });
-          setUseRealAnalysis(false);
-          startAnalysis(file);
+          return;
         }
+        
+        setUseRealAnalysis(true);
       } else {
-        console.error("Fehler beim Senden der Datei an n8n:", response.error);
+        console.log("Keine Analyseergebnisse erhalten, verwende Mock-Daten");
         toast({
-          title: "Fehler bei der Verarbeitung",
-          description: "Die Datei konnte nicht zur Analyse gesendet werden. Bitte versuchen Sie es später erneut.",
-          variant: "destructive",
+          title: "Hinweis",
+          description: "Keine Analyseergebnisse vom Server erhalten. Es werden Beispieldaten angezeigt.",
+          variant: "default",
         });
         setUseRealAnalysis(false);
-        startAnalysis(file); // Fallback zu Mock-Daten
+        startAnalysis(file);
       }
-    });
-  }, [startAnalysis, sendToN8n, toast, useRealAnalysis]);
+    } else {
+      console.error("Fehler beim Senden der Datei an n8n:", response.error);
+      toast({
+        title: "Fehler bei der Verarbeitung",
+        description: "Die Datei konnte nicht zur Analyse gesendet werden. Bitte versuchen Sie es später erneut.",
+        variant: "destructive",
+      });
+      setUseRealAnalysis(false);
+      startAnalysis(file); // Fallback zu Mock-Daten
+    }
+  }, [startAnalysis, sendToN8n, toast, useRealAnalysis, navigate]);
 
   const handleReset = useCallback(() => {
     setSelectedFile(null);
@@ -85,7 +98,7 @@ const Index = () => {
           </div>
         )}
         
-        {displayResult && (
+        {displayResult && !isCurrentlyAnalyzing && (
           <div className="bg-white rounded-xl shadow-sm p-6 mb-8">
             {useRealAnalysis ? (
               <WebhookAnalysisResult result={webhookResult} />
