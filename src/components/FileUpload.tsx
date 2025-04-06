@@ -1,7 +1,7 @@
 
 import React, { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { FileText, Upload } from 'lucide-react';
+import { FileText, Upload, X, FileCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
 import { Progress } from '@/components/ui/progress';
@@ -53,8 +53,11 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileSelected, isAnalyzing }) 
     <div className="w-full">
       <div 
         {...getRootProps()} 
-        className={`border-2 border-dashed rounded-lg p-8 flex flex-col items-center justify-center cursor-pointer transition-colors
-          ${isDragActive ? 'border-legal-secondary bg-legal-light/50' : 'border-gray-300 hover:border-legal-secondary hover:bg-legal-light/20'}
+        className={`border-2 border-dashed rounded-lg p-12 flex flex-col items-center justify-center cursor-pointer transition-all
+          ${isDragActive 
+            ? 'border-legal-secondary bg-legal-tertiary/50' 
+            : 'border-slate-200 hover:border-legal-secondary hover:bg-legal-tertiary/20'
+          }
           ${isAnalyzing ? 'opacity-50 cursor-not-allowed' : ''}
         `}
       >
@@ -62,24 +65,28 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileSelected, isAnalyzing }) 
         
         {file ? (
           <div className="text-center">
-            <FileText className="mx-auto h-12 w-12 text-legal-secondary mb-2" />
-            <p className="text-sm font-medium">{file.name}</p>
-            <p className="text-xs text-gray-500">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
+            <div className="w-16 h-16 bg-legal-tertiary rounded-full flex items-center justify-center mx-auto mb-4">
+              <FileCheck className="h-8 w-8 text-legal-primary" />
+            </div>
+            <h3 className="text-lg font-medium text-gray-800 mb-1">{file.name}</h3>
+            <p className="text-sm text-gray-500">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
           </div>
         ) : (
           <div className="text-center">
-            <Upload className="mx-auto h-12 w-12 text-gray-400 mb-2" />
-            <p className="font-medium">
-              {isDragActive ? "Dateien hier ablegen..." : "PDF-Datei hochladen"}
-            </p>
-            <p className="text-sm text-gray-500 mt-1">
-              Ziehen Sie eine Datei hierher oder klicken Sie, um eine Datei auszuwählen
+            <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Upload className="h-8 w-8 text-gray-400" />
+            </div>
+            <h3 className="text-lg font-medium text-gray-800 mb-1">
+              {isDragActive ? "PDF hier ablegen..." : "PDF-Datei hochladen"}
+            </h3>
+            <p className="text-sm text-gray-500 mt-1 max-w-md mx-auto">
+              Ziehen Sie eine PDF-Datei hierher oder klicken Sie, um einen Vertrag zur Analyse auszuwählen
             </p>
           </div>
         )}
 
         {uploadProgress > 0 && uploadProgress < 100 && (
-          <div className="w-full mt-4">
+          <div className="w-full max-w-md mt-6">
             <Progress value={uploadProgress} className="h-2" />
             <p className="text-xs text-gray-500 mt-1 text-center">{uploadProgress}% hochgeladen</p>
           </div>
@@ -87,21 +94,23 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileSelected, isAnalyzing }) 
       </div>
 
       {file && !isAnalyzing && uploadProgress === 100 && (
-        <div className="mt-4 flex justify-end">
+        <div className="mt-6 flex flex-wrap gap-3 justify-center">
           <Button 
             onClick={() => {
               setFile(null);
               setUploadProgress(0);
             }}
             variant="outline" 
-            className="mr-2"
+            className="flex items-center gap-2"
           >
+            <X size={16} />
             Datei entfernen
           </Button>
           <Button 
             onClick={() => onFileSelected(file)}
-            className="bg-legal-primary hover:bg-legal-secondary"
+            className="bg-legal-primary hover:bg-legal-secondary flex items-center gap-2"
           >
+            <FileText size={16} />
             Analyse starten
           </Button>
         </div>

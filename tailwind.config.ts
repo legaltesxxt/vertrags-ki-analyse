@@ -19,6 +19,9 @@ export default {
 			}
 		},
 		extend: {
+			fontFamily: {
+				sans: ['Inter', 'system-ui', 'sans-serif'],
+			},
 			colors: {
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
@@ -63,15 +66,16 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-				// Legal-spezifische Farben
+				// Legal-spezifische Farben - modernisiert und professioneller
 				legal: {
-					primary: '#1A365D',
-					secondary: '#2A4365',
-					light: '#EBF8FF',
+					primary: '#005B7F',    // Petrol-Blau für professionellen Look
+					secondary: '#0F83A9',  // Helles Petrol für Sekundärelemente
+					tertiary: '#E5F4F9',   // Sehr helles Petrol für Hintergründe
+					light: '#F5FBFD',      // Fast weißes Petrol für Hintergründe
 					risk: {
-						low: '#38A169',    // Grün für niedriges Risiko
-						medium: '#DD6B20', // Orange für mittleres Risiko
-						high: '#E53E3E',   // Rot für hohes Risiko
+						low: '#3DA35D',     // Grün für niedriges Risiko
+						medium: '#F0A04B',  // Orange für mittleres Risiko
+						high: '#E15759',    // Rot für hohes Risiko
 					}
 				}
 			},
@@ -100,12 +104,17 @@ export default {
 				'pulse-gentle': {
 					'0%, 100%': { opacity: '1' },
 					'50%': { opacity: '0.7' },
+				},
+				'fade-in': {
+					'0%': { opacity: '0' },
+					'100%': { opacity: '1' },
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
 				'accordion-up': 'accordion-up 0.2s ease-out',
 				'pulse-gentle': 'pulse-gentle 2s ease-in-out infinite',
+				'fade-in': 'fade-in 0.6s ease-out',
 			}
 		}
 	},
