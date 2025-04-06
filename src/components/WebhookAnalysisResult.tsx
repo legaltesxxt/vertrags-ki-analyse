@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { 
   Card,
@@ -14,6 +15,7 @@ import {
 } from '@/components/ui/accordion';
 import { AlertTriangle, CheckCircle, HelpCircle, ExternalLink } from 'lucide-react';
 import { AnalysisResult } from '@/types/analysisTypes';
+import RiskMeter from './RiskMeter';
 
 interface WebhookAnalysisResultProps {
   result: AnalysisResult | null;
@@ -74,9 +76,12 @@ const WebhookAnalysisResult: React.FC<WebhookAnalysisResultProps> = ({ result })
                       : clause.text}
                   </p>
                 </div>
-                <span className={`risk-pill ${getRiskClass(clause.risk)}`}>
-                  {clause.risk}
-                </span>
+                <div className="flex items-center gap-3">
+                  <RiskMeter risk={clause.risk} size="sm" showLabel={false} />
+                  <span className={`risk-pill ${getRiskClass(clause.risk)}`}>
+                    {clause.risk}
+                  </span>
+                </div>
               </div>
             </AccordionTrigger>
             <AccordionContent className="px-4 pt-2">
@@ -86,9 +91,14 @@ const WebhookAnalysisResult: React.FC<WebhookAnalysisResultProps> = ({ result })
                   <p className="text-sm">{clause.text}</p>
                 </div>
                 
-                <div>
-                  <h5 className="text-sm font-medium text-gray-700 mb-1">Analyse:</h5>
-                  <p className="text-sm">{clause.analysis}</p>
+                <div className="flex flex-col md:flex-row md:items-start gap-4">
+                  <div className="flex-1">
+                    <h5 className="text-sm font-medium text-gray-700 mb-1">Analyse:</h5>
+                    <p className="text-sm">{clause.analysis}</p>
+                  </div>
+                  <div className="md:w-36 flex justify-center">
+                    <RiskMeter risk={clause.risk} size="md" />
+                  </div>
                 </div>
                 
                 {clause.lawReference && clause.lawReference.text && (
@@ -129,7 +139,8 @@ const WebhookAnalysisResult: React.FC<WebhookAnalysisResultProps> = ({ result })
               <CardTitle>Vertragsanalyse</CardTitle>
               <CardDescription>Zusammenfassung und Risikobewertung</CardDescription>
             </div>
-            <div>
+            <div className="flex items-center gap-4">
+              <RiskMeter risk={result.overallRisk} size="md" showLabel={false} />
               <span className={`risk-pill ${getRiskClass(result.overallRisk)}`}>
                 Gesamtrisiko: {result.overallRisk}
               </span>
@@ -138,7 +149,14 @@ const WebhookAnalysisResult: React.FC<WebhookAnalysisResultProps> = ({ result })
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            <p className="text-gray-700">{result.summary}</p>
+            <div className="flex flex-col md:flex-row gap-6">
+              <div className="flex-1">
+                <p className="text-gray-700">{result.summary}</p>
+              </div>
+              <div className="md:w-48 flex justify-center">
+                <RiskMeter risk={result.overallRisk} size="lg" />
+              </div>
+            </div>
             
             <div className="bg-gray-50 rounded-lg p-4 mt-4">
               <h3 className="text-sm font-medium mb-2">Risiko-Übersicht</h3>

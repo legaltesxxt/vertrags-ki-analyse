@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/accordion';
 import { AlertTriangle, CheckCircle, HelpCircle, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import RiskMeter from './RiskMeter';
 
 interface Clause {
   id: string;
@@ -73,7 +74,8 @@ const ClauseAnalysis: React.FC<ClauseAnalysisProps> = ({ clauses, overallRisk, s
               <CardTitle>Vertragsanalyse</CardTitle>
               <CardDescription>Zusammenfassung und Risikobewertung</CardDescription>
             </div>
-            <div>
+            <div className="flex items-center gap-4">
+              <RiskMeter risk={overallRisk} size="md" showLabel={false} />
               <span className={`risk-pill ${getRiskClass(overallRisk)}`}>
                 Gesamtrisiko: {overallRisk}
               </span>
@@ -81,7 +83,14 @@ const ClauseAnalysis: React.FC<ClauseAnalysisProps> = ({ clauses, overallRisk, s
           </div>
         </CardHeader>
         <CardContent>
-          <p className="text-gray-700">{summary}</p>
+          <div className="flex flex-col md:flex-row gap-6">
+            <div className="flex-1">
+              <p className="text-gray-700">{summary}</p>
+            </div>
+            <div className="md:w-48 flex justify-center">
+              <RiskMeter risk={overallRisk} size="lg" />
+            </div>
+          </div>
         </CardContent>
       </Card>
 
@@ -97,9 +106,12 @@ const ClauseAnalysis: React.FC<ClauseAnalysisProps> = ({ clauses, overallRisk, s
                   <h4 className="font-medium">{clause.title}</h4>
                   <p className="text-sm text-gray-500 truncate max-w-md">{clause.text.substring(0, 60)}...</p>
                 </div>
-                <span className={`risk-pill ${getRiskClass(clause.risk)}`}>
-                  {clause.risk}
-                </span>
+                <div className="flex items-center gap-3">
+                  <RiskMeter risk={clause.risk} size="sm" showLabel={false} />
+                  <span className={`risk-pill ${getRiskClass(clause.risk)}`}>
+                    {clause.risk}
+                  </span>
+                </div>
               </div>
             </AccordionTrigger>
             <AccordionContent className="px-4 pt-2">
@@ -109,9 +121,14 @@ const ClauseAnalysis: React.FC<ClauseAnalysisProps> = ({ clauses, overallRisk, s
                   <p className="text-sm">{clause.text}</p>
                 </div>
                 
-                <div>
-                  <h5 className="text-sm font-medium text-gray-700 mb-1">Analyse:</h5>
-                  <p className="text-sm">{clause.analysis}</p>
+                <div className="flex flex-col md:flex-row md:items-start gap-4">
+                  <div className="flex-1">
+                    <h5 className="text-sm font-medium text-gray-700 mb-1">Analyse:</h5>
+                    <p className="text-sm">{clause.analysis}</p>
+                  </div>
+                  <div className="md:w-36 flex justify-center">
+                    <RiskMeter risk={clause.risk} size="md" />
+                  </div>
                 </div>
                 
                 <div className="p-3 bg-blue-50 rounded-lg">

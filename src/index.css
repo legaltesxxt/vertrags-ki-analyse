@@ -85,6 +85,19 @@
   @apply bg-legal-risk-high;
 }
 
+/* Risk Meter Styles */
+.risk-meter-wrapper {
+  @apply relative;
+}
+
+.risk-meter-arc {
+  @apply rounded-t-full overflow-hidden;
+}
+
+.risk-meter-needle {
+  @apply absolute bottom-0 left-1/2 -translate-x-1/2 origin-bottom transition-transform duration-700;
+}
+
 /* Swiss-style Card */
 .swiss-card {
   @apply bg-white rounded-lg border border-border/80 shadow-sm hover:shadow-md transition-shadow duration-300;
