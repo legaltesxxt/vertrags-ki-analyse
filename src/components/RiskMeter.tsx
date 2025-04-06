@@ -63,7 +63,7 @@ const RiskMeter: React.FC<RiskMeterProps> = ({
         {/* Der Zeiger */}
         <div 
           className={cn(
-            "absolute bottom-0 left-1/2 -translate-x-1/2 origin-bottom rounded-t bg-gray-700",
+            "absolute bottom-0 left-1/2 -translate-x-1/2 origin-bottom rounded-t bg-gray-700 transition-transform duration-300",
             pointerSizeClasses[size]
           )}
           style={{ transform: `translateX(-50%) rotate(${rotationDegrees[risk]}deg)` }}
