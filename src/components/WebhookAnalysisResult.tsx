@@ -13,7 +13,7 @@ import {
   AccordionItem,
   AccordionTrigger
 } from '@/components/ui/accordion';
-import { AlertTriangle, CheckCircle, ExternalLink } from 'lucide-react';
+import { AlertTriangle, CheckCircle, HelpCircle, ExternalLink } from 'lucide-react';
 import { AnalysisResult } from '@/types/analysisTypes';
 import RiskMeter from './RiskMeter';
 
@@ -33,7 +33,7 @@ const WebhookAnalysisResult: React.FC<WebhookAnalysisResultProps> = ({ result })
       case 'hoch':
         return <AlertTriangle className="h-5 w-5 text-legal-risk-high" />;
       default:
-        return <CheckCircle className="h-5 w-5 text-gray-400" />;
+        return <HelpCircle className="h-5 w-5 text-gray-400" />;
     }
   };
 

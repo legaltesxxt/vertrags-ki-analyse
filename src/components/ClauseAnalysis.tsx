@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { 
   Card, 
   CardContent, 
@@ -13,7 +13,8 @@ import {
   AccordionItem,
   AccordionTrigger
 } from '@/components/ui/accordion';
-import { AlertTriangle, CheckCircle, ExternalLink } from 'lucide-react';
+import { AlertTriangle, CheckCircle, HelpCircle, ExternalLink } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import RiskMeter from './RiskMeter';
 
 interface Clause {
@@ -36,6 +37,8 @@ interface ClauseAnalysisProps {
 }
 
 const ClauseAnalysis: React.FC<ClauseAnalysisProps> = ({ clauses, overallRisk, summary }) => {
+  const [selectedClause, setSelectedClause] = useState<string | null>(null);
+
   const getRiskIcon = (risk: 'niedrig' | 'mittel' | 'hoch') => {
     switch (risk) {
       case 'niedrig':
@@ -45,7 +48,7 @@ const ClauseAnalysis: React.FC<ClauseAnalysisProps> = ({ clauses, overallRisk, s
       case 'hoch':
         return <AlertTriangle className="h-5 w-5 text-legal-risk-high" />;
       default:
-        return <CheckCircle className="h-5 w-5 text-gray-400" />;
+        return <HelpCircle className="h-5 w-5 text-gray-400" />;
     }
   };
 
@@ -60,13 +63,6 @@ const ClauseAnalysis: React.FC<ClauseAnalysisProps> = ({ clauses, overallRisk, s
       default:
         return '';
     }
-  };
-
-  // Zähle die Klauseln nach Risikostufe
-  const riskCounts = {
-    niedrig: clauses.filter(c => c.risk === 'niedrig').length,
-    mittel: clauses.filter(c => c.risk === 'mittel').length,
-    hoch: clauses.filter(c => c.risk === 'hoch').length
   };
 
   return (
@@ -95,24 +91,6 @@ const ClauseAnalysis: React.FC<ClauseAnalysisProps> = ({ clauses, overallRisk, s
               <RiskMeter risk={overallRisk} size="lg" />
             </div>
           </div>
-          
-          <div className="bg-gray-50 rounded-lg p-4 mt-4">
-            <h3 className="text-sm font-medium mb-2">Risiko-Übersicht</h3>
-            <div className="grid grid-cols-3 gap-2 text-center">
-              <div className="bg-legal-risk-low/20 p-3 rounded">
-                <span className="text-xl font-bold text-legal-risk-low">{riskCounts.niedrig}</span>
-                <p className="text-sm">Niedriges Risiko</p>
-              </div>
-              <div className="bg-legal-risk-medium/20 p-3 rounded">
-                <span className="text-xl font-bold text-legal-risk-medium">{riskCounts.mittel}</span>
-                <p className="text-sm">Mittleres Risiko</p>
-              </div>
-              <div className="bg-legal-risk-high/20 p-3 rounded">
-                <span className="text-xl font-bold text-legal-risk-high">{riskCounts.hoch}</span>
-                <p className="text-sm">Hohes Risiko</p>
-              </div>
-            </div>
-          </div>
         </CardContent>
       </Card>
 
@@ -126,9 +104,7 @@ const ClauseAnalysis: React.FC<ClauseAnalysisProps> = ({ clauses, overallRisk, s
                 {getRiskIcon(clause.risk)}
                 <div className="flex-1">
                   <h4 className="font-medium">{clause.title}</h4>
-                  <p className="text-sm text-gray-500 truncate max-w-md">
-                    {clause.text.length > 60 ? `${clause.text.substring(0, 60)}...` : clause.text}
-                  </p>
+                  <p className="text-sm text-gray-500 truncate max-w-md">{clause.text.substring(0, 60)}...</p>
                 </div>
                 <div className="flex items-center gap-3">
                   <RiskMeter risk={clause.risk} size="sm" showLabel={false} />
@@ -155,30 +131,24 @@ const ClauseAnalysis: React.FC<ClauseAnalysisProps> = ({ clauses, overallRisk, s
                   </div>
                 </div>
                 
-                {clause.lawReference && clause.lawReference.text && (
-                  <div className="p-3 bg-blue-50 rounded-lg">
-                    <h5 className="text-sm font-medium text-legal-primary mb-1">Gesetzliche Referenz:</h5>
-                    <p className="text-sm">{clause.lawReference.text}</p>
-                    {clause.lawReference.link && (
-                      <a 
-                        href={clause.lawReference.link} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="text-sm text-legal-secondary hover:underline inline-flex items-center mt-1"
-                      >
-                        Gesetzestext ansehen
-                        <ExternalLink className="ml-1 h-3 w-3" />
-                      </a>
-                    )}
-                  </div>
-                )}
+                <div className="p-3 bg-blue-50 rounded-lg">
+                  <h5 className="text-sm font-medium text-legal-primary mb-1">Gesetzliche Referenz:</h5>
+                  <p className="text-sm">{clause.lawReference.text}</p>
+                  <a 
+                    href={clause.lawReference.link} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-sm text-legal-secondary hover:underline inline-flex items-center mt-1"
+                  >
+                    Gesetzestext ansehen
+                    <ExternalLink className="ml-1 h-3 w-3" />
+                  </a>
+                </div>
                 
-                {clause.recommendation && (
-                  <div>
-                    <h5 className="text-sm font-medium text-gray-700 mb-1">Empfehlung:</h5>
-                    <p className="text-sm">{clause.recommendation}</p>
-                  </div>
-                )}
+                <div>
+                  <h5 className="text-sm font-medium text-gray-700 mb-1">Empfehlung:</h5>
+                  <p className="text-sm">{clause.recommendation}</p>
+                </div>
               </div>
             </AccordionContent>
           </AccordionItem>
