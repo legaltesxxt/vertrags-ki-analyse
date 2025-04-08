@@ -8,13 +8,7 @@ export function parseClausesFromText(responseText: string): AnalysisResult {
   console.log("Verarbeite Text-Antwort vom Webhook");
   
   // Regex-Muster zum Erkennen von Klauseln
-  const clauseRegex = /###\s*(\d+)\.\s*Klausel:\s*(.*?)\n\*\*Klauseltext:\*\*(.*?)\n\*\*Analyse:\*\*(.*?)(?:\n\*\*Gesetzliche Referenz:\*\*\s*\[(.*?)\]\((.*?)\))?(?:\n\*\*Empfehlung:\*\*)?(.*?)(?=\n---|\n###|$)/gs;
-  
-  // Regex-Muster für die allgemeine Risikoeinschätzung
-  const riskAssessmentRegex = /Risikoeinschätzung:(.*?)(?:-\s*Handlungsempfehlung:|$)/s;
-  
-  // Regex-Muster für die Handlungsempfehlung
-  const recommendationRegex = /-\s*Handlungsempfehlung:(.*?)$/s;
+  const clauseRegex = /###\s*Klausel\s*(\d+):\s*(.*?)\s*\n\*\*Klauseltext:\*\*\s*(.*?)\s*\n\n\*\*Analyse:\*\*\s*(.*?)\s*\n\n\*\*Risiko-Einstufung:\*\*\s*(.*?)\s*\n\n\*\*Gesetzliche Referenz:\*\*\s*(.*?)\s*\n\n\*\*Handlungsbedarf:\*\*\s*(.*?)(?=\n---|\n###|$)/gs;
   
   const clauses: AnalysisResult['clauses'] = [];
   let match;
@@ -23,22 +17,34 @@ export function parseClausesFromText(responseText: string): AnalysisResult {
   while ((match = clauseRegex.exec(responseText)) !== null) {
     const id = match[1] || '';
     const title = match[2] ? match[2].trim() : '';
-    const text = match[3] ? match[3].trim() : '';
+    const text = match[3] ? match[3].trim().replace(/^"|"$/g, '') : '';
     const analysis = match[4] ? match[4].trim() : '';
-    const lawRefText = match[5] ? match[5].trim() : '';
-    const lawRefLink = match[6] ? match[6].trim() : '';
+    const riskEvaluation = match[5] ? match[5].trim() : '';
+    const lawReference = match[6] ? match[6].trim() : '';
     const recommendation = match[7] ? match[7].trim() : '';
     
-    // Risiko basierend auf Inhalt bestimmen
+    // Risiko basierend auf Risiko-Einstufung bestimmen
     let risk: 'niedrig' | 'mittel' | 'hoch' = 'niedrig';
-    if (analysis.toLowerCase().includes('problematisch') || 
-        analysis.toLowerCase().includes('anfechtbar') || 
-        analysis.toLowerCase().includes('nicht konform')) {
+    if (riskEvaluation.toLowerCase().includes('kritisch') || 
+        riskEvaluation.toLowerCase().includes('hoch')) {
       risk = 'hoch';
-    } else if (analysis.toLowerCase().includes('beachten') || 
-               analysis.toLowerCase().includes('könnte') || 
-               analysis.toLowerCase().includes('möglicherweise')) {
+    } else if (riskEvaluation.toLowerCase().includes('prüfen') || 
+               riskEvaluation.toLowerCase().includes('mittel') ||
+               riskEvaluation.toLowerCase().includes('beachten')) {
       risk = 'mittel';
+    } else if (riskEvaluation.toLowerCase().includes('unbedenklich') ||
+               riskEvaluation.toLowerCase().includes('niedrig')) {
+      risk = 'niedrig';
+    }
+    
+    // Gesetzliche Referenz extrahieren
+    let lawReferenceText = '';
+    let lawReferenceLink = '';
+    
+    // Versuchen, den Link und Text zu extrahieren
+    const refMatches = lawReference.match(/\*\*(.*?):\*\*\s*(.*?)(?=\n|$)/gm);
+    if (refMatches && refMatches.length > 0) {
+      lawReferenceText = lawReference;
     }
     
     clauses.push({
@@ -48,35 +54,35 @@ export function parseClausesFromText(responseText: string): AnalysisResult {
       risk,
       analysis,
       lawReference: {
-        text: lawRefText,
-        link: lawRefLink
+        text: lawReferenceText,
+        link: lawReferenceLink
       },
       recommendation
     });
   }
   
-  // Extrahieren der Risikoeinschätzung
-  const riskMatch = riskAssessmentRegex.exec(responseText);
-  const riskText = riskMatch ? riskMatch[1].trim() : '';
-  
-  // Extrahieren der Handlungsempfehlung
-  const recommendationMatch = recommendationRegex.exec(responseText);
-  const recommendationText = recommendationMatch ? recommendationMatch[1].trim() : '';
-  
-  // Gesamtrisiko bestimmen
+  // Gesamtrisiko berechnen basierend auf der Anzahl der hochriskanten Klauseln
   let overallRisk: 'niedrig' | 'mittel' | 'hoch' = 'niedrig';
-  if (riskText.toLowerCase().includes('problematisch') || 
-      riskText.toLowerCase().includes('nicht vollständig konform') ||
-      riskText.toLowerCase().includes('hohe')) {
+  const riskCounts = {
+    hoch: clauses.filter(c => c.risk === 'hoch').length,
+    mittel: clauses.filter(c => c.risk === 'mittel').length,
+    niedrig: clauses.filter(c => c.risk === 'niedrig').length
+  };
+  
+  if (riskCounts.hoch > 0) {
     overallRisk = 'hoch';
-  } else if (riskText.toLowerCase().includes('teilweise') || 
-            riskText.toLowerCase().includes('mittlere') ||
-            riskText.toLowerCase().includes('möglicherweise')) {
+  } else if (riskCounts.mittel > 0) {
     overallRisk = 'mittel';
   }
   
-  // Zusammenfassung erstellen aus Risiko und Handlungsempfehlung
-  const summary = `${riskText} ${recommendationText}`.trim();
+  // Zusammenfassung erstellen basierend auf der Analyse
+  const summary = `Der Vertrag enthält ${clauses.length} geprüfte Klauseln. 
+    ${riskCounts.niedrig} Klauseln sind unbedenklich, 
+    ${riskCounts.mittel} Klauseln sind zu prüfen und 
+    ${riskCounts.hoch} Klauseln sind kritisch zu betrachten. 
+    ${overallRisk === 'niedrig' ? 'Der Vertrag ist insgesamt unbedenklich.' : 
+      overallRisk === 'mittel' ? 'Der Vertrag enthält einige Punkte, die geprüft werden sollten.' : 
+      'Der Vertrag enthält kritische Punkte, die überarbeitet werden sollten.'}`;
   
   return {
     clauses,
