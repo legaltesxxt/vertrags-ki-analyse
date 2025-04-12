@@ -45,6 +45,9 @@ const ClauseItem: React.FC<ClauseItemProps> = ({ clause }) => {
     }
   };
 
+  // Determine if this clause needs the orange box
+  const isFraglich = clause.risk === 'Rechtlich fraglich' || clause.risk === 'mittel';
+
   return (
     <AccordionItem key={clause.id} value={clause.id}>
       <AccordionTrigger className="hover:bg-gray-50 px-4 rounded-lg">
@@ -64,7 +67,7 @@ const ClauseItem: React.FC<ClauseItemProps> = ({ clause }) => {
         </div>
       </AccordionTrigger>
       <AccordionContent className="px-4 pt-2">
-        <div className="space-y-4">
+        <div className={`space-y-4 ${isFraglich ? 'p-3 border-2 border-legal-risk-medium bg-legal-risk-medium/10 rounded-lg' : ''}`}>
           <div className="p-3 bg-gray-50 rounded-lg">
             <h5 className="text-sm font-medium text-gray-700 mb-1">Klauseltext:</h5>
             <p className="text-sm">{clause.text}</p>

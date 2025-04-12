@@ -4,38 +4,20 @@ import { ClauseAnalysisProps } from '@/types/analysisTypes';
 import ClauseList from './analysis/ClauseList';
 import AnalysisSummary from './analysis/AnalysisSummary';
 
-// We need to add this interface to the types file
-<lov-write file_path="src/types/analysisTypes.ts">
-// Definitionen für die Analyse-Ergebnisse
+const ClauseAnalysis: React.FC<ClauseAnalysisProps> = ({ clauses, overallRisk, summary }) => {
+  return (
+    <div className="space-y-6">
+      {/* First show clause analysis */}
+      <ClauseList clauses={clauses} />
 
-export interface AnalysisClause {
-  id: string;
-  title: string;
-  text: string;
-  risk: 'niedrig' | 'mittel' | 'hoch' | 'Rechtskonform' | 'Rechtlich fraglich' | 'Rechtlich unzulässig';
-  analysis: string;
-  lawReference: {
-    text: string;
-    link: string;
-  };
-  recommendation: string;
-}
+      {/* Then show summary and risk assessment */}
+      <AnalysisSummary 
+        summary={summary} 
+        overallRisk={overallRisk} 
+        clauses={clauses} 
+      />
+    </div>
+  );
+};
 
-export interface AnalysisResult {
-  clauses: AnalysisClause[];
-  overallRisk: 'niedrig' | 'mittel' | 'hoch' | 'Rechtskonform' | 'Rechtlich fraglich' | 'Rechtlich unzulässig';
-  summary: string;
-}
-
-export interface ClauseAnalysisProps {
-  clauses: AnalysisClause[];
-  overallRisk: 'niedrig' | 'mittel' | 'hoch' | 'Rechtskonform' | 'Rechtlich fraglich' | 'Rechtlich unzulässig';
-  summary: string;
-}
-
-export interface WebhookResponse {
-  success: boolean;
-  data?: any;
-  error?: string;
-  analysisResult?: AnalysisResult;
-}
+export default ClauseAnalysis;
