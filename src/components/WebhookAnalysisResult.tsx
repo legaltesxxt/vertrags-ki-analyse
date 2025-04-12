@@ -1,8 +1,21 @@
 
 import React from 'react';
+import { 
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle
+} from '@/components/ui/card';
+import { 
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger
+} from '@/components/ui/accordion';
+import { AlertTriangle, CheckCircle, HelpCircle, ExternalLink } from 'lucide-react';
 import { AnalysisResult } from '@/types/analysisTypes';
-import ClauseList from './analysis/ClauseList';
-import AnalysisSummary from './analysis/AnalysisSummary';
+import RiskMeter from './RiskMeter';
 
 interface WebhookAnalysisResultProps {
   result: AnalysisResult | null;
@@ -11,17 +24,160 @@ interface WebhookAnalysisResultProps {
 const WebhookAnalysisResult: React.FC<WebhookAnalysisResultProps> = ({ result }) => {
   if (!result) return null;
 
+  const getRiskIcon = (risk: 'niedrig' | 'mittel' | 'hoch') => {
+    switch (risk) {
+      case 'niedrig':
+        return <CheckCircle className="h-5 w-5 text-legal-risk-low" />;
+      case 'mittel':
+        return <AlertTriangle className="h-5 w-5 text-legal-risk-medium" />;
+      case 'hoch':
+        return <AlertTriangle className="h-5 w-5 text-legal-risk-high" />;
+      default:
+        return <HelpCircle className="h-5 w-5 text-gray-400" />;
+    }
+  };
+
+  const getRiskClass = (risk: 'niedrig' | 'mittel' | 'hoch') => {
+    switch (risk) {
+      case 'niedrig':
+        return 'risk-low';
+      case 'mittel':
+        return 'risk-medium';
+      case 'hoch':
+        return 'risk-high';
+      default:
+        return '';
+    }
+  };
+
+  // Zähle die Klauseln nach Risikostufe
+  const riskCounts = {
+    niedrig: result.clauses.filter(c => c.risk === 'niedrig').length,
+    mittel: result.clauses.filter(c => c.risk === 'mittel').length,
+    hoch: result.clauses.filter(c => c.risk === 'hoch').length
+  };
+
   return (
     <div className="space-y-6">
       {/* Zuerst die Klauselanalyse */}
-      <ClauseList clauses={result.clauses} />
+      <h3 className="font-semibold text-xl">Klauselanalyse</h3>
+      
+      <Accordion type="single" collapsible className="w-full mb-8">
+        {result.clauses.map((clause) => (
+          <AccordionItem key={clause.id} value={clause.id}>
+            <AccordionTrigger className="hover:bg-gray-50 px-4 rounded-lg">
+              <div className="flex items-center space-x-3 text-left w-full">
+                {getRiskIcon(clause.risk)}
+                <div className="flex-1">
+                  <h4 className="font-medium">{clause.title}</h4>
+                  <p className="text-sm text-gray-500 truncate max-w-md">
+                    {clause.text && clause.text.length > 60 
+                      ? `${clause.text.substring(0, 60)}...` 
+                      : clause.text}
+                  </p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <RiskMeter risk={clause.risk} size="sm" showLabel={false} />
+                  <span className={`risk-pill ${getRiskClass(clause.risk)}`}>
+                    {clause.risk}
+                  </span>
+                </div>
+              </div>
+            </AccordionTrigger>
+            <AccordionContent className="px-4 pt-2">
+              <div className="space-y-4">
+                <div className="p-3 bg-gray-50 rounded-lg">
+                  <h5 className="text-sm font-medium text-gray-700 mb-1">Klauseltext:</h5>
+                  <p className="text-sm">{clause.text}</p>
+                </div>
+                
+                <div className="flex flex-col md:flex-row md:items-start gap-4">
+                  <div className="flex-1">
+                    <h5 className="text-sm font-medium text-gray-700 mb-1">Analyse:</h5>
+                    <p className="text-sm">{clause.analysis}</p>
+                  </div>
+                  <div className="md:w-36 flex justify-center">
+                    <RiskMeter risk={clause.risk} size="md" />
+                  </div>
+                </div>
+                
+                {clause.lawReference && clause.lawReference.text && (
+                  <div className="p-3 bg-blue-50 rounded-lg">
+                    <h5 className="text-sm font-medium text-legal-primary mb-1">Gesetzliche Referenz:</h5>
+                    <p className="text-sm">{clause.lawReference.text}</p>
+                    {clause.lawReference.link && (
+                      <a 
+                        href={clause.lawReference.link} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-sm text-legal-secondary hover:underline inline-flex items-center mt-1"
+                      >
+                        Gesetzestext ansehen
+                        <ExternalLink className="ml-1 h-3 w-3" />
+                      </a>
+                    )}
+                  </div>
+                )}
+                
+                {clause.recommendation && (
+                  <div>
+                    <h5 className="text-sm font-medium text-gray-700 mb-1">Empfehlung:</h5>
+                    <p className="text-sm">{clause.recommendation}</p>
+                  </div>
+                )}
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+        ))}
+      </Accordion>
 
       {/* Danach die Zusammenfassung und Risikobewertung */}
-      <AnalysisSummary 
-        summary={result.summary} 
-        overallRisk={result.overallRisk} 
-        clauses={result.clauses} 
-      />
+      <Card>
+        <CardHeader>
+          <div className="flex justify-between items-center">
+            <div>
+              <CardTitle>Vertragsanalyse</CardTitle>
+              <CardDescription>Zusammenfassung und Risikobewertung</CardDescription>
+            </div>
+            <div className="flex items-center gap-4">
+              <RiskMeter risk={result.overallRisk} size="md" showLabel={false} />
+              <span className={`risk-pill ${getRiskClass(result.overallRisk)}`}>
+                Gesamtrisiko: {result.overallRisk}
+              </span>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <div className="flex flex-col md:flex-row gap-6">
+              <div className="flex-1">
+                <p className="text-gray-700">{result.summary}</p>
+              </div>
+              <div className="md:w-48 flex justify-center">
+                <RiskMeter risk={result.overallRisk} size="lg" />
+              </div>
+            </div>
+            
+            <div className="bg-gray-50 rounded-lg p-4 mt-4">
+              <h3 className="text-sm font-medium mb-2">Risiko-Übersicht</h3>
+              <div className="grid grid-cols-3 gap-2 text-center">
+                <div className="bg-legal-risk-low/20 p-3 rounded">
+                  <span className="text-xl font-bold text-legal-risk-low">{riskCounts.niedrig}</span>
+                  <p className="text-sm">Niedriges Risiko</p>
+                </div>
+                <div className="bg-legal-risk-medium/20 p-3 rounded">
+                  <span className="text-xl font-bold text-legal-risk-medium">{riskCounts.mittel}</span>
+                  <p className="text-sm">Mittleres Risiko</p>
+                </div>
+                <div className="bg-legal-risk-high/20 p-3 rounded">
+                  <span className="text-xl font-bold text-legal-risk-high">{riskCounts.hoch}</span>
+                  <p className="text-sm">Hohes Risiko</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };

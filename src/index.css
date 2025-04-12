@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -84,6 +85,19 @@
   @apply bg-legal-risk-high;
 }
 
+/* Risk Meter Styles */
+.risk-meter-wrapper {
+  @apply relative;
+}
+
+.risk-meter-arc {
+  @apply rounded-t-full overflow-hidden;
+}
+
+.risk-meter-needle {
+  @apply absolute bottom-0 left-1/2 -translate-x-1/2 origin-bottom transition-transform duration-700;
+}
+
 /* Swiss-style Card */
 .swiss-card {
   @apply bg-white rounded-lg border border-border/80 shadow-sm hover:shadow-md transition-shadow duration-300;
@@ -97,28 +111,6 @@
 /* Typography */
 h1, h2, h3, h4, h5, h6 {
   @apply tracking-tight;
-}
-
-/* Simplified Analysis Box Style - Only one green box for all analyses */
-.analysis-box {
-  @apply p-4 rounded-lg mb-4 border-l-4 bg-[#F2FCE2] border-legal-risk-low text-slate-700;
-}
-
-/* Risk icon styling */
-.risk-icon {
-  @apply inline-flex items-center justify-center rounded-full mr-2;
-}
-
-.risk-icon-rechtskonform {
-  @apply text-legal-risk-low;
-}
-
-.risk-icon-fraglich {
-  @apply text-legal-risk-medium;
-}
-
-.risk-icon-unzulassig {
-  @apply text-legal-risk-high;
 }
 
 .markdown-content h2 {
