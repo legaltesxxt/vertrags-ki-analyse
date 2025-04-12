@@ -55,19 +55,19 @@ const WebhookAnalysisResult: React.FC<WebhookAnalysisResultProps> = ({ result })
     }
   };
   
-  const getAnalysisBoxStyle = (risk: string) => {
+  const getAnalysisBoxClass = (risk: string) => {
     switch (risk) {
       case 'niedrig':
       case 'Rechtskonform':
-        return 'bg-[#F2FCE2] border-l-4 border-legal-risk-low';
+        return 'analysis-box-low';
       case 'mittel':
       case 'Rechtlich fraglich':
-        return 'bg-[#FEF3C7] border-l-4 border-legal-risk-medium';
+        return 'analysis-box-medium';
       case 'hoch':
       case 'Rechtlich unzulässig':
-        return 'bg-[#FEE2E2] border-l-4 border-legal-risk-high';
+        return 'analysis-box-high';
       default:
-        return 'bg-gray-50';
+        return '';
     }
   };
 
@@ -114,28 +114,25 @@ const WebhookAnalysisResult: React.FC<WebhookAnalysisResultProps> = ({ result })
                 
                 {/* Analyse mit farbiger Box basierend auf Risikostufe */}
                 <div>
-                  <h5 className="text-sm font-medium flex items-center gap-2 mb-1">
-                    <CheckCircle className="h-4 w-4 text-legal-primary" /> 
-                    Analyse
-                  </h5>
-                  <div className={`p-4 rounded-lg ${getAnalysisBoxStyle(clause.risk)}`}>
+                  <h5 className="text-sm font-medium text-gray-700 mb-1">Analyse:</h5>
+                  <div className={`analysis-box ${getAnalysisBoxClass(clause.risk)}`}>
                     <p className="text-sm">{clause.analysis}</p>
                   </div>
                 </div>
                 
-                {/* Risiko-Einstufung ohne Box */}
+                {/* Risiko-Einstufung ohne farbige Box */}
                 <div>
-                  <h5 className="text-sm font-medium flex items-center gap-2 mb-1">
+                  <h5 className="text-sm font-medium text-gray-700 mb-1">Risiko-Einstufung:</h5>
+                  <p className="text-sm flex items-center gap-2">
                     {getRiskIcon(clause.risk)}
-                    <span>Risiko-Einstufung</span>
-                  </h5>
-                  <p className="text-sm ml-6">{clause.risk}</p>
+                    <span>{clause.risk}</span>
+                  </p>
                 </div>
                 
                 {/* Gesetzliche Referenz ohne Box */}
                 {clause.lawReference && clause.lawReference.text && (
                   <div>
-                    <h5 className="text-sm font-medium text-legal-primary mb-1">Gesetzliche Referenz:</h5>
+                    <h5 className="text-sm font-medium text-gray-700 mb-1">Gesetzliche Referenz:</h5>
                     <p className="text-sm">{clause.lawReference.text}</p>
                     {clause.lawReference.link && (
                       <a 
@@ -154,11 +151,8 @@ const WebhookAnalysisResult: React.FC<WebhookAnalysisResultProps> = ({ result })
                 {/* Handlungsbedarf ohne Box */}
                 {clause.recommendation && (
                   <div>
-                    <h5 className="text-sm font-medium flex items-center gap-2 mb-1">
-                      <AlertTriangle className="h-4 w-4 text-legal-secondary" />
-                      <span>Handlungsbedarf</span>
-                    </h5>
-                    <p className="text-sm ml-6">{clause.recommendation}</p>
+                    <h5 className="text-sm font-medium text-gray-700 mb-1">Handlungsbedarf:</h5>
+                    <p className="text-sm">{clause.recommendation}</p>
                   </div>
                 )}
               </div>
