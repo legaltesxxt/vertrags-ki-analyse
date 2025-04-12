@@ -20,6 +20,12 @@ export interface AnalysisResult {
   summary: string;
 }
 
+export interface ClauseAnalysisProps {
+  clauses: AnalysisClause[];
+  overallRisk: 'niedrig' | 'mittel' | 'hoch' | 'Rechtskonform' | 'Rechtlich fraglich' | 'Rechtlich unzulässig';
+  summary: string;
+}
+
 export interface WebhookResponse {
   success: boolean;
   data?: any;
