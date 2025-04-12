@@ -2,7 +2,7 @@
 import React from 'react';
 import { cn } from "@/lib/utils";
 
-type RiskLevel = 'niedrig' | 'mittel' | 'hoch';
+type RiskLevel = 'niedrig' | 'mittel' | 'hoch' | 'Rechtskonform' | 'Rechtlich fraglich' | 'Rechtlich unzulässig';
 
 interface RiskMeterProps {
   risk: RiskLevel;
@@ -17,6 +17,20 @@ const RiskMeter: React.FC<RiskMeterProps> = ({
   showLabel = true,
   className 
 }) => {
+  // Map new risk terms to the standard levels
+  const normalizedRisk = (risk: RiskLevel): 'niedrig' | 'mittel' | 'hoch' => {
+    switch (risk) {
+      case 'Rechtskonform':
+        return 'niedrig';
+      case 'Rechtlich fraglich':
+        return 'mittel';
+      case 'Rechtlich unzulässig':
+        return 'hoch';
+      default:
+        return risk as 'niedrig' | 'mittel' | 'hoch';
+    }
+  };
+
   // Festlegen der Rotation basierend auf dem Risikolevel
   const rotationDegrees = {
     niedrig: -60,
@@ -49,8 +63,13 @@ const RiskMeter: React.FC<RiskMeterProps> = ({
   const labels = {
     niedrig: "Niedriges Risiko",
     mittel: "Mittleres Risiko",
-    hoch: "Hohes Risiko"
+    hoch: "Hohes Risiko",
+    Rechtskonform: "Rechtskonform",
+    "Rechtlich fraglich": "Rechtlich fraglich",
+    "Rechtlich unzulässig": "Rechtlich unzulässig"
   };
+
+  const normalizedRiskValue = normalizedRisk(risk);
 
   return (
     <div className={cn("flex flex-col items-center", className)}>
@@ -66,7 +85,7 @@ const RiskMeter: React.FC<RiskMeterProps> = ({
             "absolute bottom-0 left-1/2 -translate-x-1/2 origin-bottom rounded-t bg-gray-700 transition-transform duration-500 ease-in-out",
             pointerSizeClasses[size]
           )}
-          style={{ transform: `translateX(-50%) rotate(${rotationDegrees[risk]}deg)` }}
+          style={{ transform: `translateX(-50%) rotate(${rotationDegrees[normalizedRiskValue]}deg)` }}
         >
           <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-3 h-3 bg-gray-700 rounded-full"></div>
         </div>
