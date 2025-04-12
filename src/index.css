@@ -105,32 +105,32 @@ h1, h2, h3, h4, h5, h6 {
   @apply p-4 rounded-lg mb-4 border-l-4;
 }
 
-.analysis-box-low {
+.analysis-box-rechtskonform {
   @apply bg-[#F2FCE2] border-legal-risk-low text-slate-700;
 }
 
-.analysis-box-medium {
+.analysis-box-fraglich {
   @apply bg-[#FEF3C7] border-legal-risk-medium text-slate-700;
 }
 
-.analysis-box-high {
+.analysis-box-unzulassig {
   @apply bg-[#FEE2E2] border-legal-risk-high text-slate-700;
 }
 
-/* Risk box icon styling */
+/* Risk icon styling */
 .risk-icon {
   @apply inline-flex items-center justify-center rounded-full mr-2;
 }
 
-.risk-icon-low {
+.risk-icon-rechtskonform {
   @apply text-legal-risk-low;
 }
 
-.risk-icon-medium {
+.risk-icon-fraglich {
   @apply text-legal-risk-medium;
 }
 
-.risk-icon-high {
+.risk-icon-unzulassig {
   @apply text-legal-risk-high;
 }
 

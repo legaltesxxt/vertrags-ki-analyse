@@ -73,13 +73,13 @@ const ClauseAnalysis: React.FC<ClauseAnalysisProps> = ({ clauses, overallRisk, s
     switch (risk) {
       case 'niedrig':
       case 'Rechtskonform':
-        return 'analysis-box-low';
+        return 'analysis-box-rechtskonform';
       case 'mittel':
       case 'Rechtlich fraglich':
-        return 'analysis-box-medium';
+        return 'analysis-box-fraglich';
       case 'hoch':
       case 'Rechtlich unzulässig':
-        return 'analysis-box-high';
+        return 'analysis-box-unzulassig';
       default:
         return '';
     }
