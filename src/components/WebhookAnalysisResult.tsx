@@ -54,22 +54,6 @@ const WebhookAnalysisResult: React.FC<WebhookAnalysisResultProps> = ({ result })
         return '';
     }
   };
-  
-  const getAnalysisBoxClass = (risk: string) => {
-    switch (risk) {
-      case 'niedrig':
-      case 'Rechtskonform':
-        return 'analysis-box-rechtskonform';
-      case 'mittel':
-      case 'Rechtlich fraglich':
-        return 'analysis-box-fraglich';
-      case 'hoch':
-      case 'Rechtlich unzulässig':
-        return 'analysis-box-unzulassig';
-      default:
-        return '';
-    }
-  };
 
   // Zähle die Klauseln nach Risikostufe
   const riskCounts = {
@@ -112,15 +96,15 @@ const WebhookAnalysisResult: React.FC<WebhookAnalysisResultProps> = ({ result })
                   <p className="text-sm">{clause.text}</p>
                 </div>
                 
-                {/* Analyse mit farbiger Box basierend auf Risikostufe */}
+                {/* Analyse mit grüner Box */}
                 <div>
                   <h5 className="text-sm font-medium text-gray-700 mb-1">Analyse:</h5>
-                  <div className={`analysis-box ${getAnalysisBoxClass(clause.risk)}`}>
+                  <div className="analysis-box">
                     <p className="text-sm">{clause.analysis}</p>
                   </div>
                 </div>
                 
-                {/* Risiko-Einstufung ohne farbige Box */}
+                {/* Risiko-Einstufung ohne Box */}
                 <div>
                   <h5 className="text-sm font-medium text-gray-700 mb-1">Risiko-Einstufung:</h5>
                   <p className="text-sm flex items-center gap-2">

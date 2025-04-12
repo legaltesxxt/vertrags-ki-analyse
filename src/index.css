@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -100,21 +99,9 @@ h1, h2, h3, h4, h5, h6 {
   @apply tracking-tight;
 }
 
-/* Analysis Box Styles - NUR für die Analyse-Texte */
+/* Simplified Analysis Box Style - Only one green box for all analyses */
 .analysis-box {
-  @apply p-4 rounded-lg mb-4 border-l-4;
-}
-
-.analysis-box-rechtskonform {
-  @apply bg-[#F2FCE2] border-legal-risk-low text-slate-700;
-}
-
-.analysis-box-fraglich {
-  @apply bg-[#FEF3C7] border-legal-risk-medium text-slate-700;
-}
-
-.analysis-box-unzulassig {
-  @apply bg-[#FEE2E2] border-legal-risk-high text-slate-700;
+  @apply p-4 rounded-lg mb-4 border-l-4 bg-[#F2FCE2] border-legal-risk-low text-slate-700;
 }
 
 /* Risk icon styling */
