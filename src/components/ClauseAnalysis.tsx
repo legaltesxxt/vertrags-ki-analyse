@@ -13,7 +13,7 @@ import {
   AccordionItem,
   AccordionTrigger
 } from '@/components/ui/accordion';
-import { AlertTriangle, CheckCircle, HelpCircle, ExternalLink } from 'lucide-react';
+import { AlertTriangle, CheckCircle, XOctagon, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import RiskMeter from './RiskMeter';
 
@@ -21,7 +21,7 @@ interface Clause {
   id: string;
   title: string;
   text: string;
-  risk: 'niedrig' | 'mittel' | 'hoch';
+  risk: 'niedrig' | 'mittel' | 'hoch' | 'Rechtskonform' | 'Rechtlich fraglich' | 'Rechtlich unzulässig';
   analysis: string;
   lawReference: {
     text: string;
@@ -32,36 +32,58 @@ interface Clause {
 
 interface ClauseAnalysisProps {
   clauses: Clause[];
-  overallRisk: 'niedrig' | 'mittel' | 'hoch';
+  overallRisk: 'niedrig' | 'mittel' | 'hoch' | 'Rechtskonform' | 'Rechtlich fraglich' | 'Rechtlich unzulässig';
   summary: string;
 }
 
 const ClauseAnalysis: React.FC<ClauseAnalysisProps> = ({ clauses, overallRisk, summary }) => {
   const [selectedClause, setSelectedClause] = useState<string | null>(null);
 
-  const getRiskIcon = (risk: 'niedrig' | 'mittel' | 'hoch') => {
+  const getRiskIcon = (risk: string) => {
     switch (risk) {
       case 'niedrig':
+      case 'Rechtskonform':
         return <CheckCircle className="h-5 w-5 text-legal-risk-low" />;
       case 'mittel':
+      case 'Rechtlich fraglich':
         return <AlertTriangle className="h-5 w-5 text-legal-risk-medium" />;
       case 'hoch':
-        return <AlertTriangle className="h-5 w-5 text-legal-risk-high" />;
+      case 'Rechtlich unzulässig':
+        return <XOctagon className="h-5 w-5 text-legal-risk-high" />;
       default:
-        return <HelpCircle className="h-5 w-5 text-gray-400" />;
+        return null;
     }
   };
 
-  const getRiskClass = (risk: 'niedrig' | 'mittel' | 'hoch') => {
+  const getRiskClass = (risk: string) => {
     switch (risk) {
       case 'niedrig':
+      case 'Rechtskonform':
         return 'risk-low';
       case 'mittel':
+      case 'Rechtlich fraglich':
         return 'risk-medium';
       case 'hoch':
+      case 'Rechtlich unzulässig':
         return 'risk-high';
       default:
         return '';
+    }
+  };
+  
+  const getRiskBoxStyle = (risk: string) => {
+    switch (risk) {
+      case 'niedrig':
+      case 'Rechtskonform':
+        return 'bg-[#F2FCE2] text-legal-risk-low border-l-4 border-legal-risk-low';
+      case 'mittel':
+      case 'Rechtlich fraglich':
+        return 'bg-[#FEF3C7] text-legal-risk-medium border-l-4 border-legal-risk-medium';
+      case 'hoch':
+      case 'Rechtlich unzulässig':
+        return 'bg-[#FEE2E2] text-legal-risk-high border-l-4 border-legal-risk-high';
+      default:
+        return 'bg-gray-50';
     }
   };
 
@@ -123,8 +145,13 @@ const ClauseAnalysis: React.FC<ClauseAnalysisProps> = ({ clauses, overallRisk, s
                 
                 <div className="flex flex-col md:flex-row md:items-start gap-4">
                   <div className="flex-1">
-                    <h5 className="text-sm font-medium text-gray-700 mb-1">Analyse:</h5>
-                    <p className="text-sm">{clause.analysis}</p>
+                    <div className={`p-4 rounded-lg ${getRiskBoxStyle(clause.risk)}`}>
+                      <div className="flex items-center gap-2 mb-2">
+                        {getRiskIcon(clause.risk)}
+                        <h5 className="text-sm font-medium">Analyse</h5>
+                      </div>
+                      <p className="text-sm">{clause.analysis}</p>
+                    </div>
                   </div>
                   <div className="md:w-36 flex justify-center">
                     <RiskMeter risk={clause.risk} size="md" />

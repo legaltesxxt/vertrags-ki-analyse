@@ -5,7 +5,7 @@ export interface AnalysisClause {
   id: string;
   title: string;
   text: string;
-  risk: 'niedrig' | 'mittel' | 'hoch';
+  risk: 'niedrig' | 'mittel' | 'hoch' | 'Rechtskonform' | 'Rechtlich fraglich' | 'Rechtlich unzulässig';
   analysis: string;
   lawReference: {
     text: string;
@@ -16,7 +16,7 @@ export interface AnalysisClause {
 
 export interface AnalysisResult {
   clauses: AnalysisClause[];
-  overallRisk: 'niedrig' | 'mittel' | 'hoch';
+  overallRisk: 'niedrig' | 'mittel' | 'hoch' | 'Rechtskonform' | 'Rechtlich fraglich' | 'Rechtlich unzulässig';
   summary: string;
 }
 
