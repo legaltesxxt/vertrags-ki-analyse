@@ -14,8 +14,6 @@ import {
   AccordionTrigger
 } from '@/components/ui/accordion';
 import { AlertTriangle, CheckCircle, XOctagon, ExternalLink } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import RiskMeter from './RiskMeter';
 
 interface Clause {
   id: string;
@@ -71,17 +69,17 @@ const ClauseAnalysis: React.FC<ClauseAnalysisProps> = ({ clauses, overallRisk, s
     }
   };
   
-  const getRiskBoxStyle = (risk: string) => {
+  const getAnalysisBoxStyle = (risk: string) => {
     switch (risk) {
       case 'niedrig':
       case 'Rechtskonform':
-        return 'bg-[#F2FCE2] text-legal-risk-low border-l-4 border-legal-risk-low';
+        return 'bg-[#F2FCE2] border-l-4 border-legal-risk-low';
       case 'mittel':
       case 'Rechtlich fraglich':
-        return 'bg-[#FEF3C7] text-legal-risk-medium border-l-4 border-legal-risk-medium';
+        return 'bg-[#FEF3C7] border-l-4 border-legal-risk-medium';
       case 'hoch':
       case 'Rechtlich unzulässig':
-        return 'bg-[#FEE2E2] text-legal-risk-high border-l-4 border-legal-risk-high';
+        return 'bg-[#FEE2E2] border-l-4 border-legal-risk-high';
       default:
         return 'bg-gray-50';
     }
@@ -96,23 +94,13 @@ const ClauseAnalysis: React.FC<ClauseAnalysisProps> = ({ clauses, overallRisk, s
               <CardTitle>Vertragsanalyse</CardTitle>
               <CardDescription>Zusammenfassung und Risikobewertung</CardDescription>
             </div>
-            <div className="flex items-center gap-4">
-              <RiskMeter risk={overallRisk} size="md" showLabel={false} />
-              <span className={`risk-pill ${getRiskClass(overallRisk)}`}>
-                Gesamtrisiko: {overallRisk}
-              </span>
-            </div>
+            <span className={`risk-pill ${getRiskClass(overallRisk)}`}>
+              Gesamtrisiko: {overallRisk}
+            </span>
           </div>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-col md:flex-row gap-6">
-            <div className="flex-1">
-              <p className="text-gray-700">{summary}</p>
-            </div>
-            <div className="md:w-48 flex justify-center">
-              <RiskMeter risk={overallRisk} size="lg" />
-            </div>
-          </div>
+          <p className="text-gray-700">{summary}</p>
         </CardContent>
       </Card>
 
@@ -126,14 +114,13 @@ const ClauseAnalysis: React.FC<ClauseAnalysisProps> = ({ clauses, overallRisk, s
                 {getRiskIcon(clause.risk)}
                 <div className="flex-1">
                   <h4 className="font-medium">{clause.title}</h4>
-                  <p className="text-sm text-gray-500 truncate max-w-md">{clause.text.substring(0, 60)}...</p>
+                  <p className="text-sm text-gray-500 truncate max-w-md">
+                    {clause.text.substring(0, 60)}...
+                  </p>
                 </div>
-                <div className="flex items-center gap-3">
-                  <RiskMeter risk={clause.risk} size="sm" showLabel={false} />
-                  <span className={`risk-pill ${getRiskClass(clause.risk)}`}>
-                    {clause.risk}
-                  </span>
-                </div>
+                <span className={`risk-pill ${getRiskClass(clause.risk)}`}>
+                  {clause.risk}
+                </span>
               </div>
             </AccordionTrigger>
             <AccordionContent className="px-4 pt-2">
@@ -143,22 +130,28 @@ const ClauseAnalysis: React.FC<ClauseAnalysisProps> = ({ clauses, overallRisk, s
                   <p className="text-sm">{clause.text}</p>
                 </div>
                 
-                <div className="flex flex-col md:flex-row md:items-start gap-4">
-                  <div className="flex-1">
-                    <div className={`p-4 rounded-lg ${getRiskBoxStyle(clause.risk)}`}>
-                      <div className="flex items-center gap-2 mb-2">
-                        {getRiskIcon(clause.risk)}
-                        <h5 className="text-sm font-medium">Analyse</h5>
-                      </div>
-                      <p className="text-sm">{clause.analysis}</p>
-                    </div>
-                  </div>
-                  <div className="md:w-36 flex justify-center">
-                    <RiskMeter risk={clause.risk} size="md" />
+                {/* Analyse mit farbiger Box basierend auf Risikostufe */}
+                <div>
+                  <h5 className="text-sm font-medium flex items-center gap-2 mb-1">
+                    <CheckCircle className="h-4 w-4 text-legal-primary" /> 
+                    Analyse
+                  </h5>
+                  <div className={`p-4 rounded-lg ${getAnalysisBoxStyle(clause.risk)}`}>
+                    <p className="text-sm">{clause.analysis}</p>
                   </div>
                 </div>
                 
-                <div className="p-3 bg-blue-50 rounded-lg">
+                {/* Risiko-Einstufung ohne Box */}
+                <div>
+                  <h5 className="text-sm font-medium flex items-center gap-2 mb-1">
+                    {getRiskIcon(clause.risk)}
+                    <span>Risiko-Einstufung</span>
+                  </h5>
+                  <p className="text-sm ml-6">{clause.risk}</p>
+                </div>
+                
+                {/* Gesetzliche Referenz ohne Box */}
+                <div>
                   <h5 className="text-sm font-medium text-legal-primary mb-1">Gesetzliche Referenz:</h5>
                   <p className="text-sm">{clause.lawReference.text}</p>
                   <a 
@@ -172,9 +165,13 @@ const ClauseAnalysis: React.FC<ClauseAnalysisProps> = ({ clauses, overallRisk, s
                   </a>
                 </div>
                 
+                {/* Handlungsbedarf ohne Box */}
                 <div>
-                  <h5 className="text-sm font-medium text-gray-700 mb-1">Empfehlung:</h5>
-                  <p className="text-sm">{clause.recommendation}</p>
+                  <h5 className="text-sm font-medium flex items-center gap-2 mb-1">
+                    <AlertTriangle className="h-4 w-4 text-legal-secondary" />
+                    <span>Handlungsbedarf</span>
+                  </h5>
+                  <p className="text-sm ml-6">{clause.recommendation}</p>
                 </div>
               </div>
             </AccordionContent>
