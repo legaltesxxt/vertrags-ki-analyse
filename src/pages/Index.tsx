@@ -10,14 +10,15 @@ import { useN8nWebhook } from '@/hooks/useN8nWebhook';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
 import WebhookAnalysisResult from '@/components/WebhookAnalysisResult';
-import { ArrowRight, Shield, Lock, FileText } from 'lucide-react';
+import { ArrowRight, Shield, Lock, FileText, AlertTriangle, RefreshCw } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
+import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 
 const Index = () => {
   const navigate = useNavigate();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const { startAnalysis, resetAnalysis, isAnalyzing, progress, analysisResult: mockResult } = useMockAnalysis();
-  const { sendToN8n, isLoading: isSendingToN8n, analysisResult: webhookResult } = useN8nWebhook();
+  const { sendToN8n, isLoading: isSendingToN8n, analysisResult: webhookResult, error: webhookError, resetError } = useN8nWebhook();
   const [useRealAnalysis, setUseRealAnalysis] = useState(true);
   const { toast } = useToast();
 
@@ -26,11 +27,6 @@ const Index = () => {
 
   const handleFileSelected = useCallback(async (file: File) => {
     setSelectedFile(file);
-    
-    // Starte die Mock-Analyse für die Fortschrittsanzeige
-    if (!useRealAnalysis) {
-      startAnalysis(file);
-    }
     
     // Sende die Datei an n8n für die Backend-Verarbeitung
     const response = await sendToN8n(file);
@@ -64,14 +60,12 @@ const Index = () => {
           setUseRealAnalysis(true);
         }
       } else {
-        console.log("Keine Analyseergebnisse erhalten, verwende Mock-Daten");
+        console.log("Keine Analyseergebnisse erhalten");
         toast({
           title: "Hinweis",
-          description: "Keine Analyseergebnisse vom Server erhalten. Es werden Beispieldaten angezeigt.",
+          description: "Keine Analyseergebnisse vom Server erhalten.",
           variant: "default",
         });
-        setUseRealAnalysis(false);
-        startAnalysis(file);
       }
     } else {
       console.error("Fehler beim Senden der Datei an n8n:", response.error);
@@ -80,19 +74,18 @@ const Index = () => {
         description: "Die Datei konnte nicht zur Analyse gesendet werden. Bitte versuchen Sie es später erneut.",
         variant: "destructive",
       });
-      setUseRealAnalysis(false);
-      startAnalysis(file); // Fallback zu Mock-Daten
     }
-  }, [startAnalysis, sendToN8n, toast, useRealAnalysis, navigate]);
+  }, [sendToN8n, toast, navigate]);
 
   const handleReset = useCallback(() => {
     setSelectedFile(null);
     resetAnalysis();
+    resetError();
     setUseRealAnalysis(true);
-  }, [resetAnalysis]);
+  }, [resetAnalysis, resetError]);
 
   // Status der Analyse, entweder von Mock oder tatsächlich ladend
-  const isCurrentlyAnalyzing = (useRealAnalysis ? isSendingToN8n : isAnalyzing);
+  const isCurrentlyAnalyzing = isSendingToN8n;
 
   return (
     <div className="min-h-screen flex flex-col bg-legal-light">
@@ -155,11 +148,44 @@ const Index = () => {
         
         {isCurrentlyAnalyzing && (
           <div className="bg-white rounded-xl shadow-sm p-8 border border-border/50 mb-10 animate-fade-in">
-            <AnalysisProgress progress={useRealAnalysis ? 50 : progress} />
+            <AnalysisProgress progress={50} />
           </div>
         )}
         
-        {displayResult && !isCurrentlyAnalyzing && (
+        {webhookError && !isCurrentlyAnalyzing && (
+          <div className="bg-white rounded-xl shadow-sm p-8 border border-border/50 mb-10 animate-fade-in">
+            <Alert variant="destructive" className="mb-6">
+              <AlertTriangle className="h-5 w-5" />
+              <AlertTitle className="ml-2">Fehler bei der Vertragsanalyse</AlertTitle>
+              <AlertDescription className="ml-2">
+                {webhookError}
+              </AlertDescription>
+            </Alert>
+            
+            <div className="p-6 bg-gray-50 rounded-lg text-center">
+              <p className="mb-4 text-gray-700">
+                Leider ist bei der Analyse Ihres Vertrags ein Problem aufgetreten. 
+                Dies kann verschiedene Ursachen haben:
+              </p>
+              <ul className="text-left list-disc list-inside mb-6 text-gray-600 space-y-2">
+                <li>Der Server ist momentan nicht erreichbar</li>
+                <li>Das PDF-Format konnte nicht korrekt verarbeitet werden</li>
+                <li>Der Vertrag enthält Inhalte, die nicht erkannt werden konnten</li>
+                <li>Es besteht ein temporäres Verbindungsproblem</li>
+              </ul>
+              
+              <Button 
+                onClick={handleReset}
+                className="bg-legal-primary hover:bg-legal-secondary text-white flex items-center gap-2 mx-auto"
+              >
+                <RefreshCw size={16} />
+                Neue Analyse starten
+              </Button>
+            </div>
+          </div>
+        )}
+        
+        {displayResult && !isCurrentlyAnalyzing && !webhookError && (
           <div className="bg-white rounded-xl shadow-sm p-8 border border-border/50 mb-10 animate-fade-in">
             {useRealAnalysis ? (
               <WebhookAnalysisResult result={webhookResult} />

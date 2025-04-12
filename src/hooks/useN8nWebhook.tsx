@@ -9,6 +9,7 @@ export type { AnalysisClause, AnalysisResult } from '../types/analysisTypes';
 export function useN8nWebhook() {
   const [isLoading, setIsLoading] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
   // Die konfigurierte n8n Webhook URL
@@ -16,12 +17,14 @@ export function useN8nWebhook() {
 
   const sendToN8n = useCallback(async (file: File): Promise<WebhookResponse> => {
     if (!webhookUrl) {
-      console.error("Webhook URL ist nicht konfiguriert");
-      return { success: false, error: "Webhook nicht konfiguriert" };
+      const errorMsg = "Webhook URL ist nicht konfiguriert";
+      setError(errorMsg);
+      return { success: false, error: errorMsg };
     }
 
     setIsLoading(true);
     setAnalysisResult(null);
+    setError(null);
 
     try {
       // FormData erstellen für den Datei-Upload
@@ -37,7 +40,9 @@ export function useN8nWebhook() {
       });
       
       if (!response.ok) {
-        throw new Error(`HTTP Error: ${response.status}`);
+        const errorMsg = `HTTP Error: ${response.status} - Verbindung zum Server fehlgeschlagen`;
+        setError(errorMsg);
+        throw new Error(errorMsg);
       }
       
       // Prüfe, ob die Antwort JSON ist
@@ -47,6 +52,16 @@ export function useN8nWebhook() {
         // Wenn es JSON ist, parsen wir es als JSON
         const data = await response.json();
         console.log("JSON-Antwort vom Webhook erhalten:", data);
+        
+        // Prüfen, ob die Antwort eine leere Analyse enthält
+        if (!data || !data[0]?.output) {
+          const errorMsg = "Keine gültige Analyse vom Server erhalten";
+          setError(errorMsg);
+          return { 
+            success: false, 
+            error: errorMsg 
+          };
+        }
         
         // Direkte Weiterleitung der unveränderten Response
         return { 
@@ -58,6 +73,15 @@ export function useN8nWebhook() {
         const responseText = await response.text();
         console.log("Text-Antwort vom Webhook erhalten:", responseText);
         
+        if (!responseText || responseText.trim() === "") {
+          const errorMsg = "Leere Antwort vom Server erhalten";
+          setError(errorMsg);
+          return { 
+            success: false, 
+            error: errorMsg 
+          };
+        }
+        
         // Text-Antwort in ein strukturiertes Format umwandeln oder direkt zurückgeben
         return {
           success: true,
@@ -66,12 +90,18 @@ export function useN8nWebhook() {
       }
       
     } catch (error) {
-      console.error("Fehler beim Senden zum n8n Webhook:", error);
-      return { success: false, error: String(error) };
+      const errorMsg = String(error);
+      setError(errorMsg);
+      console.error("Fehler beim Senden zum n8n Webhook:", errorMsg);
+      return { success: false, error: errorMsg };
     } finally {
       setIsLoading(false);
     }
   }, []);
 
-  return { sendToN8n, isLoading, analysisResult };
+  const resetError = useCallback(() => {
+    setError(null);
+  }, []);
+
+  return { sendToN8n, isLoading, analysisResult, error, resetError };
 }
