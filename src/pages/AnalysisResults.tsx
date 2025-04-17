@@ -6,6 +6,8 @@ import { ArrowLeft, FileText } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import MarkdownRenderer from '@/components/MarkdownRenderer';
 import Navbar from '@/components/Navbar';
+import WebhookAnalysisResult from '@/components/WebhookAnalysisResult';
+import { AnalysisResult } from '@/types/analysisTypes';
 
 interface WebhookResponseItem {
   output: string;
@@ -15,15 +17,22 @@ const AnalysisResults = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [analysisOutput, setAnalysisOutput] = useState('');
+  const [structuredResult, setStructuredResult] = useState<AnalysisResult | null>(null);
 
-  // Extract analysis output from location state or raw webhook response
+  // Extrahiere Analyseergebnisse aus dem Location-State oder der Webhook-Antwort
   useEffect(() => {
     if (location.state) {
+      // Prüfe auf strukturiertes Analyseergebnis
+      if (location.state.analysisResult) {
+        setStructuredResult(location.state.analysisResult);
+      }
+      
+      // Prüfe auf direkte String-Ausgabe oder Webhook-Antwort
       if (location.state.analysisOutput) {
-        // Direct string output from state
+        // Direkte String-Ausgabe aus dem State
         setAnalysisOutput(location.state.analysisOutput);
       } else if (location.state.webhookResponse) {
-        // Array response from webhook
+        // Array-Antwort vom Webhook
         const response = location.state.webhookResponse;
         if (Array.isArray(response) && response.length > 0 && response[0].output) {
           setAnalysisOutput(response[0].output);
@@ -56,7 +65,9 @@ const AnalysisResults = () => {
 
         <div className="bg-white rounded-xl shadow-sm p-8 border border-border/50 mb-8 animate-fade-in">
           <ScrollArea className="h-[calc(100vh-250px)] pr-4">
-            {analysisOutput ? (
+            {structuredResult ? (
+              <WebhookAnalysisResult result={structuredResult} />
+            ) : analysisOutput ? (
               <MarkdownRenderer content={analysisOutput} />
             ) : (
               <div className="p-12 text-center text-gray-500">
@@ -76,7 +87,7 @@ const AnalysisResults = () => {
             )}
           </ScrollArea>
           
-          {analysisOutput && (
+          {(analysisOutput || structuredResult) && (
             <div className="mt-8 border-t border-border pt-6 flex justify-center">
               <Button 
                 onClick={() => navigate('/')}

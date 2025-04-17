@@ -13,7 +13,7 @@ import {
   AccordionItem,
   AccordionTrigger
 } from '@/components/ui/accordion';
-import { AlertTriangle, CheckCircle, HelpCircle, ExternalLink, AlertCircle } from 'lucide-react';
+import { AlertCircle, CheckCircle, HelpCircle, ExternalLink } from 'lucide-react';
 import { AnalysisResult } from '@/types/analysisTypes';
 import RiskMeter from './RiskMeter';
 import { cn } from '@/lib/utils';
@@ -58,25 +58,25 @@ const WebhookAnalysisResult: React.FC<WebhookAnalysisResultProps> = ({ result })
   };
 
   const formatContentWithRiskBox = (content: string) => {
-    // Check if the content contains the risk assessment heading
+    // Prüfen, ob der Inhalt die Risikoeinstufung-Überschrift enthält
     if (!content || !content.includes('**Risiko-Einstufung**')) {
       return <p className="text-sm">{content}</p>;
     }
 
-    // Split content by the risk assessment heading
+    // Teile den Inhalt anhand der Risikoeinstufung-Überschrift
     const parts = content.split('**Risiko-Einstufung**');
     
-    // Check if there's content after the heading
+    // Prüfen, ob es Inhalt nach der Überschrift gibt
     if (parts.length < 2 || !parts[1]) {
       return <p className="text-sm">{content}</p>;
     }
 
-    // Extract the risk assessment (take the first line after the heading)
+    // Extrahiere die Risikoeinstufung (nehme die erste Zeile nach der Überschrift)
     const afterHeading = parts[1].trim();
     const lines = afterHeading.split('\n');
     const riskText = lines[0].trim();
     
-    // Determine risk level and styling
+    // Bestimme Risiko-Level und Styling
     let riskLevel = '';
     let bgColor = '';
     let textColor = '';
@@ -89,17 +89,17 @@ const WebhookAnalysisResult: React.FC<WebhookAnalysisResultProps> = ({ result })
       icon = <CheckCircle className="h-4 w-4 mr-1.5 text-green-600" />;
     } else if (riskText === 'Rechtlich fraglich') {
       riskLevel = 'Rechtlich fraglich';
-      bgColor = 'bg-[#FEC6A1]'; // Soft orange
+      bgColor = 'bg-[#FEF3C7]'; // Soft orange
       textColor = 'text-orange-700';
       icon = <HelpCircle className="h-4 w-4 mr-1.5 text-orange-600" />;
     } else if (riskText === 'Rechtlich unzulässig') {
       riskLevel = 'Rechtlich unzulässig';
-      bgColor = 'bg-[#ea384c]/10'; // Red with opacity
+      bgColor = 'bg-[#FEE2E2]'; // Soft red
       textColor = 'text-red-700';
-      icon = <AlertTriangle className="h-4 w-4 mr-1.5 text-red-600" />;
+      icon = <AlertCircle className="h-4 w-4 mr-1.5 text-red-600" />;
     }
     
-    // Create content with special formatting for risk assessment
+    // Erstelle Inhalt mit spezieller Formatierung für die Risikoeinstufung
     if (riskLevel) {
       const restContent = lines.slice(1).join('\n').trim();
       
@@ -115,7 +115,7 @@ const WebhookAnalysisResult: React.FC<WebhookAnalysisResultProps> = ({ result })
       );
     }
     
-    // Fall back to regular formatting if no specific risk level is found
+    // Fallback zur regulären Formatierung, wenn kein spezifisches Risiko-Level gefunden wurde
     return <p className="text-sm">{content}</p>;
   };
 
@@ -146,7 +146,7 @@ const WebhookAnalysisResult: React.FC<WebhookAnalysisResultProps> = ({ result })
                   </p>
                 </div>
                 <div className="flex items-center gap-3">
-                  <RiskMeter risk={clause.risk as 'niedrig' | 'mittel' | 'hoch'} size="sm" showLabel={false} />
+                  <RiskMeter risk={clause.risk} size="sm" showLabel={false} />
                   <span className={`risk-pill ${getRiskClass(clause.risk)}`}>
                     {clause.risk}
                   </span>
@@ -166,7 +166,7 @@ const WebhookAnalysisResult: React.FC<WebhookAnalysisResultProps> = ({ result })
                     {formatContentWithRiskBox(clause.analysis)}
                   </div>
                   <div className="md:w-36 flex justify-center">
-                    <RiskMeter risk={clause.risk as 'niedrig' | 'mittel' | 'hoch'} size="md" />
+                    <RiskMeter risk={clause.risk} size="md" />
                   </div>
                 </div>
                 
@@ -209,7 +209,7 @@ const WebhookAnalysisResult: React.FC<WebhookAnalysisResultProps> = ({ result })
               <CardDescription>Zusammenfassung und Risikobewertung</CardDescription>
             </div>
             <div className="flex items-center gap-4">
-              <RiskMeter risk={result.overallRisk as 'niedrig' | 'mittel' | 'hoch'} size="md" showLabel={false} />
+              <RiskMeter risk={result.overallRisk} size="md" showLabel={false} />
               <span className={`risk-pill ${getRiskClass(result.overallRisk)}`}>
                 Gesamtrisiko: {result.overallRisk}
               </span>
@@ -223,7 +223,7 @@ const WebhookAnalysisResult: React.FC<WebhookAnalysisResultProps> = ({ result })
                 {formatContentWithRiskBox(result.summary)}
               </div>
               <div className="md:w-48 flex justify-center">
-                <RiskMeter risk={result.overallRisk as 'niedrig' | 'mittel' | 'hoch'} size="lg" />
+                <RiskMeter risk={result.overallRisk} size="lg" />
               </div>
             </div>
             

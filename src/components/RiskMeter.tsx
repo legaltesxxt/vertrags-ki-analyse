@@ -17,7 +17,7 @@ const RiskMeter: React.FC<RiskMeterProps> = ({
   showLabel = true,
   className 
 }) => {
-  // Map new risk terms to the standard levels
+  // Neue Risikobegriffe auf die Standardstufen abbilden
   const normalizedRisk = (risk: RiskLevel): 'niedrig' | 'mittel' | 'hoch' => {
     switch (risk) {
       case 'Rechtskonform':
