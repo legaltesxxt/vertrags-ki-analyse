@@ -33,35 +33,44 @@ export function parseClausesFromText(responseText: string): AnalysisResult {
     const analysis = match[4] ? match[4].trim() : '';
     
     // Direkte Risiko-Einstufung aus dem Text extrahieren, wenn vorhanden
-    let extractedRisk = match[5] ? match[5].trim().toLowerCase() : '';
+    let extractedRisk = match[5] ? match[5].trim() : '';
     
     const lawRefText = match[6] || match[8] || '';
     const lawRefLink = match[7] || '';
     const recommendation = match[9] ? match[9].trim() : '';
     
-    // Risiko basierend auf expliziter Angabe oder Inhalt bestimmen
-    let risk: 'niedrig' | 'mittel' | 'hoch';
+    // Risiko basierend auf expliziter Angabe bestimmen
+    let risk: 'niedrig' | 'mittel' | 'hoch' | 'Rechtskonform' | 'Rechtlich fraglich' | 'Rechtlich unzulässig';
     
-    if (extractedRisk) {
-      if (extractedRisk.includes('unbedenklich') || 
-          extractedRisk.includes('niedrig') || 
-          extractedRisk.includes('gering')) {
+    // Direkt die Risikoeinstufung aus dem Text verwenden, wenn es eines der neuen Formate ist
+    if (extractedRisk === 'Rechtskonform' || 
+        extractedRisk === 'Rechtlich fraglich' || 
+        extractedRisk === 'Rechtlich unzulässig') {
+      risk = extractedRisk;
+      console.log(`Klausel ${id}: Direktes Risiko-Format gefunden: ${risk}`);
+    } else if (extractedRisk) {
+      // Alte Formate auf neue Formate mappen
+      if (extractedRisk.toLowerCase().includes('unbedenklich') || 
+          extractedRisk.toLowerCase().includes('niedrig') || 
+          extractedRisk.toLowerCase().includes('gering')) {
         risk = 'niedrig';
-      } else if (extractedRisk.includes('kritisch zu prüfen') || 
-                extractedRisk.includes('mittel') || 
-                extractedRisk.includes('zu beachten')) {
+      } else if (extractedRisk.toLowerCase().includes('kritisch zu prüfen') || 
+                extractedRisk.toLowerCase().includes('mittel') || 
+                extractedRisk.toLowerCase().includes('zu beachten')) {
         risk = 'mittel';
-      } else if (extractedRisk.includes('problematisch') || 
-                extractedRisk.includes('hoch') || 
-                extractedRisk.includes('bedenklich')) {
+      } else if (extractedRisk.toLowerCase().includes('problematisch') || 
+                extractedRisk.toLowerCase().includes('hoch') || 
+                extractedRisk.toLowerCase().includes('bedenklich')) {
         risk = 'hoch';
       } else {
         // Fallback zur Inhaltsanalyse
         risk = getRiskFromAnalysisText(analysis);
       }
+      console.log(`Klausel ${id}: Gemapptes Risiko: ${risk} (aus: ${extractedRisk})`);
     } else {
       // Fallback zur Inhaltsanalyse
       risk = getRiskFromAnalysisText(analysis);
+      console.log(`Klausel ${id}: Abgeleitetes Risiko aus Analysetext: ${risk}`);
     }
     
     clauses.push({
@@ -101,34 +110,25 @@ export function parseClausesFromText(responseText: string): AnalysisResult {
   const recommendationText = recommendationMatch ? recommendationMatch[1].trim() : '';
   
   // Gesamtrisiko bestimmen
-  let overallRisk: 'niedrig' | 'mittel' | 'hoch';
+  let overallRisk: 'niedrig' | 'mittel' | 'hoch' | 'Rechtskonform' | 'Rechtlich fraglich' | 'Rechtlich unzulässig';
   
-  // Zuerst basierend auf dem Text der Risikoeinschätzung
-  if (riskText.toLowerCase().includes('problematisch') || 
-      riskText.toLowerCase().includes('nicht vollständig konform') ||
-      riskText.toLowerCase().includes('hohe')) {
-    overallRisk = 'hoch';
-  } else if (riskText.toLowerCase().includes('teilweise') || 
-             riskText.toLowerCase().includes('mittlere') ||
-             riskText.toLowerCase().includes('möglicherweise')) {
-    overallRisk = 'mittel';
+  // Zählen der Klauseln nach Risikostufen
+  const highRiskCount = clauses.filter(c => c.risk === 'hoch' || c.risk === 'Rechtlich unzulässig').length;
+  const mediumRiskCount = clauses.filter(c => c.risk === 'mittel' || c.risk === 'Rechtlich fraglich').length;
+  const lowRiskCount = clauses.filter(c => c.risk === 'niedrig' || c.risk === 'Rechtskonform').length;
+  
+  console.log(`Risikozählung: Hoch: ${highRiskCount}, Mittel: ${mediumRiskCount}, Niedrig: ${lowRiskCount}`);
+  
+  // Entscheidung basierend auf den Klauselrisiken
+  if (highRiskCount > 0) {
+    overallRisk = 'Rechtlich unzulässig';
+  } else if (mediumRiskCount > 0) {
+    overallRisk = 'Rechtlich fraglich';
   } else {
-    overallRisk = 'niedrig';
+    overallRisk = 'Rechtskonform';
   }
   
-  // Falls kein Risikotext gefunden wurde, basierend auf den Klauselrisiken berechnen
-  if (!riskText) {
-    const highRiskCount = clauses.filter(c => c.risk === 'hoch').length;
-    const mediumRiskCount = clauses.filter(c => c.risk === 'mittel').length;
-    
-    if (highRiskCount > 0) {
-      overallRisk = 'hoch';
-    } else if (mediumRiskCount > 0) {
-      overallRisk = 'mittel';
-    } else {
-      overallRisk = 'niedrig';
-    }
-  }
+  console.log(`Gesamtrisiko bestimmt als: ${overallRisk}`);
   
   // Zusammenfassung erstellen aus Risiko und Handlungsempfehlung
   const summary = riskText || recommendationText ? 
@@ -145,7 +145,7 @@ export function parseClausesFromText(responseText: string): AnalysisResult {
 /**
  * Hilfsfunktion zur Bestimmung des Risikos anhand des Analysetextes
  */
-function getRiskFromAnalysisText(analysisText: string): 'niedrig' | 'mittel' | 'hoch' {
+function getRiskFromAnalysisText(analysisText: string): 'niedrig' | 'mittel' | 'hoch' | 'Rechtskonform' | 'Rechtlich fraglich' | 'Rechtlich unzulässig' {
   const text = analysisText.toLowerCase();
   
   if (text.includes('problematisch') || 
@@ -153,14 +153,14 @@ function getRiskFromAnalysisText(analysisText: string): 'niedrig' | 'mittel' | '
       text.includes('nicht konform') ||
       text.includes('rechtswidrig') || 
       text.includes('unzulässig')) {
-    return 'hoch';
+    return 'Rechtlich unzulässig';
   } else if (text.includes('beachten') || 
              text.includes('könnte') || 
              text.includes('möglicherweise') ||
              text.includes('zu prüfen') ||
              text.includes('unklar')) {
-    return 'mittel';
+    return 'Rechtlich fraglich';
   }
   
-  return 'niedrig';
+  return 'Rechtskonform';
 }

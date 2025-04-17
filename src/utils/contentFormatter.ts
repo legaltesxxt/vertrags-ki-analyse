@@ -1,7 +1,7 @@
 
 import { cn } from '@/lib/utils';
 
-// Definiere einen Typ für die formatierte Rückgabe
+// Define a type for the formatted return
 export interface FormattedContent {
   mainContent: string;
   riskLevel: string;
@@ -15,32 +15,46 @@ export interface FormattedContent {
  * Formats content with special handling for risk classifications
  */
 export const formatContentWithRiskBox = (content: string): string | FormattedContent => {
-  // Verbesserte Risiko-Erkennung - prüfe verschiedene Varianten
+  // Return early if content is empty
   if (!content) return content;
-
-  // Prüfe auf Risiko-Einstufung im Text - zwei Varianten
-  let riskMatch = content.match(/\*\*Risiko-Einstufung\*\*\s*\n\s*(Rechtskonform|Rechtlich fraglich|Rechtlich unzulässig)/i);
   
-  // Wenn kein Match mit Sternen, prüfe ohne Formatierung
-  if (!riskMatch) {
-    riskMatch = content.match(/Risiko-Einstufung\s*\n\s*(Rechtskonform|Rechtlich fraglich|Rechtlich unzulässig)/i);
+  console.log("Formatting content:", content.substring(0, 100));
+
+  // Check for risk classification in different formats
+  const riskRegexes = [
+    /\*\*Risiko-Einstufung\*\*\s*\n\s*(Rechtskonform|Rechtlich fraglich|Rechtlich unzulässig)/i,
+    /Risiko-Einstufung\s*\n\s*(Rechtskonform|Rechtlich fraglich|Rechtlich unzulässig)/i,
+    /\*\*Risiko\*\*\s*\n\s*(Rechtskonform|Rechtlich fraglich|Rechtlich unzulässig)/i,
+    /Risiko\s*\n\s*(Rechtskonform|Rechtlich fraglich|Rechtlich unzulässig)/i
+  ];
+  
+  let riskMatch = null;
+  
+  // Try each regex pattern until we find a match
+  for (const regex of riskRegexes) {
+    const match = content.match(regex);
+    if (match) {
+      riskMatch = match;
+      console.log("Matched risk with pattern:", regex);
+      break;
+    }
   }
   
   if (!riskMatch) {
-    console.log("Keine Risiko-Einstufung erkannt in:", content.substring(0, 100) + "...");
+    console.log("No risk assessment found in:", content.substring(0, 100) + "...");
     return content;
   }
   
-  // Extrahiere den Risikotext
+  // Extract the risk text
   const riskText = riskMatch[1].trim();
-  console.log("Gefundener Risikotext:", riskText);
+  console.log("Found risk text:", riskText);
   
-  // Finde Position der Risiko-Einstufung im Content
-  const risikoPos = content.indexOf(riskMatch[0]);
-  const mainContent = risikoPos > 0 ? content.substring(0, risikoPos) : "";
+  // Find position of risk assessment in content
+  const riskPos = content.indexOf(riskMatch[0]);
+  const mainContent = riskPos > 0 ? content.substring(0, riskPos).trim() : "";
   
-  // Extrahiere den Rest nach dem Risikotext
-  const restStartPos = risikoPos + riskMatch[0].length;
+  // Extract rest of content after risk assessment
+  const restStartPos = riskPos + riskMatch[0].length;
   let restContent = "";
   
   if (restStartPos < content.length) {
@@ -75,13 +89,13 @@ export const formatContentWithRiskBox = (content: string): string | FormattedCon
   
   // If no specific risk level was found, return the original content
   if (!riskLevel) {
-    console.log("Kein Risiko-Level erkannt für:", riskText);
+    console.log("No risk level matched for:", riskText);
     return content;
   }
 
-  console.log("Erkanntes Risiko-Level:", riskLevel);
+  console.log("Identified risk level:", riskLevel, "with bgColor:", bgColor);
   
-  // Rückgabe des formatierten Inhalts
+  // Return formatted content
   return {
     mainContent,
     riskLevel,

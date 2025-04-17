@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { 
   Card,
@@ -27,14 +28,16 @@ const RiskSummary: React.FC<RiskSummaryProps> = ({ result }) => {
 
   // Format the summary content
   const formattedSummary = formatContentWithRiskBox(result.summary);
-  console.log("Formatierte Zusammenfassung:", formattedSummary);
+  console.log("Formatted summary type:", typeof formattedSummary);
   
   // Render based on whether the content was specially formatted or not
   const renderSummary = () => {
     if (typeof formattedSummary === 'string') {
+      console.log("Summary - Returning plain string content");
       return <p className="text-sm">{formattedSummary}</p>;
     } else {
-      // Es ist ein FormattedContent-Objekt
+      // It's a FormattedContent object
+      console.log("Summary - Rendering formatted box with risk level:", formattedSummary.riskLevel);
       return (
         <>
           {formattedSummary.mainContent && 

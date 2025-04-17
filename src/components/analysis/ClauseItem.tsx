@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { 
   AccordionItem,
@@ -50,14 +51,16 @@ const ClauseItem: React.FC<ClauseItemProps> = ({ clause }) => {
 
   // Format the analysis content
   const formattedContent = formatContentWithRiskBox(clause.analysis);
-  console.log("Formatierte Inhalte für Klausel:", clause.id, formattedContent);
+  console.log(`Clause ${clause.id} - Risk: ${clause.risk} - Formatted content type:`, typeof formattedContent);
   
   // Render based on whether the content was specially formatted or not
   const renderAnalysis = () => {
     if (typeof formattedContent === 'string') {
+      console.log(`Clause ${clause.id} - Returning plain string content`);
       return <p className="text-sm">{formattedContent}</p>;
     } else {
-      // Es ist ein FormattedContent-Objekt
+      // It's a FormattedContent object
+      console.log(`Clause ${clause.id} - Rendering formatted box with risk level:`, formattedContent.riskLevel);
       return (
         <>
           {formattedContent.mainContent && 
