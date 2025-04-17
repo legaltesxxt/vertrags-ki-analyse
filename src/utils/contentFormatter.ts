@@ -33,6 +33,10 @@ export const formatContentWithRiskBox = (content: string): string | FormattedCon
   const lines = afterHeading.split('\n');
   const riskText = lines[0].trim();
   
+  // Logging für Debugging
+  console.log("Gefundener Risikotext:", riskText);
+  console.log("Gesamter Text nach Einstufung:", afterHeading);
+  
   // Determine risk level and styling
   let riskLevel = '';
   let bgColor = '';
@@ -58,9 +62,12 @@ export const formatContentWithRiskBox = (content: string): string | FormattedCon
   
   // If no specific risk level was found, return the original content
   if (!riskLevel) {
+    console.log("Kein Risiko-Level erkannt für:", riskText);
     return content;
   }
 
+  console.log("Erkanntes Risiko-Level:", riskLevel);
+  
   // For the actual rendering, we'll return the JSX element that can be used in React components
   const restContent = lines.slice(1).join('\n').trim();
   

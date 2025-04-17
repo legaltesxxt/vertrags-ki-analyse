@@ -28,13 +28,14 @@ const RiskSummary: React.FC<RiskSummaryProps> = ({ result }) => {
 
   // Format the summary content
   const formattedSummary = formatContentWithRiskBox(result.summary);
+  console.log("Formatierte Zusammenfassung:", formattedSummary);
   
   // Render based on whether the content was specially formatted or not
   const renderSummary = () => {
     if (typeof formattedSummary === 'string') {
       return <p className="text-sm">{formattedSummary}</p>;
     } else {
-      // It's an object with formatted parts
+      // Es ist ein FormattedContent-Objekt
       return (
         <>
           <p className="text-sm">{formattedSummary.mainContent}<strong>Risiko-Einstufung</strong></p>

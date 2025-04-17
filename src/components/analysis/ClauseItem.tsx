@@ -51,13 +51,14 @@ const ClauseItem: React.FC<ClauseItemProps> = ({ clause }) => {
 
   // Format the analysis content
   const formattedContent = formatContentWithRiskBox(clause.analysis);
+  console.log("Formatierte Inhalte für Klausel:", clause.id, formattedContent);
   
   // Render based on whether the content was specially formatted or not
   const renderAnalysis = () => {
     if (typeof formattedContent === 'string') {
       return <p className="text-sm">{formattedContent}</p>;
     } else {
-      // It's an object with formatted parts
+      // Es ist ein FormattedContent-Objekt
       return (
         <>
           <p className="text-sm">{formattedContent.mainContent}<strong>Risiko-Einstufung</strong></p>
