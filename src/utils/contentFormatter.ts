@@ -1,7 +1,5 @@
-
 import { cn } from '@/lib/utils';
 
-// Define a type for the formatted return
 export interface FormattedContent {
   mainContent: string;
   riskLevel: string;
@@ -11,91 +9,101 @@ export interface FormattedContent {
   restContent: string;
 }
 
-/**
- * Formats content with special handling for risk classifications
- */
 export const formatContentWithRiskBox = (content: string): string | FormattedContent => {
-  // Return early if content is empty
   if (!content) return content;
   
-  console.log("Formatting content:", content.substring(0, 100));
+  console.log("=== Formatting Content Analysis ===");
+  console.log("Raw content:", content);
 
-  // Check for risk classification in different formats
+  // Erweiterte Regex-Muster für verschiedene Formate der Risiko-Einstufung
   const riskRegexes = [
-    /\*\*Risiko-Einstufung\*\*\s*\n\s*(Rechtskonform|Rechtlich fraglich|Rechtlich unzulässig)/i,
-    /Risiko-Einstufung\s*\n\s*(Rechtskonform|Rechtlich fraglich|Rechtlich unzulässig)/i,
-    /\*\*Risiko\*\*\s*\n\s*(Rechtskonform|Rechtlich fraglich|Rechtlich unzulässig)/i,
-    /Risiko\s*\n\s*(Rechtskonform|Rechtlich fraglich|Rechtlich unzulässig)/i
+    // Markdown Format mit Sternchen
+    /\*\*(?:Risiko-Einstufung|Risiko)\*\*\s*(?:\:|\n)?\s*(Rechtskonform|Rechtlich fraglich|Rechtlich unzulässig)/i,
+    // Plain Text Format
+    /(?:Risiko-Einstufung|Risiko)\s*(?:\:|\n)?\s*(Rechtskonform|Rechtlich fraglich|Rechtlich unzulässig)/i,
+    // Format mit Bindestrich
+    /(?:Risiko|Risiko-Einstufung)\s*-\s*(Rechtskonform|Rechtlich fraglich|Rechtlich unzulässig)/i,
+    // Format mit Doppelpunkt
+    /(?:Risiko|Risiko-Einstufung)\:\s*(Rechtskonform|Rechtlich fraglich|Rechtlich unzulässig)/i
   ];
   
   let riskMatch = null;
+  let matchedPattern = '';
   
-  // Try each regex pattern until we find a match
+  // Teste jedes Regex-Muster
   for (const regex of riskRegexes) {
     const match = content.match(regex);
     if (match) {
       riskMatch = match;
-      console.log("Matched risk with pattern:", regex);
+      matchedPattern = regex.toString();
+      console.log("Matched risk pattern:", matchedPattern);
+      console.log("Extracted risk:", match[1]);
       break;
     }
   }
   
   if (!riskMatch) {
-    console.log("No risk assessment found in:", content.substring(0, 100) + "...");
+    console.log("No risk assessment found - Full content:", content);
     return content;
   }
   
-  // Extract the risk text
+  // Extrahiere den Risikotext
   const riskText = riskMatch[1].trim();
-  console.log("Found risk text:", riskText);
   
-  // Find position of risk assessment in content
+  // Position der Risikobewertung im Text finden
   const riskPos = content.indexOf(riskMatch[0]);
-  const mainContent = riskPos > 0 ? content.substring(0, riskPos).trim() : "";
   
-  // Extract rest of content after risk assessment
+  // Hauptinhalt (vor der Risikobewertung)
+  const mainContent = riskPos > 0 ? content.substring(0, riskPos).trim() : "";
+  console.log("Main content:", mainContent);
+  
+  // Restinhalt (nach der Risikobewertung)
   const restStartPos = riskPos + riskMatch[0].length;
   let restContent = "";
   
   if (restStartPos < content.length) {
-    restContent = content.substring(restStartPos).trim();
+    // Suche nach dem nächsten Abschnitt (z.B. "Gesetzliche Referenz" oder "Handlungsbedarf")
+    const nextSectionRegex = /\n\*\*(?:Gesetzliche Referenz|Handlungsbedarf)\:\*\*/i;
+    const nextSection = content.substring(restStartPos).match(nextSectionRegex);
+    
+    if (nextSection) {
+      restContent = content.substring(restStartPos, restStartPos + nextSection.index).trim();
+    } else {
+      restContent = content.substring(restStartPos).trim();
+    }
   }
   
-  console.log("Main content length:", mainContent.length);
-  console.log("Rest content:", restContent.substring(0, 50) + "...");
+  console.log("Rest content:", restContent);
   
-  // Determine risk level and styling
+  // Styling basierend auf Risikobewertung
   let riskLevel = '';
   let bgColor = '';
   let textColor = '';
   let iconClass = '';
   
-  if (riskText.includes('Rechtskonform')) {
+  // Normalisiere den Risikotext für den Vergleich
+  const normalizedRisk = riskText.toLowerCase().trim();
+  
+  if (normalizedRisk.includes('rechtskonform')) {
     riskLevel = 'Rechtskonform';
-    bgColor = 'bg-[#F2FCE2]'; // Soft green
+    bgColor = 'bg-[#F2FCE2]';
     textColor = 'text-green-700';
     iconClass = 'text-green-600';
-  } else if (riskText.includes('Rechtlich fraglich')) {
+  } else if (normalizedRisk.includes('rechtlich fraglich')) {
     riskLevel = 'Rechtlich fraglich';
-    bgColor = 'bg-[#FEF3C7]'; // Soft orange
+    bgColor = 'bg-[#FEF3C7]';
     textColor = 'text-orange-700';
     iconClass = 'text-orange-600';
-  } else if (riskText.includes('Rechtlich unzulässig')) {
+  } else if (normalizedRisk.includes('rechtlich unzulässig')) {
     riskLevel = 'Rechtlich unzulässig';
-    bgColor = 'bg-[#FEE2E2]'; // Soft red
+    bgColor = 'bg-[#FEE2E2]';
     textColor = 'text-red-700';
     iconClass = 'text-red-600';
   }
   
-  // If no specific risk level was found, return the original content
-  if (!riskLevel) {
-    console.log("No risk level matched for:", riskText);
-    return content;
-  }
-
-  console.log("Identified risk level:", riskLevel, "with bgColor:", bgColor);
+  console.log("Final risk level:", riskLevel);
+  console.log("=== End Content Analysis ===");
   
-  // Return formatted content
   return {
     mainContent,
     riskLevel,
@@ -106,9 +114,6 @@ export const formatContentWithRiskBox = (content: string): string | FormattedCon
   };
 };
 
-/**
- * Returns the appropriate CSS class for a risk level
- */
 export const getRiskClass = (risk: 'niedrig' | 'mittel' | 'hoch' | 'Rechtskonform' | 'Rechtlich fraglich' | 'Rechtlich unzulässig') => {
   switch (risk) {
     case 'niedrig':
