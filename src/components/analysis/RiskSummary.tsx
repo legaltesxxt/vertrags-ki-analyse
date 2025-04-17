@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { 
   Card,
@@ -38,7 +37,9 @@ const RiskSummary: React.FC<RiskSummaryProps> = ({ result }) => {
       // Es ist ein FormattedContent-Objekt
       return (
         <>
-          <p className="text-sm">{formattedSummary.mainContent}<strong>Risiko-Einstufung</strong></p>
+          {formattedSummary.mainContent && 
+            <p className="text-sm mb-2">{formattedSummary.mainContent}</p>
+          }
           <div className={cn("flex items-center p-2 rounded-md my-2", formattedSummary.bgColor)}>
             {formattedSummary.riskLevel === 'Rechtskonform' && (
               <CheckCircle className={`h-4 w-4 mr-1.5 ${formattedSummary.iconClass}`} />

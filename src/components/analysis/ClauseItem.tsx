@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { 
   AccordionItem,
@@ -61,7 +60,9 @@ const ClauseItem: React.FC<ClauseItemProps> = ({ clause }) => {
       // Es ist ein FormattedContent-Objekt
       return (
         <>
-          <p className="text-sm">{formattedContent.mainContent}<strong>Risiko-Einstufung</strong></p>
+          {formattedContent.mainContent && 
+            <p className="text-sm mb-2">{formattedContent.mainContent}</p>
+          }
           <div className={cn("flex items-center p-2 rounded-md my-2", formattedContent.bgColor)}>
             {formattedContent.riskLevel === 'Rechtskonform' && (
               <CheckCircle className={`h-4 w-4 mr-1.5 ${formattedContent.iconClass}`} />

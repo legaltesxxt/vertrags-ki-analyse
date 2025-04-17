@@ -2,7 +2,7 @@
 import { cn } from '@/lib/utils';
 
 // Definiere einen Typ für die formatierte Rückgabe
-interface FormattedContent {
+export interface FormattedContent {
   mainContent: string;
   riskLevel: string;
   bgColor: string;
@@ -15,27 +15,40 @@ interface FormattedContent {
  * Formats content with special handling for risk classifications
  */
 export const formatContentWithRiskBox = (content: string): string | FormattedContent => {
-  // Check if the content contains the risk assessment heading
-  if (!content || !content.includes('**Risiko-Einstufung**')) {
+  // Verbesserte Risiko-Erkennung - prüfe verschiedene Varianten
+  if (!content) return content;
+
+  // Prüfe auf Risiko-Einstufung im Text - zwei Varianten
+  let riskMatch = content.match(/\*\*Risiko-Einstufung\*\*\s*\n\s*(Rechtskonform|Rechtlich fraglich|Rechtlich unzulässig)/i);
+  
+  // Wenn kein Match mit Sternen, prüfe ohne Formatierung
+  if (!riskMatch) {
+    riskMatch = content.match(/Risiko-Einstufung\s*\n\s*(Rechtskonform|Rechtlich fraglich|Rechtlich unzulässig)/i);
+  }
+  
+  if (!riskMatch) {
+    console.log("Keine Risiko-Einstufung erkannt in:", content.substring(0, 100) + "...");
     return content;
   }
-
-  // Split the content based on the risk assessment heading
-  const parts = content.split('**Risiko-Einstufung**');
   
-  // Check if there's content after the heading
-  if (parts.length < 2 || !parts[1]) {
-    return content;
-  }
-
-  // Extract the risk assessment (take the first line after the heading)
-  const afterHeading = parts[1].trim();
-  const lines = afterHeading.split('\n');
-  const riskText = lines[0].trim();
-  
-  // Logging für Debugging
+  // Extrahiere den Risikotext
+  const riskText = riskMatch[1].trim();
   console.log("Gefundener Risikotext:", riskText);
-  console.log("Gesamter Text nach Einstufung:", afterHeading);
+  
+  // Finde Position der Risiko-Einstufung im Content
+  const risikoPos = content.indexOf(riskMatch[0]);
+  const mainContent = risikoPos > 0 ? content.substring(0, risikoPos) : "";
+  
+  // Extrahiere den Rest nach dem Risikotext
+  const restStartPos = risikoPos + riskMatch[0].length;
+  let restContent = "";
+  
+  if (restStartPos < content.length) {
+    restContent = content.substring(restStartPos).trim();
+  }
+  
+  console.log("Main content length:", mainContent.length);
+  console.log("Rest content:", restContent.substring(0, 50) + "...");
   
   // Determine risk level and styling
   let riskLevel = '';
@@ -43,17 +56,17 @@ export const formatContentWithRiskBox = (content: string): string | FormattedCon
   let textColor = '';
   let iconClass = '';
   
-  if (riskText === 'Rechtskonform') {
+  if (riskText.includes('Rechtskonform')) {
     riskLevel = 'Rechtskonform';
     bgColor = 'bg-[#F2FCE2]'; // Soft green
     textColor = 'text-green-700';
     iconClass = 'text-green-600';
-  } else if (riskText === 'Rechtlich fraglich') {
+  } else if (riskText.includes('Rechtlich fraglich')) {
     riskLevel = 'Rechtlich fraglich';
     bgColor = 'bg-[#FEF3C7]'; // Soft orange
     textColor = 'text-orange-700';
     iconClass = 'text-orange-600';
-  } else if (riskText === 'Rechtlich unzulässig') {
+  } else if (riskText.includes('Rechtlich unzulässig')) {
     riskLevel = 'Rechtlich unzulässig';
     bgColor = 'bg-[#FEE2E2]'; // Soft red
     textColor = 'text-red-700';
@@ -68,11 +81,9 @@ export const formatContentWithRiskBox = (content: string): string | FormattedCon
 
   console.log("Erkanntes Risiko-Level:", riskLevel);
   
-  // For the actual rendering, we'll return the JSX element that can be used in React components
-  const restContent = lines.slice(1).join('\n').trim();
-  
+  // Rückgabe des formatierten Inhalts
   return {
-    mainContent: parts[0],
+    mainContent,
     riskLevel,
     bgColor,
     textColor,
