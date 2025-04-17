@@ -1,17 +1,20 @@
 
 import { cn } from '@/lib/utils';
 
-/**
- * Formats content with special handling for risk classifications
- */
-export const formatContentWithRiskBox = (content: string): string | JSX.Element | {
+// Definiere einen Typ für die formatierte Rückgabe
+interface FormattedContent {
   mainContent: string;
   riskLevel: string;
   bgColor: string;
   textColor: string;
   iconClass: string;
   restContent: string;
-} => {
+}
+
+/**
+ * Formats content with special handling for risk classifications
+ */
+export const formatContentWithRiskBox = (content: string): string | FormattedContent => {
   // Check if the content contains the risk assessment heading
   if (!content || !content.includes('**Risiko-Einstufung**')) {
     return content;
