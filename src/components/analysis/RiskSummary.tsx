@@ -11,6 +11,8 @@ import RiskMeter from '../RiskMeter';
 import { formatContentWithRiskBox } from '@/utils/contentFormatter';
 import { AnalysisResult } from '@/types/analysisTypes';
 import { getRiskClass } from '@/utils/contentFormatter';
+import { CheckCircle, HelpCircle, AlertCircle } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface RiskSummaryProps {
   result: AnalysisResult;
@@ -22,6 +24,36 @@ const RiskSummary: React.FC<RiskSummaryProps> = ({ result }) => {
     niedrig: result.clauses.filter(c => c.risk === 'niedrig' || c.risk === 'Rechtskonform').length,
     mittel: result.clauses.filter(c => c.risk === 'mittel' || c.risk === 'Rechtlich fraglich').length,
     hoch: result.clauses.filter(c => c.risk === 'hoch' || c.risk === 'Rechtlich unzulässig').length
+  };
+
+  // Format the summary content
+  const formattedSummary = formatContentWithRiskBox(result.summary);
+  
+  // Render based on whether the content was specially formatted or not
+  const renderSummary = () => {
+    if (typeof formattedSummary === 'string') {
+      return <p className="text-sm">{formattedSummary}</p>;
+    } else {
+      // It's an object with formatted parts
+      return (
+        <>
+          <p className="text-sm">{formattedSummary.mainContent}<strong>Risiko-Einstufung</strong></p>
+          <div className={cn("flex items-center p-2 rounded-md my-2", formattedSummary.bgColor)}>
+            {formattedSummary.riskLevel === 'Rechtskonform' && (
+              <CheckCircle className={`h-4 w-4 mr-1.5 ${formattedSummary.iconClass}`} />
+            )}
+            {formattedSummary.riskLevel === 'Rechtlich fraglich' && (
+              <HelpCircle className={`h-4 w-4 mr-1.5 ${formattedSummary.iconClass}`} />
+            )}
+            {formattedSummary.riskLevel === 'Rechtlich unzulässig' && (
+              <AlertCircle className={`h-4 w-4 mr-1.5 ${formattedSummary.iconClass}`} />
+            )}
+            <span className={cn("font-medium", formattedSummary.textColor)}>{formattedSummary.riskLevel}</span>
+          </div>
+          {formattedSummary.restContent && <p className="text-sm mt-2">{formattedSummary.restContent}</p>}
+        </>
+      );
+    }
   };
 
   return (
@@ -44,7 +76,7 @@ const RiskSummary: React.FC<RiskSummaryProps> = ({ result }) => {
         <div className="space-y-4">
           <div className="flex flex-col md:flex-row gap-6">
             <div className="flex-1">
-              {formatContentWithRiskBox(result.summary)}
+              {renderSummary()}
             </div>
             <div className="md:w-48 flex justify-center">
               <RiskMeter risk={result.overallRisk} size="lg" />

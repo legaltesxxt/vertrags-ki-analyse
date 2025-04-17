@@ -10,6 +10,7 @@ import { AnalysisClause } from '@/types/analysisTypes';
 import RiskMeter from '../RiskMeter';
 import { CheckCircle, HelpCircle, AlertCircle } from 'lucide-react';
 import { formatContentWithRiskBox } from '@/utils/contentFormatter';
+import { cn } from '@/lib/utils';
 
 interface ClauseItemProps {
   clause: AnalysisClause;
@@ -48,6 +49,36 @@ const ClauseItem: React.FC<ClauseItemProps> = ({ clause }) => {
     }
   };
 
+  // Format the analysis content
+  const formattedContent = formatContentWithRiskBox(clause.analysis);
+  
+  // Render based on whether the content was specially formatted or not
+  const renderAnalysis = () => {
+    if (typeof formattedContent === 'string') {
+      return <p className="text-sm">{formattedContent}</p>;
+    } else {
+      // It's an object with formatted parts
+      return (
+        <>
+          <p className="text-sm">{formattedContent.mainContent}<strong>Risiko-Einstufung</strong></p>
+          <div className={cn("flex items-center p-2 rounded-md my-2", formattedContent.bgColor)}>
+            {formattedContent.riskLevel === 'Rechtskonform' && (
+              <CheckCircle className={`h-4 w-4 mr-1.5 ${formattedContent.iconClass}`} />
+            )}
+            {formattedContent.riskLevel === 'Rechtlich fraglich' && (
+              <HelpCircle className={`h-4 w-4 mr-1.5 ${formattedContent.iconClass}`} />
+            )}
+            {formattedContent.riskLevel === 'Rechtlich unzulässig' && (
+              <AlertCircle className={`h-4 w-4 mr-1.5 ${formattedContent.iconClass}`} />
+            )}
+            <span className={cn("font-medium", formattedContent.textColor)}>{formattedContent.riskLevel}</span>
+          </div>
+          {formattedContent.restContent && <p className="text-sm mt-2">{formattedContent.restContent}</p>}
+        </>
+      );
+    }
+  };
+
   return (
     <AccordionItem key={clause.id} value={clause.id}>
       <AccordionTrigger className="hover:bg-gray-50 px-4 rounded-lg">
@@ -79,7 +110,7 @@ const ClauseItem: React.FC<ClauseItemProps> = ({ clause }) => {
           <div className="flex flex-col md:flex-row md:items-start gap-4">
             <div className="flex-1">
               <h5 className="text-sm font-medium text-gray-700 mb-1">Analyse:</h5>
-              {formatContentWithRiskBox(clause.analysis)}
+              {renderAnalysis()}
             </div>
             <div className="md:w-36 flex justify-center">
               <RiskMeter risk={clause.risk} size="md" />

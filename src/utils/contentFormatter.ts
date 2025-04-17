@@ -1,15 +1,13 @@
 
-import React from 'react';
-import { CheckCircle, HelpCircle, AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 /**
  * Formats content with special handling for risk classifications
  */
-export const formatContentWithRiskBox = (content: string) => {
+export const formatContentWithRiskBox = (content: string): string | JSX.Element => {
   // Check if the content contains the risk assessment heading
   if (!content || !content.includes('**Risiko-Einstufung**')) {
-    return <p className="text-sm">{content}</p>;
+    return content;
   }
 
   // Split the content based on the risk assessment heading
@@ -17,7 +15,7 @@ export const formatContentWithRiskBox = (content: string) => {
   
   // Check if there's content after the heading
   if (parts.length < 2 || !parts[1]) {
-    return <p className="text-sm">{content}</p>;
+    return content;
   }
 
   // Extract the risk assessment (take the first line after the heading)
@@ -29,43 +27,41 @@ export const formatContentWithRiskBox = (content: string) => {
   let riskLevel = '';
   let bgColor = '';
   let textColor = '';
-  let icon = null;
+  let iconClass = '';
   
   if (riskText === 'Rechtskonform') {
     riskLevel = 'Rechtskonform';
     bgColor = 'bg-[#F2FCE2]'; // Soft green
     textColor = 'text-green-700';
-    icon = <CheckCircle className="h-4 w-4 mr-1.5 text-green-600" />;
+    iconClass = 'text-green-600';
   } else if (riskText === 'Rechtlich fraglich') {
     riskLevel = 'Rechtlich fraglich';
     bgColor = 'bg-[#FEF3C7]'; // Soft orange
     textColor = 'text-orange-700';
-    icon = <HelpCircle className="h-4 w-4 mr-1.5 text-orange-600" />;
+    iconClass = 'text-orange-600';
   } else if (riskText === 'Rechtlich unzulässig') {
     riskLevel = 'Rechtlich unzulässig';
     bgColor = 'bg-[#FEE2E2]'; // Soft red
     textColor = 'text-red-700';
-    icon = <AlertCircle className="h-4 w-4 mr-1.5 text-red-600" />;
+    iconClass = 'text-red-600';
   }
   
-  // Create content with special formatting for risk assessment
-  if (riskLevel) {
-    const restContent = lines.slice(1).join('\n').trim();
-    
-    return (
-      <>
-        <p className="text-sm">{parts[0]}<strong>Risiko-Einstufung</strong></p>
-        <div className={cn("flex items-center p-2 rounded-md my-2", bgColor)}>
-          {icon}
-          <span className={cn("font-medium", textColor)}>{riskLevel}</span>
-        </div>
-        {restContent && <p className="text-sm mt-2">{restContent}</p>}
-      </>
-    );
+  // If no specific risk level was found, return the original content
+  if (!riskLevel) {
+    return content;
   }
+
+  // For the actual rendering, we'll return the JSX element that can be used in React components
+  const restContent = lines.slice(1).join('\n').trim();
   
-  // Fallback to regular formatting if no specific risk level was found
-  return <p className="text-sm">{content}</p>;
+  return {
+    mainContent: parts[0],
+    riskLevel,
+    bgColor,
+    textColor,
+    iconClass,
+    restContent
+  };
 };
 
 /**
