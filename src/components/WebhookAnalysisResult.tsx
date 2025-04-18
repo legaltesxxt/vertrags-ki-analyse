@@ -13,18 +13,19 @@ const WebhookAnalysisResult: React.FC<WebhookAnalysisResultProps> = ({ result })
   if (!result) return null;
 
   return (
-    <div className="space-y-6">
-      {/* First the clause analysis */}
-      <h3 className="font-semibold text-xl">Klauselanalyse</h3>
-      
-      <Accordion type="single" collapsible className="w-full mb-8">
-        {result.clauses.map((clause) => (
-          <ClauseItem key={clause.id} clause={clause} />
-        ))}
-      </Accordion>
-
-      {/* Then the summary and risk assessment */}
+    <div className="space-y-8 animate-fade-in">
+      {/* First the summary and risk assessment */}
       <RiskSummary result={result} />
+      
+      {/* Then the clause analysis */}
+      <div className="mt-8">
+        <h3 className="font-medium text-xl mb-4 text-legal-primary tracking-tight">Klausel-Analyse</h3>
+        <Accordion type="single" collapsible className="w-full space-y-2">
+          {result.clauses.map((clause) => (
+            <ClauseItem key={clause.id} clause={clause} />
+          ))}
+        </Accordion>
+      </div>
     </div>
   );
 };

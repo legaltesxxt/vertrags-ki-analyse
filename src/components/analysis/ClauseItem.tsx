@@ -5,7 +5,9 @@ import {
   AccordionTrigger,
   AccordionContent
 } from '@/components/ui/accordion';
-import { ExternalLink } from 'lucide-react';
+import { Separator } from '@/components/ui/separator';
+import { Badge } from '@/components/ui/badge';
+import { ExternalLink, BookOpen, FileText, Lightbulb } from 'lucide-react';
 import { AnalysisClause } from '@/types/analysisTypes';
 import RiskMeter from '../RiskMeter';
 import { CheckCircle, HelpCircle, AlertCircle } from 'lucide-react';
@@ -37,13 +39,13 @@ const ClauseItem: React.FC<ClauseItemProps> = ({ clause }) => {
     switch (risk) {
       case 'niedrig':
       case 'Rechtskonform':
-        return 'risk-low';
+        return 'bg-legal-risk-low/10 text-legal-risk-low border-legal-risk-low/30';
       case 'mittel':
       case 'Rechtlich fraglich':
-        return 'risk-medium';
+        return 'bg-legal-risk-medium/10 text-legal-risk-medium border-legal-risk-medium/30';
       case 'hoch':
       case 'Rechtlich unzulässig':
-        return 'risk-high';
+        return 'bg-legal-risk-high/10 text-legal-risk-high border-legal-risk-high/30';
       default:
         return '';
     }
@@ -51,70 +53,69 @@ const ClauseItem: React.FC<ClauseItemProps> = ({ clause }) => {
 
   // Format the analysis content
   const formattedContent = formatContentWithRiskBox(clause.analysis);
-  console.log(`Clause ${clause.id} - Risk: ${clause.risk} - Formatted content type:`, typeof formattedContent);
   
   // Render based on whether the content was specially formatted or not
   const renderAnalysis = () => {
     if (typeof formattedContent === 'string') {
-      console.log(`Clause ${clause.id} - Returning plain string content`);
-      return <p className="text-sm">{formattedContent}</p>;
+      return <p className="text-sm text-slate-700 leading-relaxed">{formattedContent}</p>;
     } else {
-      // It's a FormattedContent object
-      console.log(`Clause ${clause.id} - Rendering formatted box with risk level:`, formattedContent.riskLevel);
       return (
         <>
           {formattedContent.mainContent && 
-            <p className="text-sm mb-2">{formattedContent.mainContent}</p>
+            <p className="text-sm text-slate-700 leading-relaxed mb-3">{formattedContent.mainContent}</p>
           }
-          <div className={cn("flex items-center p-2 rounded-md my-2", formattedContent.bgColor)}>
+          <div className={cn("flex items-center p-3 rounded-md my-3", formattedContent.bgColor)}>
             {formattedContent.riskLevel === 'Rechtskonform' && (
-              <CheckCircle className={`h-4 w-4 mr-1.5 ${formattedContent.iconClass}`} />
+              <CheckCircle className={`h-4 w-4 mr-2 ${formattedContent.iconClass}`} />
             )}
             {formattedContent.riskLevel === 'Rechtlich fraglich' && (
-              <HelpCircle className={`h-4 w-4 mr-1.5 ${formattedContent.iconClass}`} />
+              <HelpCircle className={`h-4 w-4 mr-2 ${formattedContent.iconClass}`} />
             )}
             {formattedContent.riskLevel === 'Rechtlich unzulässig' && (
-              <AlertCircle className={`h-4 w-4 mr-1.5 ${formattedContent.iconClass}`} />
+              <AlertCircle className={`h-4 w-4 mr-2 ${formattedContent.iconClass}`} />
             )}
             <span className={cn("font-medium", formattedContent.textColor)}>{formattedContent.riskLevel}</span>
           </div>
-          {formattedContent.restContent && <p className="text-sm mt-2">{formattedContent.restContent}</p>}
+          {formattedContent.restContent && <p className="text-sm mt-3 text-slate-700 leading-relaxed">{formattedContent.restContent}</p>}
         </>
       );
     }
   };
 
   return (
-    <AccordionItem key={clause.id} value={clause.id}>
-      <AccordionTrigger className="hover:bg-gray-50 px-4 rounded-lg">
+    <AccordionItem key={clause.id} value={clause.id} className="border-legal-primary/10">
+      <AccordionTrigger className="hover:bg-slate-50 px-4 py-3 rounded-lg transition-all">
         <div className="flex items-center space-x-3 text-left w-full">
           {getRiskIcon(clause.risk)}
           <div className="flex-1">
-            <h4 className="font-medium">{clause.title}</h4>
-            <p className="text-sm text-gray-500 truncate max-w-md">
+            <h4 className="font-medium text-legal-primary">{clause.title}</h4>
+            <p className="text-sm text-slate-500 truncate max-w-md">
               {clause.text && clause.text.length > 60 
                 ? `${clause.text.substring(0, 60)}...` 
                 : clause.text}
             </p>
           </div>
-          <div className="flex items-center gap-3">
-            <RiskMeter risk={clause.risk} size="sm" showLabel={false} />
-            <span className={`risk-pill ${getRiskClass(clause.risk)}`}>
-              {clause.risk}
-            </span>
-          </div>
+          <Badge className={`ml-2 border ${getRiskClass(clause.risk)}`}>
+            {clause.risk}
+          </Badge>
         </div>
       </AccordionTrigger>
-      <AccordionContent className="px-4 pt-2">
-        <div className="space-y-4">
-          <div className="p-3 bg-gray-50 rounded-lg">
-            <h5 className="text-sm font-medium text-gray-700 mb-1">Klauseltext:</h5>
-            <p className="text-sm">{clause.text}</p>
+      <AccordionContent className="px-6 pt-3 pb-5">
+        <div className="space-y-5">
+          <div className="p-4 bg-slate-50 rounded-lg border border-slate-100">
+            <div className="flex items-center gap-2 mb-2">
+              <FileText size={16} className="text-legal-secondary" />
+              <h5 className="text-sm font-medium text-legal-secondary">Klauseltext</h5>
+            </div>
+            <p className="text-sm text-slate-700 leading-relaxed">{clause.text}</p>
           </div>
           
-          <div className="flex flex-col md:flex-row md:items-start gap-4">
+          <div className="flex flex-col md:flex-row md:items-start gap-5">
             <div className="flex-1">
-              <h5 className="text-sm font-medium text-gray-700 mb-1">Analyse:</h5>
+              <div className="flex items-center gap-2 mb-2">
+                <BookOpen size={16} className="text-legal-secondary" />
+                <h5 className="text-sm font-medium text-legal-secondary">Analyse</h5>
+              </div>
               {renderAnalysis()}
             </div>
             <div className="md:w-36 flex justify-center">
@@ -123,15 +124,18 @@ const ClauseItem: React.FC<ClauseItemProps> = ({ clause }) => {
           </div>
           
           {clause.lawReference && clause.lawReference.text && (
-            <div className="p-3 bg-blue-50 rounded-lg">
-              <h5 className="text-sm font-medium text-legal-primary mb-1">Gesetzliche Referenz:</h5>
-              <p className="text-sm">{clause.lawReference.text}</p>
+            <div className="p-4 bg-legal-tertiary/30 rounded-lg border border-legal-tertiary">
+              <div className="flex items-center gap-2 mb-2">
+                <BookOpen size={16} className="text-legal-primary" />
+                <h5 className="text-sm font-medium text-legal-primary">Gesetzliche Referenz</h5>
+              </div>
+              <p className="text-sm text-slate-700 leading-relaxed">{clause.lawReference.text}</p>
               {clause.lawReference.link && (
                 <a 
                   href={clause.lawReference.link} 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="text-sm text-legal-secondary hover:underline inline-flex items-center mt-1"
+                  className="text-sm text-legal-secondary hover:text-legal-primary hover:underline inline-flex items-center mt-2 transition-colors"
                 >
                   Gesetzestext ansehen
                   <ExternalLink className="ml-1 h-3 w-3" />
@@ -141,9 +145,12 @@ const ClauseItem: React.FC<ClauseItemProps> = ({ clause }) => {
           )}
           
           {clause.recommendation && (
-            <div>
-              <h5 className="text-sm font-medium text-gray-700 mb-1">Empfehlung:</h5>
-              <p className="text-sm">{clause.recommendation}</p>
+            <div className="p-4 bg-white rounded-lg border border-slate-200">
+              <div className="flex items-center gap-2 mb-2">
+                <Lightbulb size={16} className="text-legal-secondary" />
+                <h5 className="text-sm font-medium text-legal-secondary">Empfehlung</h5>
+              </div>
+              <p className="text-sm text-slate-700 leading-relaxed">{clause.recommendation}</p>
             </div>
           )}
         </div>

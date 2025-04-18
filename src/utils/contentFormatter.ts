@@ -1,3 +1,4 @@
+
 import { cn } from '@/lib/utils';
 
 export interface FormattedContent {
@@ -17,14 +18,20 @@ export const formatContentWithRiskBox = (content: string): string | FormattedCon
 
   // Erweiterte Regex-Muster für verschiedene Formate der Risiko-Einstufung
   const riskRegexes = [
-    // Markdown Format mit Sternchen
-    /\*\*(?:Risiko-Einstufung|Risiko)\*\*\s*(?:\:|\n)?\s*(Rechtskonform|Rechtlich fraglich|Rechtlich unzulässig)/i,
-    // Plain Text Format
-    /(?:Risiko-Einstufung|Risiko)\s*(?:\:|\n)?\s*(Rechtskonform|Rechtlich fraglich|Rechtlich unzulässig)/i,
+    // Markdown Format mit Sternchen und Doppelpunkt
+    /\*\*(?:Risiko-Einstufung|Risiko)\*\*\s*(?:\:|-)?\s*\n?\s*(Rechtskonform|Rechtlich fraglich|Rechtlich unzulässig)/i,
+    // Markdown Format mit Sternchen ohne Doppelpunkt
+    /\*\*(?:Risiko-Einstufung|Risiko)\*\*\s*\n?\s*(Rechtskonform|Rechtlich fraglich|Rechtlich unzulässig)/i,
+    // Plain Text Format mit Doppelpunkt
+    /(?:Risiko-Einstufung|Risiko)\s*(?:\:|-)?\s*\n?\s*(Rechtskonform|Rechtlich fraglich|Rechtlich unzulässig)/i,
+    // Plain Text Format ohne Doppelpunkt
+    /(?:Risiko-Einstufung|Risiko)\s*\n?\s*(Rechtskonform|Rechtlich fraglich|Rechtlich unzulässig)/i,
     // Format mit Bindestrich
     /(?:Risiko|Risiko-Einstufung)\s*-\s*(Rechtskonform|Rechtlich fraglich|Rechtlich unzulässig)/i,
     // Format mit Doppelpunkt
-    /(?:Risiko|Risiko-Einstufung)\:\s*(Rechtskonform|Rechtlich fraglich|Rechtlich unzulässig)/i
+    /(?:Risiko|Risiko-Einstufung)\:\s*(Rechtskonform|Rechtlich fraglich|Rechtlich unzulässig)/i,
+    // Direktes Auftreten der Risikobegriffe
+    /(Rechtskonform|Rechtlich fraglich|Rechtlich unzulässig)(?:\s*:|\.)/i
   ];
   
   let riskMatch = null;
@@ -63,7 +70,7 @@ export const formatContentWithRiskBox = (content: string): string | FormattedCon
   
   if (restStartPos < content.length) {
     // Suche nach dem nächsten Abschnitt (z.B. "Gesetzliche Referenz" oder "Handlungsbedarf")
-    const nextSectionRegex = /\n\*\*(?:Gesetzliche Referenz|Handlungsbedarf)\:\*\*/i;
+    const nextSectionRegex = /\n\*\*(?:Gesetzliche Referenz|Handlungsbedarf|Empfehlung|Begründung)\s*(?:\:|\*\*)/i;
     const nextSection = content.substring(restStartPos).match(nextSectionRegex);
     
     if (nextSection) {

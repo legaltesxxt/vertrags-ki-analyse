@@ -7,11 +7,13 @@ import {
   CardHeader,
   CardTitle
 } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
+import { Badge } from '@/components/ui/badge';
 import RiskMeter from '../RiskMeter';
 import { formatContentWithRiskBox } from '@/utils/contentFormatter';
 import { AnalysisResult } from '@/types/analysisTypes';
 import { getRiskClass } from '@/utils/contentFormatter';
-import { CheckCircle, HelpCircle, AlertCircle } from 'lucide-react';
+import { CheckCircle, HelpCircle, AlertCircle, BarChart3 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface RiskSummaryProps {
@@ -34,74 +36,81 @@ const RiskSummary: React.FC<RiskSummaryProps> = ({ result }) => {
   const renderSummary = () => {
     if (typeof formattedSummary === 'string') {
       console.log("Summary - Returning plain string content");
-      return <p className="text-sm">{formattedSummary}</p>;
+      return <p className="text-sm leading-relaxed">{formattedSummary}</p>;
     } else {
       // It's a FormattedContent object
       console.log("Summary - Rendering formatted box with risk level:", formattedSummary.riskLevel);
       return (
         <>
           {formattedSummary.mainContent && 
-            <p className="text-sm mb-2">{formattedSummary.mainContent}</p>
+            <p className="text-sm leading-relaxed mb-4">{formattedSummary.mainContent}</p>
           }
-          <div className={cn("flex items-center p-2 rounded-md my-2", formattedSummary.bgColor)}>
+          <div className={cn("flex items-center p-3 rounded-lg my-3", formattedSummary.bgColor)}>
             {formattedSummary.riskLevel === 'Rechtskonform' && (
-              <CheckCircle className={`h-4 w-4 mr-1.5 ${formattedSummary.iconClass}`} />
+              <CheckCircle className={`h-5 w-5 mr-2 ${formattedSummary.iconClass}`} />
             )}
             {formattedSummary.riskLevel === 'Rechtlich fraglich' && (
-              <HelpCircle className={`h-4 w-4 mr-1.5 ${formattedSummary.iconClass}`} />
+              <HelpCircle className={`h-5 w-5 mr-2 ${formattedSummary.iconClass}`} />
             )}
             {formattedSummary.riskLevel === 'Rechtlich unzulässig' && (
-              <AlertCircle className={`h-4 w-4 mr-1.5 ${formattedSummary.iconClass}`} />
+              <AlertCircle className={`h-5 w-5 mr-2 ${formattedSummary.iconClass}`} />
             )}
             <span className={cn("font-medium", formattedSummary.textColor)}>{formattedSummary.riskLevel}</span>
           </div>
-          {formattedSummary.restContent && <p className="text-sm mt-2">{formattedSummary.restContent}</p>}
+          {formattedSummary.restContent && <p className="text-sm mt-4 leading-relaxed">{formattedSummary.restContent}</p>}
         </>
       );
     }
   };
 
   return (
-    <Card>
-      <CardHeader>
+    <Card className="border-legal-primary/10 shadow-sm">
+      <CardHeader className="bg-gradient-to-r from-white to-legal-tertiary/30 rounded-t-lg">
         <div className="flex justify-between items-center">
           <div>
-            <CardTitle>Vertragsanalyse</CardTitle>
-            <CardDescription>Zusammenfassung und Risikobewertung</CardDescription>
+            <CardTitle className="text-legal-primary text-2xl font-light tracking-tight">Analyse-Zusammenfassung</CardTitle>
+            <CardDescription className="text-legal-secondary/80">Juristische Bewertung und Risikoeinstufung</CardDescription>
           </div>
-          <div className="flex items-center gap-4">
-            <RiskMeter risk={result.overallRisk} size="md" showLabel={false} />
-            <span className={`risk-pill ${getRiskClass(result.overallRisk)}`}>
-              Gesamtrisiko: {result.overallRisk}
-            </span>
-          </div>
+          <Badge 
+            className={`px-3 py-1.5 text-sm font-medium ${getRiskClass(result.overallRisk)}`}
+            variant="outline"
+          >
+            {result.overallRisk}
+          </Badge>
         </div>
       </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
+      <CardContent className="pt-6">
+        <div className="space-y-6">
           <div className="flex flex-col md:flex-row gap-6">
             <div className="flex-1">
-              {renderSummary()}
+              <div className="prose prose-sm max-w-none">
+                {renderSummary()}
+              </div>
             </div>
             <div className="md:w-48 flex justify-center">
               <RiskMeter risk={result.overallRisk} size="lg" />
             </div>
           </div>
           
-          <div className="bg-gray-50 rounded-lg p-4 mt-4">
-            <h3 className="text-sm font-medium mb-2">Risiko-Übersicht</h3>
-            <div className="grid grid-cols-3 gap-2 text-center">
-              <div className="bg-legal-risk-low/20 p-3 rounded">
+          <Separator className="my-6" />
+          
+          <div className="rounded-lg bg-slate-50 p-5">
+            <h3 className="text-base font-medium mb-4 flex items-center gap-2 text-legal-primary">
+              <BarChart3 size={18} />
+              Risiko-Übersicht
+            </h3>
+            <div className="grid grid-cols-3 gap-3 text-center">
+              <div className="bg-legal-risk-low/10 p-3 rounded-lg border border-legal-risk-low/20 transition-all hover:shadow-sm">
                 <span className="text-xl font-bold text-legal-risk-low">{riskCounts.niedrig}</span>
-                <p className="text-sm">Niedriges Risiko</p>
+                <p className="text-sm text-slate-600 mt-1">Niedriges Risiko</p>
               </div>
-              <div className="bg-legal-risk-medium/20 p-3 rounded">
+              <div className="bg-legal-risk-medium/10 p-3 rounded-lg border border-legal-risk-medium/20 transition-all hover:shadow-sm">
                 <span className="text-xl font-bold text-legal-risk-medium">{riskCounts.mittel}</span>
-                <p className="text-sm">Mittleres Risiko</p>
+                <p className="text-sm text-slate-600 mt-1">Mittleres Risiko</p>
               </div>
-              <div className="bg-legal-risk-high/20 p-3 rounded">
+              <div className="bg-legal-risk-high/10 p-3 rounded-lg border border-legal-risk-high/20 transition-all hover:shadow-sm">
                 <span className="text-xl font-bold text-legal-risk-high">{riskCounts.hoch}</span>
-                <p className="text-sm">Hohes Risiko</p>
+                <p className="text-sm text-slate-600 mt-1">Hohes Risiko</p>
               </div>
             </div>
           </div>

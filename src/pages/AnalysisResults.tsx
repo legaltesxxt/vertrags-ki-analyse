@@ -2,8 +2,9 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, FileText } from 'lucide-react';
+import { ArrowLeft, FileText, Shield } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Separator } from '@/components/ui/separator';
 import MarkdownRenderer from '@/components/MarkdownRenderer';
 import Navbar from '@/components/Navbar';
 import WebhookAnalysisResult from '@/components/WebhookAnalysisResult';
@@ -42,20 +43,23 @@ const AnalysisResults = () => {
   }, [location.state]);
 
   return (
-    <div className="min-h-screen flex flex-col bg-legal-light">
+    <div className="min-h-screen flex flex-col bg-slate-50">
       <Navbar />
 
-      <main className="flex-1 container mx-auto px-4 py-8 max-w-5xl">
-        <div className="flex items-center justify-between mb-6">
+      <main className="flex-1 container mx-auto px-4 py-6 md:py-10 max-w-5xl">
+        <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-3">
-            <div className="bg-legal-primary p-2 rounded text-white">
-              <FileText className="h-5 w-5" />
+            <div className="bg-gradient-to-r from-legal-primary to-legal-secondary p-2.5 rounded-lg text-white shadow-sm">
+              <FileText className="h-6 w-6" />
             </div>
-            <h1 className="text-3xl font-bold text-legal-primary">Vertragsanalyse</h1>
+            <div>
+              <h1 className="text-3xl font-light tracking-tight text-legal-primary">Vertragsanalyse</h1>
+              <p className="text-sm text-slate-500 mt-0.5">Rechtliche Bewertung nach Schweizer Recht</p>
+            </div>
           </div>
           <Button 
             variant="outline" 
-            className="flex items-center gap-2 border-legal-primary/20 hover:bg-legal-tertiary" 
+            className="flex items-center gap-2 border-legal-primary/20 hover:bg-legal-tertiary text-legal-primary transition-all" 
             onClick={() => navigate('/')}
           >
             <ArrowLeft size={18} />
@@ -63,7 +67,7 @@ const AnalysisResults = () => {
           </Button>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm p-8 border border-border/50 mb-8 animate-fade-in">
+        <div className="bg-white rounded-xl shadow-sm border border-slate-200/50 p-6 md:p-8 mb-8 animate-fade-in">
           <ScrollArea className="h-[calc(100vh-250px)] pr-4">
             {structuredResult ? (
               <WebhookAnalysisResult result={structuredResult} />
@@ -88,28 +92,30 @@ const AnalysisResults = () => {
           </ScrollArea>
           
           {(analysisOutput || structuredResult) && (
-            <div className="mt-8 border-t border-border pt-6 flex justify-center">
+            <div className="mt-8 border-t border-slate-100 pt-6 flex justify-center">
               <Button 
                 onClick={() => navigate('/')}
                 className="bg-legal-primary hover:bg-legal-secondary flex items-center gap-2"
               >
                 Neuen Vertrag analysieren
-                <ArrowLeft size={16} />
               </Button>
             </div>
           )}
         </div>
       </main>
       
-      <footer className="bg-legal-primary text-white py-8 mt-auto">
+      <footer className="bg-gradient-to-r from-legal-primary to-legal-secondary text-white py-8 mt-auto">
         <div className="container mx-auto px-4 max-w-5xl">
           <div className="flex flex-col md:flex-row justify-between items-center">
-            <div>
-              <h3 className="font-semibold text-lg">VertragsAnalyse</h3>
-              <p className="text-sm mt-1 text-gray-300">Schweizer Rechtsanalyse-Tool</p>
+            <div className="flex items-center gap-3">
+              <Shield className="h-6 w-6 text-white/90" />
+              <div>
+                <h3 className="font-light text-xl tracking-tight">VertragsAnalyse</h3>
+                <p className="text-sm mt-1 text-white/80">Schweizer Rechtsanalyse-Tool</p>
+              </div>
             </div>
-            <div className="mt-4 md:mt-0 text-xs text-gray-300">
-              <p>Vertragspartner: OpenAI (Analyse via GPT-4 Turbo) | Supabase Hosting | n8n Automatisierung</p>
+            <div className="mt-4 md:mt-0 text-xs text-white/70">
+              <p>API: OpenAI GPT-4 Turbo | Hosting: Supabase | Automatisierung: n8n</p>
               <p className="text-center mt-2">© {new Date().getFullYear()} VertragsAnalyse. Alle Rechte vorbehalten.</p>
             </div>
           </div>

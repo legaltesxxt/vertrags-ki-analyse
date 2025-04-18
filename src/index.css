@@ -59,6 +59,23 @@
   body {
     @apply bg-background text-foreground;
     font-feature-settings: "pnum" on, "lnum" on;
+    letter-spacing: -0.01em;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply tracking-tight;
+  }
+  
+  .swiss-card {
+    @apply bg-white rounded-xl border border-slate-100/50 shadow-sm transition duration-300 hover:shadow-md;
+  }
+  
+  .swiss-gradient {
+    @apply bg-gradient-to-r from-legal-primary to-legal-secondary;
+  }
+  
+  .swiss-bg-subtle {
+    @apply bg-gradient-to-r from-legal-tertiary/30 to-white;
   }
 }
 
@@ -98,23 +115,14 @@
   @apply absolute bottom-0 left-1/2 -translate-x-1/2 origin-bottom transition-transform duration-700;
 }
 
-/* Swiss-style Card */
-.swiss-card {
-  @apply bg-white rounded-lg border border-border/80 shadow-sm hover:shadow-md transition-shadow duration-300;
-}
-
 /* Smooth transitions */
 .smooth-transition {
   @apply transition-all duration-300 ease-in-out;
 }
 
 /* Typography */
-h1, h2, h3, h4, h5, h6 {
-  @apply tracking-tight;
-}
-
 .markdown-content h2 {
-  @apply text-xl font-semibold text-legal-primary mt-8 mb-3;
+  @apply text-xl font-light text-legal-primary mt-8 mb-3;
 }
 
 .markdown-content h3 {
@@ -131,5 +139,29 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .markdown-content a {
-  @apply text-legal-secondary hover:underline font-medium;
+  @apply text-legal-secondary hover:text-legal-primary hover:underline transition-colors font-medium;
+}
+
+/* Keyframe Animations */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Animation Classes */
+.animate-fade-in {
+  animation: fade-in 0.5s ease-out forwards;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .risk-meter-wrapper {
+    transform: scale(0.85);
+  }
 }
