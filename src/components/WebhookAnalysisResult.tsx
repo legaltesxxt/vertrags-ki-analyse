@@ -22,7 +22,6 @@ const WebhookAnalysisResult: React.FC<WebhookAnalysisResultProps> = ({ result })
       <div className="mt-8">
         <div className="flex justify-between items-center mb-4">
           <h3 className="font-medium text-xl text-legal-primary tracking-tight">Klausel-Analyse</h3>
-          <DownloadAnalysisButton result={result} />
         </div>
         <Accordion type="single" collapsible className="w-full space-y-2">
           {result.clauses.map((clause) => (
@@ -30,8 +29,14 @@ const WebhookAnalysisResult: React.FC<WebhookAnalysisResultProps> = ({ result })
           ))}
         </Accordion>
       </div>
+
+      {/* Download button at the end of the analysis */}
+      <div className="flex justify-center mt-8">
+        <DownloadAnalysisButton result={result} />
+      </div>
     </div>
   );
 };
 
 export default WebhookAnalysisResult;
+
