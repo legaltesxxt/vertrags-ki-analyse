@@ -1,14 +1,15 @@
-
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, FileText, Shield } from 'lucide-react';
+import { ArrowLeft, FileText, Shield, Download } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import MarkdownRenderer from '@/components/MarkdownRenderer';
 import Navbar from '@/components/Navbar';
 import WebhookAnalysisResult from '@/components/WebhookAnalysisResult';
 import { AnalysisResult } from '@/types/analysisTypes';
+import html2pdf from 'html2pdf.js';
+import { useToast } from '@/components/ui/use-toast';
 
 interface WebhookResponseItem {
   output: string;
@@ -17,23 +18,19 @@ interface WebhookResponseItem {
 const AnalysisResults = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { toast } = useToast();
   const [analysisOutput, setAnalysisOutput] = useState('');
   const [structuredResult, setStructuredResult] = useState<AnalysisResult | null>(null);
 
-  // Extrahiere Analyseergebnisse aus dem Location-State oder der Webhook-Antwort
   useEffect(() => {
     if (location.state) {
-      // Prüfe auf strukturiertes Analyseergebnis
       if (location.state.analysisResult) {
         setStructuredResult(location.state.analysisResult);
       }
       
-      // Prüfe auf direkte String-Ausgabe oder Webhook-Antwort
       if (location.state.analysisOutput) {
-        // Direkte String-Ausgabe aus dem State
         setAnalysisOutput(location.state.analysisOutput);
       } else if (location.state.webhookResponse) {
-        // Array-Antwort vom Webhook
         const response = location.state.webhookResponse;
         if (Array.isArray(response) && response.length > 0 && response[0].output) {
           setAnalysisOutput(response[0].output);
@@ -41,6 +38,72 @@ const AnalysisResults = () => {
       }
     }
   }, [location.state]);
+
+  const downloadFullAnalysisPDF = async () => {
+    if (!structuredResult) {
+      toast({
+        title: "Kein Analyseergebnis",
+        description: "Es sind keine Analyseergebnisse zum Herunterladen verfügbar.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      const element = document.createElement('div');
+      element.innerHTML = `
+        <div style="font-family: Arial, sans-serif; padding: 40px;">
+          <h1 style="color: #1a5f7a; margin-bottom: 20px;">Vollständige Vertragsanalyse</h1>
+          
+          <div style="margin-bottom: 30px;">
+            <h2 style="color: #2c3e50; margin-bottom: 10px;">Zusammenfassung</h2>
+            <p>${structuredResult.summary}</p>
+            <p style="color: #666; margin-top: 10px;">Gesamtrisiko: ${structuredResult.overallRisk}</p>
+          </div>
+
+          <div>
+            <h2 style="color: #2c3e50; margin-bottom: 15px;">Detaillierte Klauselanalyse</h2>
+            ${structuredResult.clauses.map(clause => `
+              <div style="margin-bottom: 20px; padding: 15px; border: 1px solid #eee; border-radius: 8px;">
+                <h3 style="color: #1a5f7a; margin-bottom: 10px;">${clause.title}</h3>
+                <p style="margin-bottom: 8px;"><strong>Klauseltext:</strong> ${clause.text}</p>
+                <p style="margin-bottom: 8px;"><strong>Analyse:</strong> ${clause.analysis}</p>
+                <p style="margin-bottom: 8px;"><strong>Risikoeinstufung:</strong> ${clause.risk}</p>
+                <p style="margin-bottom: 8px;"><strong>Empfehlung:</strong> ${clause.recommendation}</p>
+                <p><strong>Gesetzliche Referenz:</strong> ${clause.lawReference.text}</p>
+              </div>
+            `).join('')}
+          </div>
+
+          <div style="margin-top: 30px; text-align: center; color: #666; font-size: 12px;">
+            <p>Erstellt mit VertragsAnalyse</p>
+            <p>© ${new Date().getFullYear()} Alle Rechte vorbehalten</p>
+          </div>
+        </div>
+      `;
+
+      const opt = {
+        margin: 10,
+        filename: 'vollstaendige_vertragsanalyse.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+
+      await html2pdf().from(element).set(opt).save();
+      
+      toast({
+        title: "PDF erstellt",
+        description: "Die vollständige Analyse wurde erfolgreich als PDF heruntergeladen.",
+      });
+    } catch (error) {
+      toast({
+        title: "Fehler beim PDF-Export",
+        description: "Beim Erstellen der PDF ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.",
+        variant: "destructive",
+      });
+    }
+  };
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50">
@@ -57,14 +120,25 @@ const AnalysisResults = () => {
               <p className="text-sm text-slate-500 mt-0.5">Rechtliche Bewertung nach Schweizer Recht</p>
             </div>
           </div>
-          <Button 
-            variant="outline" 
-            className="flex items-center gap-2 border-legal-primary/20 hover:bg-legal-tertiary text-legal-primary transition-all" 
-            onClick={() => navigate('/')}
-          >
-            <ArrowLeft size={18} />
-            Neuen Vertrag analysieren
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button 
+              variant="outline" 
+              className="flex items-center gap-2 border-legal-primary/20 hover:bg-legal-tertiary text-legal-primary transition-all" 
+              onClick={() => navigate('/')}
+            >
+              <ArrowLeft size={18} />
+              Neuen Vertrag analysieren
+            </Button>
+            {structuredResult && (
+              <Button 
+                onClick={downloadFullAnalysisPDF}
+                className="bg-legal-primary hover:bg-legal-secondary flex items-center gap-2"
+              >
+                <Download size={18} />
+                Vollständige Analyse
+              </Button>
+            )}
+          </div>
         </div>
 
         <div className="bg-white rounded-xl shadow-sm border border-slate-200/50 p-6 md:p-8 mb-8 animate-fade-in">
