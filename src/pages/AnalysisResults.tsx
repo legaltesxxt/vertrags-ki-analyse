@@ -1,15 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, FileText, Shield, Download } from 'lucide-react';
+import { ArrowLeft, Download, FileText, Shield } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Separator } from '@/components/ui/separator';
 import MarkdownRenderer from '@/components/MarkdownRenderer';
 import Navbar from '@/components/Navbar';
 import WebhookAnalysisResult from '@/components/WebhookAnalysisResult';
 import { AnalysisResult } from '@/types/analysisTypes';
 import html2pdf from 'html2pdf.js';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 
 interface WebhookResponseItem {
   output: string;
@@ -135,7 +134,7 @@ const AnalysisResults = () => {
                 className="bg-legal-primary hover:bg-legal-secondary flex items-center gap-2"
               >
                 <Download size={18} />
-                Vollständige Analyse
+                PDF herunterladen
               </Button>
             )}
           </div>
@@ -166,13 +165,22 @@ const AnalysisResults = () => {
           </ScrollArea>
           
           {(analysisOutput || structuredResult) && (
-            <div className="mt-8 border-t border-slate-100 pt-6 flex justify-center">
+            <div className="mt-8 border-t border-slate-100 pt-6 flex justify-center gap-4">
               <Button 
                 onClick={() => navigate('/')}
                 className="bg-legal-primary hover:bg-legal-secondary flex items-center gap-2"
               >
                 Neuen Vertrag analysieren
               </Button>
+              {structuredResult && (
+                <Button 
+                  onClick={downloadFullAnalysisPDF}
+                  className="bg-legal-primary hover:bg-legal-secondary flex items-center gap-2"
+                >
+                  <Download size={18} />
+                  PDF herunterladen
+                </Button>
+              )}
             </div>
           )}
         </div>

@@ -4,7 +4,6 @@ import { Accordion } from '@/components/ui/accordion';
 import { AnalysisResult } from '@/types/analysisTypes';
 import ClauseItem from './analysis/ClauseItem';
 import RiskSummary from './analysis/RiskSummary';
-import DownloadAnalysisButton from './DownloadAnalysisButton';
 
 interface WebhookAnalysisResultProps {
   result: AnalysisResult | null;
@@ -29,14 +28,8 @@ const WebhookAnalysisResult: React.FC<WebhookAnalysisResultProps> = ({ result })
           ))}
         </Accordion>
       </div>
-
-      {/* Download button at the end of the analysis */}
-      <div className="flex justify-center mt-8">
-        <DownloadAnalysisButton result={result} />
-      </div>
     </div>
   );
 };
 
 export default WebhookAnalysisResult;
-
