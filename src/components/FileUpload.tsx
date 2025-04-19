@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { FileText, Upload, X, FileCheck, AlertTriangle } from 'lucide-react';
@@ -27,7 +26,6 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileSelected, isAnalyzing }) 
         title: "Datei zu groß",
         description: `Die PDF-Datei darf maximal 10 MB groß sein. Ihre Datei hat ${(selectedFile.size / 1024 / 1024).toFixed(2)} MB.`,
         variant: "destructive",
-        icon: <AlertTriangle className="h-5 w-5" />
       });
       return;
     }
@@ -63,7 +61,6 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileSelected, isAnalyzing }) 
     maxFiles: 1
   });
 
-  // ... Rest des bestehenden Codes bleibt unverändert
   return (
     <div className="w-full">
       <div 
@@ -92,8 +89,6 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileSelected, isAnalyzing }) 
           </p>
         </div>
       </div>
-
-      {/* Restlicher Code bleibt unverändert */}
     </div>
   );
 };
