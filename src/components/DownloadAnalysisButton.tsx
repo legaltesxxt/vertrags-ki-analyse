@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { FilePdf, Download } from 'lucide-react';
+import { FileText, Download } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { AnalysisResult } from '@/types/analysisTypes';
 import html2pdf from 'html2pdf.js';
@@ -55,7 +55,7 @@ const DownloadAnalysisButton: React.FC<DownloadAnalysisButtonProps> = ({ result 
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
       };
 
-      const pdf = await html2pdf().from(element).set(opt).save();
+      await html2pdf().from(element).set(opt).save();
       
       toast({
         title: "PDF erstellt",
@@ -75,7 +75,7 @@ const DownloadAnalysisButton: React.FC<DownloadAnalysisButtonProps> = ({ result 
       onClick={downloadPDF}
       className="bg-legal-primary hover:bg-legal-secondary flex items-center gap-2"
     >
-      <FilePdf className="h-4 w-4" />
+      <FileText className="h-4 w-4" />
       <Download className="h-4 w-4" />
       Analyse als PDF herunterladen
     </Button>
