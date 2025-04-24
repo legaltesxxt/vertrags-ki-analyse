@@ -61,12 +61,6 @@ const AnalysisResults = () => {
         <div style="font-family: Arial, sans-serif; padding: 40px;">
           <h1 style="color: #1a5f7a; margin-bottom: 20px;">Vollständige Vertragsanalyse</h1>
           
-          <div style="margin-bottom: 30px;">
-            <h2 style="color: #2c3e50; margin-bottom: 10px;">Zusammenfassung</h2>
-            <p>${structuredResult.summary}</p>
-            <p style="color: #666; margin-top: 10px;">Gesamtrisiko: ${structuredResult.overallRisk}</p>
-          </div>
-
           <div>
             <h2 style="color: #2c3e50; margin-bottom: 15px;">Detaillierte Klauselanalyse</h2>
             ${structuredResult.clauses.map(clause => `

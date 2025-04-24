@@ -14,9 +14,6 @@ const WebhookAnalysisResult: React.FC<WebhookAnalysisResultProps> = ({ result })
   return (
     <div className="space-y-8 animate-fade-in">
       <div className="mt-8">
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="font-medium text-xl text-legal-primary tracking-tight">Klausel-Analyse</h3>
-        </div>
         <Accordion type="single" collapsible className="w-full space-y-2">
           {result.clauses.map((clause) => (
             <ClauseItem key={clause.id} clause={clause} />
