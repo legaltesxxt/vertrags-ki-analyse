@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Shield } from 'lucide-react';
@@ -10,7 +9,7 @@ import WebhookAnalysisResult from '@/components/WebhookAnalysisResult';
 import AnalysisHeader from '@/components/analysis/AnalysisHeader';
 import AnalysisFooter from '@/components/analysis/AnalysisFooter';
 import EmptyAnalysis from '@/components/analysis/EmptyAnalysis';
-import { AnalysisResult } from '@/types/analysisTypes';
+import { AnalysisResult, AnalysisClause } from '@/types/analysisTypes';
 import html2pdf from 'html2pdf.js';
 
 interface WebhookResponseItem {
@@ -25,36 +24,76 @@ const AnalysisResults = () => {
 
   useEffect(() => {
     if (location.state) {
-      // Handle direct structured result
       if (location.state.analysisResult) {
         console.log('Received structured analysis result:', location.state.analysisResult);
         setStructuredResult(location.state.analysisResult);
       }
       
-      // Handle webhook response and try to parse it into structured result
       if (location.state.webhookResponse) {
         const response = location.state.webhookResponse;
         console.log('Received webhook response:', response);
         
         if (Array.isArray(response) && response.length > 0) {
           try {
-            // Try to parse the webhook response into a structured format
             const outputData = response[0];
-            if (outputData.structuredAnalysis) {
-              setStructuredResult(outputData.structuredAnalysis);
-            } else if (outputData.output) {
+            if (outputData.output) {
               setAnalysisOutput(outputData.output);
-              // Try to parse the output as JSON if it looks like JSON
-              try {
-                if (outputData.output.trim().startsWith('{')) {
-                  const parsedOutput = JSON.parse(outputData.output);
-                  if (parsedOutput.clauses && parsedOutput.overallRisk && parsedOutput.summary) {
-                    setStructuredResult(parsedOutput);
-                  }
+              
+              const clauses: AnalysisClause[] = [];
+              const clauseRegex = /### Klausel (\d+)[^\n]*\n\n\*\*Klauseltext\*\*\s*\n([^\n]*)\n\n\*\*Analyse\*\*\s*\n([^\n]*)\n\n\*\*Risiko-Einstufung\*\*\s*\n([^\n]*)\n\n\*\*Gesetzliche Referenz\*\*\s*\n([^\n]*)\n\n\*\*Handlungsbedarf\*\*\s*\n([^\n]*)/g;
+              
+              let match;
+              while ((match = clauseRegex.exec(outputData.output)) !== null) {
+                const [_, id, text, analysis, risk, lawRef, recommendation] = match;
+                
+                let mappedRisk: 'niedrig' | 'mittel' | 'hoch' | 'Rechtskonform' | 'Rechtlich fraglich' | 'Rechtlich unzulässig';
+                if (risk.includes('Rechtskonform')) {
+                  mappedRisk = 'Rechtskonform';
+                } else if (risk.includes('fraglich')) {
+                  mappedRisk = 'Rechtlich fraglich';
+                } else {
+                  mappedRisk = 'Rechtlich unzulässig';
                 }
-              } catch (e) {
-                console.log('Output is not JSON format:', e);
+
+                clauses.push({
+                  id: id,
+                  title: `Klausel ${id}`,
+                  text: text.trim(),
+                  analysis: analysis.trim(),
+                  risk: mappedRisk,
+                  lawReference: {
+                    text: lawRef.trim(),
+                    link: ''  // No links in the current format
+                  },
+                  recommendation: recommendation.trim()
+                });
               }
+
+              let overallRisk: 'Rechtskonform' | 'Rechtlich fraglich' | 'Rechtlich unzulässig' = 'Rechtskonform';
+              if (clauses.some(c => c.risk === 'Rechtlich unzulässig')) {
+                overallRisk = 'Rechtlich unzulässig';
+              } else if (clauses.some(c => c.risk === 'Rechtlich fraglich')) {
+                overallRisk = 'Rechtlich fraglich';
+              }
+
+              const criticalClauses = clauses.filter(c => c.risk === 'Rechtlich unzulässig');
+              const questionableClauses = clauses.filter(c => c.risk === 'Rechtlich fraglich');
+              
+              let summary = `Analyse von ${clauses.length} Vertragsklauseln. `;
+              if (criticalClauses.length > 0) {
+                summary += `${criticalClauses.length} rechtlich unzulässige Klauseln gefunden: ${
+                  criticalClauses.map(c => c.title).join(', ')}. `;
+              }
+              if (questionableClauses.length > 0) {
+                summary += `${questionableClauses.length} rechtlich fragliche Klauseln: ${
+                  questionableClauses.map(c => c.title).join(', ')}. `;
+              }
+
+              setStructuredResult({
+                clauses,
+                overallRisk,
+                summary
+              });
             }
           } catch (error) {
             console.error('Error processing webhook response:', error);
@@ -62,7 +101,6 @@ const AnalysisResults = () => {
         }
       }
       
-      // Handle direct analysis output
       if (location.state.analysisOutput) {
         console.log('Received analysis output:', location.state.analysisOutput);
         setAnalysisOutput(location.state.analysisOutput);
