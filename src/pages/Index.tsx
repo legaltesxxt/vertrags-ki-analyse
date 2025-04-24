@@ -22,42 +22,54 @@ const Index = () => {
     
     const response = await sendToN8n(file);
       
-    if (response.success) {
-      if (response.data) {
-        console.log("Webhook-Antwort erhalten:", response.data);
+    if (response.success && response.data) {
+      console.log("Webhook response received:", response.data);
+      
+      // Parse the response into structured analysis result
+      if (Array.isArray(response.data) && response.data.length > 0 && response.data[0].output) {
+        const outputText = response.data[0].output;
         
-        if (Array.isArray(response.data) && response.data.length > 0 && response.data[0].output) {
-          navigate('/analysis-results', { 
-            state: { 
-              webhookResponse: response.data
-            }
-          });
-          return;
-        }
-        
-        if (response.data.rawText) {
-          navigate('/analysis-results', { 
-            state: { 
-              analysisOutput: response.data.rawText 
-            }
-          });
-          return;
-        }
-        
-        if (response.analysisResult) {
-          console.log("Analyse erfolgreich empfangen:", response.analysisResult);
-          setUseRealAnalysis(true);
-        }
-      } else {
-        console.log("Keine Analyseergebnisse erhalten");
-        toast({
-          title: "Hinweis",
-          description: "Keine Analyseergebnisse vom Server erhalten.",
-          variant: "default",
+        // Parse the markdown content into structured data
+        const clauses = outputText.split('### ').filter(Boolean).map((clauseText, index) => {
+          const title = clauseText.split('\n')[0].trim();
+          const matches = {
+            text: clauseText.match(/\*\*Klauseltext\*\*\s*\n([^*]+)/m)?.[1]?.trim() || '',
+            analysis: clauseText.match(/\*\*Analyse\*\*\s*\n([^*]+)/m)?.[1]?.trim() || '',
+            risk: (clauseText.match(/\*\*Risiko-Einstufung\*\*\s*\n([^*]+)/m)?.[1]?.trim() || 'Rechtskonform') as 'Rechtskonform' | 'Rechtlich fraglich' | 'Rechtlich unzulässig',
+            lawReference: {
+              text: clauseText.match(/\*\*Gesetzliche Referenz\*\*\s*\n([^*]+)/m)?.[1]?.trim() || '',
+              link: ''
+            },
+            recommendation: clauseText.match(/\*\*Handlungsbedarf\*\*\s*\n([^*]+)/m)?.[1]?.trim() || ''
+          };
+
+          return {
+            id: `clause-${index + 1}`,
+            title,
+            ...matches
+          };
         });
+
+        const analysisResult = {
+          clauses,
+          overallRisk: clauses.some(c => c.risk === 'Rechtlich unzulässig') 
+            ? 'Rechtlich unzulässig' 
+            : clauses.some(c => c.risk === 'Rechtlich fraglich') 
+              ? 'Rechtlich fraglich' 
+              : 'Rechtskonform',
+          summary: 'Vertragliche Analyse abgeschlossen'
+        };
+
+        navigate('/analysis-results', { 
+          state: { 
+            analysisResult,
+            analysisOutput: outputText
+          }
+        });
+        return;
       }
     } else {
-      console.error("Fehler beim Senden der Datei an n8n:", response.error);
+      console.error("Error sending file to n8n:", response.error);
       toast({
         title: "Fehler bei der Verarbeitung",
         description: "Die Datei konnte nicht zur Analyse gesendet werden. Bitte versuchen Sie es später erneut.",
