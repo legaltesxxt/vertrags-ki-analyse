@@ -1,10 +1,8 @@
-
 import React, { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import FileUpload from '@/components/FileUpload';
 import AnalysisProgress from '@/components/AnalysisProgress';
-import ClauseAnalysis from '@/components/ClauseAnalysis';
 import { useMockAnalysis } from '@/hooks/useMockAnalysis';
 import { useN8nWebhook } from '@/hooks/useN8nWebhook';
 import { Button } from '@/components/ui/button';
@@ -22,20 +20,17 @@ const Index = () => {
   const [useRealAnalysis, setUseRealAnalysis] = useState(true);
   const { toast } = useToast();
 
-  // Bestimme, welche Analyseergebnisse angezeigt werden sollen (Mock oder Webhook)
   const displayResult = useRealAnalysis ? webhookResult : mockResult;
 
   const handleFileSelected = useCallback(async (file: File) => {
     setSelectedFile(file);
     
-    // Sende die Datei an n8n für die Backend-Verarbeitung
     const response = await sendToN8n(file);
       
     if (response.success) {
       if (response.data) {
         console.log("Webhook-Antwort erhalten:", response.data);
         
-        // Bei Erfolg: Wenn die Antwort ein Array mit einem output-Feld ist, direkt zur Markdown-Ansicht navigieren
         if (Array.isArray(response.data) && response.data.length > 0 && response.data[0].output) {
           navigate('/analysis-results', { 
             state: { 
@@ -45,7 +40,6 @@ const Index = () => {
           return;
         }
         
-        // Alternativ, wenn es eine Textantwort gibt
         if (response.data.rawText) {
           navigate('/analysis-results', { 
             state: { 
@@ -84,7 +78,6 @@ const Index = () => {
     setUseRealAnalysis(true);
   }, [resetAnalysis, resetError]);
 
-  // Status der Analyse, entweder von Mock oder tatsächlich ladend
   const isCurrentlyAnalyzing = isSendingToN8n;
 
   return (
