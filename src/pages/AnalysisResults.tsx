@@ -1,15 +1,12 @@
+
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { Shield } from 'lucide-react';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { useToast } from '@/hooks/use-toast';
-import MarkdownRenderer from '@/components/MarkdownRenderer';
-import Navbar from '@/components/Navbar';
-import WebhookAnalysisResult from '@/components/WebhookAnalysisResult';
+import { AnalysisResult } from '@/types/analysisTypes';
+import AnalysisLayout from '@/components/analysis/AnalysisLayout';
 import AnalysisHeader from '@/components/analysis/AnalysisHeader';
+import AnalysisContent from '@/components/analysis/AnalysisContent';
 import AnalysisFooter from '@/components/analysis/AnalysisFooter';
-import EmptyAnalysis from '@/components/analysis/EmptyAnalysis';
-import { AnalysisResult, AnalysisClause } from '@/types/analysisTypes';
 import html2pdf from 'html2pdf.js';
 
 interface WebhookResponseItem {
@@ -34,69 +31,9 @@ const AnalysisResults = () => {
         console.log('Received webhook response:', response);
         
         if (Array.isArray(response) && response.length > 0) {
-          try {
-            const outputData = response[0];
-            if (outputData.output) {
-              setAnalysisOutput(outputData.output);
-              
-              const clauses: AnalysisClause[] = [];
-              const clauseRegex = /### Klausel (\d+)[^\n]*\n\n\*\*Klauseltext\*\*\s*\n([^\n]*)\n\n\*\*Analyse\*\*\s*\n([^\n]*)\n\n\*\*Risiko-Einstufung\*\*\s*\n([^\n]*)\n\n\*\*Gesetzliche Referenz\*\*\s*\n([^\n]*)\n\n\*\*Handlungsbedarf\*\*\s*\n([^\n]*)/g;
-              
-              let match;
-              while ((match = clauseRegex.exec(outputData.output)) !== null) {
-                const [_, id, text, analysis, risk, lawRef, recommendation] = match;
-                
-                let mappedRisk: 'niedrig' | 'mittel' | 'hoch' | 'Rechtskonform' | 'Rechtlich fraglich' | 'Rechtlich unzulässig';
-                if (risk.includes('Rechtskonform')) {
-                  mappedRisk = 'Rechtskonform';
-                } else if (risk.includes('fraglich')) {
-                  mappedRisk = 'Rechtlich fraglich';
-                } else {
-                  mappedRisk = 'Rechtlich unzulässig';
-                }
-
-                clauses.push({
-                  id: id,
-                  title: `Klausel ${id}`,
-                  text: text.trim(),
-                  analysis: analysis.trim(),
-                  risk: mappedRisk,
-                  lawReference: {
-                    text: lawRef.trim(),
-                    link: ''  // No links in the current format
-                  },
-                  recommendation: recommendation.trim()
-                });
-              }
-
-              let overallRisk: 'Rechtskonform' | 'Rechtlich fraglich' | 'Rechtlich unzulässig' = 'Rechtskonform';
-              if (clauses.some(c => c.risk === 'Rechtlich unzulässig')) {
-                overallRisk = 'Rechtlich unzulässig';
-              } else if (clauses.some(c => c.risk === 'Rechtlich fraglich')) {
-                overallRisk = 'Rechtlich fraglich';
-              }
-
-              const criticalClauses = clauses.filter(c => c.risk === 'Rechtlich unzulässig');
-              const questionableClauses = clauses.filter(c => c.risk === 'Rechtlich fraglich');
-              
-              let summary = `Analyse von ${clauses.length} Vertragsklauseln. `;
-              if (criticalClauses.length > 0) {
-                summary += `${criticalClauses.length} rechtlich unzulässige Klauseln gefunden: ${
-                  criticalClauses.map(c => c.title).join(', ')}. `;
-              }
-              if (questionableClauses.length > 0) {
-                summary += `${questionableClauses.length} rechtlich fragliche Klauseln: ${
-                  questionableClauses.map(c => c.title).join(', ')}. `;
-              }
-
-              setStructuredResult({
-                clauses,
-                overallRisk,
-                summary
-              });
-            }
-          } catch (error) {
-            console.error('Error processing webhook response:', error);
+          const outputData = response[0];
+          if (outputData.output) {
+            setAnalysisOutput(outputData.output);
           }
         }
       }
@@ -177,52 +114,24 @@ const AnalysisResults = () => {
   const hasContent = !!(analysisOutput || structuredResult);
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50">
-      <Navbar />
-
-      <main className="flex-1 container mx-auto px-4 py-6 md:py-10 max-w-5xl">
-        <AnalysisHeader 
-          structuredResult={structuredResult} 
-          onDownloadPDF={downloadFullAnalysisPDF} 
-        />
-
-        <div className="bg-white rounded-xl shadow-sm border border-slate-200/50 p-6 md:p-8 mb-8 animate-fade-in">
-          <ScrollArea className="h-[calc(100vh-250px)] pr-4">
-            {structuredResult ? (
-              <WebhookAnalysisResult result={structuredResult} />
-            ) : analysisOutput ? (
-              <MarkdownRenderer content={analysisOutput} />
-            ) : (
-              <EmptyAnalysis />
-            )}
-          </ScrollArea>
-          
-          <AnalysisFooter 
-            hasContent={hasContent}
-            structuredResult={structuredResult} 
-            onDownloadPDF={downloadFullAnalysisPDF} 
-          />
-        </div>
-      </main>
+    <AnalysisLayout>
+      <AnalysisHeader 
+        structuredResult={structuredResult} 
+        onDownloadPDF={downloadFullAnalysisPDF} 
+      />
       
-      <footer className="bg-gradient-to-r from-legal-primary to-legal-secondary text-white py-8 mt-auto">
-        <div className="container mx-auto px-4 max-w-5xl">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="flex items-center gap-3">
-              <Shield className="h-6 w-6 text-white/90" />
-              <div>
-                <h3 className="font-light text-xl tracking-tight">VertragsAnalyse</h3>
-                <p className="text-sm mt-1 text-white/80">Schweizer Rechtsanalyse-Tool</p>
-              </div>
-            </div>
-            <div className="mt-4 md:mt-0 text-xs text-white/70">
-              <p>API: OpenAI GPT-4 Turbo | Hosting: Supabase | Automatisierung: n8n</p>
-              <p className="text-center mt-2">© {new Date().getFullYear()} VertragsAnalyse. Alle Rechte vorbehalten.</p>
-            </div>
-          </div>
-        </div>
-      </footer>
-    </div>
+      <AnalysisContent 
+        analysisOutput={analysisOutput}
+        structuredResult={structuredResult}
+        hasContent={hasContent}
+      />
+      
+      <AnalysisFooter 
+        hasContent={hasContent}
+        structuredResult={structuredResult} 
+        onDownloadPDF={downloadFullAnalysisPDF} 
+      />
+    </AnalysisLayout>
   );
 };
 

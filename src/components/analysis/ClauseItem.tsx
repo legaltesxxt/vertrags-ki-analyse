@@ -5,11 +5,9 @@ import {
   AccordionTrigger,
   AccordionContent
 } from '@/components/ui/accordion';
-import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { ExternalLink, BookOpen, FileText, Lightbulb } from 'lucide-react';
 import { AnalysisClause } from '@/types/analysisTypes';
-import RiskMeter from '../RiskMeter';
 import { CheckCircle, HelpCircle, AlertCircle } from 'lucide-react';
 import { formatContentWithRiskBox } from '@/utils/contentFormatter';
 import { cn } from '@/lib/utils';
@@ -117,9 +115,6 @@ const ClauseItem: React.FC<ClauseItemProps> = ({ clause }) => {
                 <h5 className="text-sm font-medium text-legal-secondary">Analyse</h5>
               </div>
               {renderAnalysis()}
-            </div>
-            <div className="md:w-36 flex justify-center">
-              <RiskMeter risk={clause.risk} size="md" />
             </div>
           </div>
           
