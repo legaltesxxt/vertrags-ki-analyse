@@ -1,3 +1,4 @@
+
 import React, { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
@@ -183,11 +184,9 @@ const Index = () => {
             {useRealAnalysis ? (
               <WebhookAnalysisResult result={webhookResult} />
             ) : (
-              <ClauseAnalysis 
-                clauses={mockResult!.clauses} 
-                overallRisk={mockResult!.overallRisk}
-                summary={mockResult!.summary}
-              />
+              <div>
+                {/* The mockResult is not being used anymore */}
+              </div>
             )}
             
             <div className="mt-10 flex justify-center">
