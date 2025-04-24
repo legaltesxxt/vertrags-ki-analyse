@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Shield } from 'lucide-react';
@@ -24,17 +25,47 @@ const AnalysisResults = () => {
 
   useEffect(() => {
     if (location.state) {
+      // Handle direct structured result
       if (location.state.analysisResult) {
+        console.log('Received structured analysis result:', location.state.analysisResult);
         setStructuredResult(location.state.analysisResult);
       }
       
-      if (location.state.analysisOutput) {
-        setAnalysisOutput(location.state.analysisOutput);
-      } else if (location.state.webhookResponse) {
+      // Handle webhook response and try to parse it into structured result
+      if (location.state.webhookResponse) {
         const response = location.state.webhookResponse;
-        if (Array.isArray(response) && response.length > 0 && response[0].output) {
-          setAnalysisOutput(response[0].output);
+        console.log('Received webhook response:', response);
+        
+        if (Array.isArray(response) && response.length > 0) {
+          try {
+            // Try to parse the webhook response into a structured format
+            const outputData = response[0];
+            if (outputData.structuredAnalysis) {
+              setStructuredResult(outputData.structuredAnalysis);
+            } else if (outputData.output) {
+              setAnalysisOutput(outputData.output);
+              // Try to parse the output as JSON if it looks like JSON
+              try {
+                if (outputData.output.trim().startsWith('{')) {
+                  const parsedOutput = JSON.parse(outputData.output);
+                  if (parsedOutput.clauses && parsedOutput.overallRisk && parsedOutput.summary) {
+                    setStructuredResult(parsedOutput);
+                  }
+                }
+              } catch (e) {
+                console.log('Output is not JSON format:', e);
+              }
+            }
+          } catch (error) {
+            console.error('Error processing webhook response:', error);
+          }
         }
+      }
+      
+      // Handle direct analysis output
+      if (location.state.analysisOutput) {
+        console.log('Received analysis output:', location.state.analysisOutput);
+        setAnalysisOutput(location.state.analysisOutput);
       }
     }
   }, [location.state]);
