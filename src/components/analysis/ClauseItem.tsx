@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { 
   AccordionItem,
@@ -45,6 +44,14 @@ const ClauseItem: React.FC<ClauseItemProps> = ({ clause }) => {
       default:
         return '';
     }
+  };
+
+  const isRecommendationMeaningful = (recommendation?: string) => {
+    if (!recommendation) return false;
+    const trimmedRecommendation = recommendation.trim().toLowerCase();
+    return trimmedRecommendation !== '' && 
+           trimmedRecommendation !== '---' && 
+           trimmedRecommendation !== 'keine änderungen erforderlich.';
   };
 
   return (
@@ -104,7 +111,7 @@ const ClauseItem: React.FC<ClauseItemProps> = ({ clause }) => {
             )}
           </div>
           
-          {clause.recommendation && (
+          {isRecommendationMeaningful(clause.recommendation) && (
             <div className="p-4 bg-white rounded-lg border border-slate-200">
               <div className="flex items-center gap-2 mb-2">
                 <Lightbulb size={16} className="text-legal-secondary" />
