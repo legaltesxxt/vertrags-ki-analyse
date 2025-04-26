@@ -25,7 +25,7 @@ const toolsData = [{
       value: "Ja",
       isPositive: true
     },
-    benutzerfreundlichkeit: {
+    bedienbarkeit: {
       value: "Einfach",
       isPositive: true
     }
@@ -54,7 +54,7 @@ const toolsData = [{
       value: "Nein",
       isPositive: false
     },
-    benutzerfreundlichkeit: {
+    bedienbarkeit: {
       value: "Komplex",
       isPositive: false
     }
@@ -83,7 +83,7 @@ const toolsData = [{
       value: "Teilweise",
       isPositive: false
     },
-    benutzerfreundlichkeit: {
+    bedienbarkeit: {
       value: "Mittel",
       isPositive: true
     }
@@ -112,7 +112,7 @@ const toolsData = [{
       value: "Ja",
       isPositive: true
     },
-    benutzerfreundlichkeit: {
+    bedienbarkeit: {
       value: "Komplex",
       isPositive: false
     }

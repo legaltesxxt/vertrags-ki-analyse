@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { cn } from "@/lib/utils";
 import { Check, X } from 'lucide-react';
@@ -9,7 +8,7 @@ interface ComparisonData {
   risikoAnalyse: { value: string; isPositive: boolean };
   dauer: { value: string; isPositive: boolean };
   kritischeKlauseln: { value: string; isPositive: boolean };
-  benutzerfreundlichkeit: { value: string; isPositive: boolean };
+  bedienbarkeit: { value: string; isPositive: boolean };
 }
 
 interface FlipCardProps {
@@ -62,7 +61,7 @@ const FlipCard = ({ title, description, comparison, className }: FlipCardProps) 
               <ComparisonRow label="Risiko-Analyse" data={comparison.risikoAnalyse} />
               <ComparisonRow label="Dauer" data={comparison.dauer} />
               <ComparisonRow label="Kritische Klauseln" data={comparison.kritischeKlauseln} />
-              <ComparisonRow label="Benutzerfreundlichkeit" data={comparison.benutzerfreundlichkeit} />
+              <ComparisonRow label="Bedienbarkeit" data={comparison.bedienbarkeit} />
             </div>
             <p className="text-xs text-muted-foreground mt-auto text-center">Klicken zum Umdrehen</p>
           </div>
