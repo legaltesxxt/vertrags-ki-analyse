@@ -1,4 +1,3 @@
-
 import React from 'react';
 import {
   Accordion,
@@ -10,7 +9,7 @@ import {
 const faqData = [
   {
     question: "Was ist LegalAI?",
-    answer: "LegalAI nutzt moderne KI-Technologie, um Verträge schnell und zuverlässig auf Risiken zu prüfen. Innerhalb von wenigen Minuten erhältst du einen Risiko-Score, kritische Klauseln werden hervorgehoben und du bekommst eine klare Einschätzung – speziell angepasst auf das Schweizer Recht."
+    answer: "LegalAI nutzt moderne KI-Technologie, um Verträge schnell und zuverlässig auf Risiken zu prüfen. Innerhalb von wenigen Minuten erhältst du eine Risikoeinschätzung, Handlungsbedarf, kritische Klauseln werden hervorgehoben und du bekommst eine klare Einschätzung – speziell angepasst auf das Schweizer Recht."
   },
   {
     question: "Welche Verträge kann ich prüfen lassen?",
@@ -34,7 +33,7 @@ const faqData = [
   },
   {
     question: "Kann ich mein Ergebnis als PDF speichern?",
-    answer: "Ja! Nach der Analyse kannst du dein vollständiges Ergebnis inklusive Risiko-Score und Kommentaren als PDF herunterladen."
+    answer: "Ja! Nach der Analyse kannst du dein vollständiges Ergebnis inklusive Risikoeinschätzung, Handlungsbedarf und Kommentaren als PDF herunterladen."
   },
   {
     question: "Was kostet die Vertragsanalyse?",
@@ -75,4 +74,3 @@ const FAQ = () => {
 };
 
 export default FAQ;
-
