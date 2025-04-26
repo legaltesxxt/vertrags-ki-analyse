@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -164,4 +163,17 @@
   .risk-meter-wrapper {
     transform: scale(0.85);
   }
+}
+
+/* Flip Card Styles */
+.perspective {
+  perspective: 1000px;
+}
+
+.preserve-3d {
+  transform-style: preserve-3d;
+}
+
+.backface-hidden {
+  backface-visibility: hidden;
 }

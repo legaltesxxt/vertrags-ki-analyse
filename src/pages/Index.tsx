@@ -10,6 +10,7 @@ import FeatureCards from '@/components/features/FeatureCards';
 import ProcessSteps from '@/components/home/ProcessSteps';
 import AnalysisSection from '@/components/analysis/AnalysisSection';
 import ComparisonTable from '@/components/home/ComparisonTable';
+import FlipCardsGrid from '@/components/home/FlipCardsGrid';
 
 const Index = () => {
   const navigate = useNavigate();
@@ -93,7 +94,7 @@ const Index = () => {
         <Header />
         <FeatureCards />
         <ProcessSteps />
-        <ComparisonTable />
+        <FlipCardsGrid />
         
         <div className="bg-white rounded-xl shadow-sm p-8 border border-border/50 mb-10">
           <h2 className="text-2xl font-semibold mb-6 text-legal-primary">PDF-Vertrag hochladen</h2>
