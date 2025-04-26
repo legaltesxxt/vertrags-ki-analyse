@@ -8,6 +8,7 @@ import { useToast } from '@/hooks/use-toast';
 import Header from '@/components/home/Header';
 import Footer from '@/components/home/Footer';
 import FeatureCards from '@/components/features/FeatureCards';
+import ProcessSteps from '@/components/home/ProcessSteps';
 import AnalysisSection from '@/components/analysis/AnalysisSection';
 
 const Index = () => {
@@ -91,6 +92,7 @@ const Index = () => {
       <main className="flex-1 container mx-auto px-4 py-12 max-w-5xl">
         <Header />
         <FeatureCards />
+        <ProcessSteps />
 
         <div className="bg-white rounded-xl shadow-sm p-8 border border-border/50 mb-10">
           <h2 className="text-2xl font-semibold mb-6 text-legal-primary">PDF-Vertrag hochladen</h2>
