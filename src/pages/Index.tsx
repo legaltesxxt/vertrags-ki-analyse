@@ -1,3 +1,4 @@
+
 import React, { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
@@ -9,7 +10,6 @@ import Footer from '@/components/home/Footer';
 import FeatureCards from '@/components/features/FeatureCards';
 import ProcessSteps from '@/components/home/ProcessSteps';
 import AnalysisSection from '@/components/analysis/AnalysisSection';
-import ComparisonTable from '@/components/home/ComparisonTable';
 import FlipCardsGrid from '@/components/home/FlipCardsGrid';
 
 const Index = () => {
