@@ -1,4 +1,3 @@
-
 import React from 'react';
 import FlipCard from './FlipCard';
 
@@ -122,19 +121,21 @@ const toolsData = [{
 
 const FlipCardsGrid = () => {
   return (
-    <section className="my-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <h2 className="text-2xl font-semibold text-legal-primary text-center mb-8">
-        Vergleich der Analysemethoden:
-      </h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-        {toolsData.map(tool => (
-          <FlipCard
-            key={tool.title}
-            title={tool.title}
-            description={tool.description}
-            comparison={tool.comparison}
-          />
-        ))}
+    <section className="container mx-auto px-4 sm:px-6 lg:px-8 my-16">
+      <div className="max-w-6xl mx-auto">
+        <h2 className="text-2xl font-semibold text-legal-primary text-center mb-8">
+          Vergleich der Analysemethoden:
+        </h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {toolsData.map(tool => (
+            <FlipCard
+              key={tool.title}
+              title={tool.title}
+              description={tool.description}
+              comparison={tool.comparison}
+            />
+          ))}
+        </div>
       </div>
     </section>
   );

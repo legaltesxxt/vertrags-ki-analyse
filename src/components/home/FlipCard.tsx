@@ -41,7 +41,7 @@ const FlipCard = ({ title, description, comparison, className }: FlipCardProps) 
   return (
     <div
       className={cn(
-        "h-[400px] w-full perspective cursor-pointer",
+        "h-[420px] perspective cursor-pointer",
         className
       )}
       onClick={() => setIsFlipped(!isFlipped)}
@@ -54,8 +54,8 @@ const FlipCard = ({ title, description, comparison, className }: FlipCardProps) 
       >
         {/* Front */}
         <div className="absolute h-full w-full backface-hidden">
-          <div className="flex h-full flex-col rounded-xl border border-border/50 bg-white p-4 sm:p-6 text-left shadow-sm hover:shadow-md transition-shadow">
-            <h3 className="text-lg sm:text-xl font-semibold text-legal-primary mb-4">{title}</h3>
+          <div className="flex h-full flex-col rounded-lg border border-gray-200 bg-white p-4 text-left shadow-sm hover:shadow-md transition-shadow">
+            <h3 className="text-lg font-semibold text-legal-primary mb-3">{title}</h3>
             <div className="space-y-2">
               <ComparisonRow label="Expertise" data={comparison.expertise} />
               <ComparisonRow label="Kosten" data={comparison.kosten} />
@@ -64,16 +64,16 @@ const FlipCard = ({ title, description, comparison, className }: FlipCardProps) 
               <ComparisonRow label="Kritische Klauseln" data={comparison.kritischeKlauseln} />
               <ComparisonRow label="Benutzerfreundlichkeit" data={comparison.benutzerfreundlichkeit} />
             </div>
-            <p className="text-sm text-muted-foreground mt-auto text-center">Klicken zum Umdrehen</p>
+            <p className="text-xs text-muted-foreground mt-auto text-center">Klicken zum Umdrehen</p>
           </div>
         </div>
 
         {/* Back */}
         <div className="absolute h-full w-full [transform:rotateY(180deg)] backface-hidden">
-          <div className="flex h-full flex-col rounded-xl border border-border/50 bg-white p-4 sm:p-6 shadow-sm hover:shadow-md transition-shadow">
-            <h3 className="text-lg sm:text-xl font-semibold text-legal-primary mb-4">{title}</h3>
-            <p className="text-sm text-slate-600 mb-4 overflow-y-auto">{description}</p>
-            <p className="text-sm text-muted-foreground mt-auto text-center">Klicken zum Zurückdrehen</p>
+          <div className="flex h-full flex-col rounded-lg border border-gray-200 bg-white p-4 shadow-sm hover:shadow-md transition-shadow">
+            <h3 className="text-lg font-semibold text-legal-primary mb-3">{title}</h3>
+            <p className="text-sm text-slate-600 overflow-y-auto flex-grow">{description}</p>
+            <p className="text-xs text-muted-foreground mt-3 text-center">Klicken zum Zurückdrehen</p>
           </div>
         </div>
       </div>
