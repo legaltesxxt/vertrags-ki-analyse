@@ -1,5 +1,6 @@
 import React from 'react';
 import FlipCard from './FlipCard';
+
 const toolsData = [{
   title: "Unser Tool",
   description: "LegalAI verbindet spezialisiertes Wissen im Schweizer Vertragsrecht mit modernster KI-Technologie. Innerhalb von wenigen Minuten erhalten Nutzer eine präzise Risikobewertung ihres Vertrags inklusive detaillierter Hervorhebung kritischer Klauseln. Der Service bietet schnelle, verständliche und konkrete Hinweise, die sofort umsetzbar sind. Ideal für Einzelpersonen und KMUs, die schnelle Klarheit und Sicherheit bei Verträgen benötigen.",
@@ -89,7 +90,7 @@ const toolsData = [{
   }
 }, {
   title: "Anwalt",
-  description: "Ein Anwalt bietet zwar professionelle Rechtsberatung, ist aber oft mit hohen Kosten und längeren Wartezeiten verbunden. Für einfache Vertragsprüfungen kann dies unverhältnismäßig sein.",
+  description: "Anwälte bieten fundierte juristische Expertise und hohe Qualität, sind aber mit erheblichen Kosten verbunden und die Bearbeitung dauert oft Tage bis Wochen. Vor allem bei einfachen oder alltäglichen Verträgen stehen Aufwand und Nutzen nicht im Verhältnis. Ideal für komplexe Fälle, jedoch für schnelle und bezahlbare Vertragschecks meist zu teuer und unpraktisch.",
   comparison: {
     expertise: {
       value: "Sehr hoch",
