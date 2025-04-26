@@ -1,6 +1,7 @@
 import React from 'react';
 import { FileText, Search, CheckCircle } from 'lucide-react';
 import { Card } from '@/components/ui/card';
+
 const ProcessSteps = () => {
   const steps = [{
     icon: <FileText className="h-8 w-8 text-legal-primary" />,
@@ -12,9 +13,10 @@ const ProcessSteps = () => {
     description: "Unsere KI analysiert den Vertrag nach Schweizer Recht"
   }, {
     icon: <CheckCircle className="h-8 w-8 text-legal-primary" />,
-    title: "Ergebnis erhalten",
+    title: "Ergebnis sofort erhalten",
     description: "Erhalten Sie eine detaillierte rechtliche Bewertung"
   }];
+
   return <section className="my-16">
       <h2 className="text-2xl font-semibold text-legal-primary text-center mb-12">So funktioniert's :</h2>
       
