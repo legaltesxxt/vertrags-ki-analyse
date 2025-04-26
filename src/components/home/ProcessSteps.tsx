@@ -20,7 +20,7 @@ const ProcessSteps = () => {
       
       <div className="grid md:grid-cols-3 gap-8 relative">
         {steps.map((step, index) => <React.Fragment key={step.title}>
-            <Card className="p-6 flex flex-col items-center text-center bg-white border-border/50 shadow-sm hover:shadow-md transition-shadow">
+            <Card className="p-6 flex flex-col items-center text-center bg-white border-border/50 shadow-sm hover:shadow-md transition-shadow rounded-full">
               <div className="mb-4 p-3 bg-legal-tertiary/10 rounded-full">
                 {step.icon}
               </div>
