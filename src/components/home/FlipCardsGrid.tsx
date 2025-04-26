@@ -1,4 +1,3 @@
-
 import React from 'react';
 import FlipCard from './FlipCard';
 const toolsData = [{
@@ -32,7 +31,7 @@ const toolsData = [{
   }
 }, {
   title: "Selbst prüfen",
-  description: "Die eigenständige Prüfung von Verträgen erfordert viel Zeit und rechtliches Fachwissen. Ohne juristische Expertise können wichtige Details übersehen werden.",
+  description: "Verträge eigenständig zu prüfen spart zwar kurzfristig Geld, birgt aber hohe Risiken. Ohne Fachwissen werden wichtige rechtliche Risiken und kritische Klauseln oft übersehen. Zudem kostet die eigenständige Prüfung meist viel Zeit und kann zu Unsicherheit führen, da die rechtliche Sicherheit nicht gewährleistet werden kann.",
   comparison: {
     expertise: {
       value: "Niedrig",
@@ -128,4 +127,3 @@ const FlipCardsGrid = () => {
     </section>;
 };
 export default FlipCardsGrid;
-
