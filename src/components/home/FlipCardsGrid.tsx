@@ -60,7 +60,7 @@ const toolsData = [{
   }
 }, {
   title: "ChatGPT",
-  description: "Während ChatGPT bei allgemeinen Fragen hilfreich sein kann, fehlt ihm die spezifische Expertise im Schweizer Recht. Die Analyse könnte ungenau oder nicht rechtskonform sein.",
+  description: "ChatGPT bietet zwar schnelle Antworten, verarbeitet aber juristische Dokumente allgemein und oberflächlich. Die Ergebnisse variieren stark und hängen vom formulierten Prompt ab, was Nutzer oft vor Unsicherheiten stellt. Zwar kostengünstig, fehlt es ChatGPT jedoch an spezifischem Fachwissen über Schweizer Recht, was die Genauigkeit und Zuverlässigkeit stark einschränkt.",
   comparison: {
     expertise: {
       value: "Mittel",
