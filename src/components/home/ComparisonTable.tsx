@@ -28,7 +28,7 @@ const ComparisonTable = () => {
       isText: true
     },
     {
-      criteria: "Risiko-Analyse & Score",
+      criteria: "Risiko-Analyse",
       deinTool: true,
       selbst: false,
       chatGPT: false,
