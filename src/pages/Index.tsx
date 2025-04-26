@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
@@ -10,6 +9,7 @@ import Footer from '@/components/home/Footer';
 import FeatureCards from '@/components/features/FeatureCards';
 import ProcessSteps from '@/components/home/ProcessSteps';
 import AnalysisSection from '@/components/analysis/AnalysisSection';
+import ComparisonTable from '@/components/home/ComparisonTable';
 
 const Index = () => {
   const navigate = useNavigate();
@@ -93,7 +93,8 @@ const Index = () => {
         <Header />
         <FeatureCards />
         <ProcessSteps />
-
+        <ComparisonTable />
+        
         <div className="bg-white rounded-xl shadow-sm p-8 border border-border/50 mb-10">
           <h2 className="text-2xl font-semibold mb-6 text-legal-primary">PDF-Vertrag hochladen</h2>
           <FileUpload onFileSelected={handleFileSelected} isAnalyzing={isSendingToN8n} />
