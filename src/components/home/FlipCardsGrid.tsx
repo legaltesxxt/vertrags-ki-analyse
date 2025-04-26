@@ -1,8 +1,8 @@
 import React from 'react';
 import FlipCard from './FlipCard';
 const toolsData = [{
-  title: "Dein Tool",
-  description: "Unsere KI-gestützte Analyse bietet eine schnelle und zuverlässige Prüfung Ihrer Verträge. Mit Schweizer Rechtexpertise entwickelt, erkennt sie kritische Klauseln und gibt praktische Handlungsempfehlungen.",
+  title: "Unser Tool",
+  description: "LegalAI verbindet spezialisiertes Wissen im Schweizer Vertragsrecht mit modernster KI-Technologie. Innerhalb von wenigen Minuten erhalten Nutzer eine präzise Risikobewertung ihres Vertrags inklusive detaillierter Hervorhebung kritischer Klauseln. Der Service bietet schnelle, verständliche und konkrete Hinweise, die sofort umsetzbar sind. Ideal für Einzelpersonen und KMUs, die schnelle Klarheit und Sicherheit bei Verträgen benötigen.",
   comparison: {
     expertise: {
       value: "Hoch",
@@ -117,6 +117,7 @@ const toolsData = [{
     }
   }
 }];
+
 const FlipCardsGrid = () => {
   return <section className="my-16">
       <h2 className="text-2xl font-semibold text-legal-primary text-center mb-8">Vergleich der Analysemethoden:</h2>
