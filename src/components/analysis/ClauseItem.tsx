@@ -51,7 +51,8 @@ const ClauseItem: React.FC<ClauseItemProps> = ({ clause }) => {
     const trimmedRecommendation = recommendation.trim().toLowerCase();
     return trimmedRecommendation !== '' && 
            trimmedRecommendation !== '---' && 
-           trimmedRecommendation !== 'keine änderungen erforderlich.';
+           trimmedRecommendation !== 'keine änderungen erforderlich.' &&
+           trimmedRecommendation !== 'keiner ---';
   };
 
   return (
@@ -111,15 +112,25 @@ const ClauseItem: React.FC<ClauseItemProps> = ({ clause }) => {
             )}
           </div>
           
-          {isRecommendationMeaningful(clause.recommendation) && (
+          {isRecommendationMeaningful(clause.recommendation) ? (
             <div className="p-4 bg-white rounded-lg border border-slate-200">
               <div className="flex items-center gap-2 mb-2">
                 <Lightbulb size={16} className="text-legal-secondary" />
                 <h5 className="text-sm font-medium text-legal-secondary">Empfehlung</h5>
               </div>
-              <p className="text-sm text-slate-700 leading-relaxed">{clause.recommendation}</p>
+              <p className="text-sm text-slate-700 leading-relaxed">
+                {clause.recommendation === "Keiner" ? "Keiner" : clause.recommendation}
+              </p>
             </div>
-          )}
+          ) : clause.recommendation === "Keiner" || clause.recommendation === "Keiner ---" ? (
+            <div className="p-4 bg-white rounded-lg border border-slate-200">
+              <div className="flex items-center gap-2 mb-2">
+                <Lightbulb size={16} className="text-legal-secondary" />
+                <h5 className="text-sm font-medium text-legal-secondary">Empfehlung</h5>
+              </div>
+              <p className="text-sm text-slate-700 leading-relaxed">Keiner</p>
+            </div>
+          ) : null}
         </div>
       </AccordionContent>
     </AccordionItem>
