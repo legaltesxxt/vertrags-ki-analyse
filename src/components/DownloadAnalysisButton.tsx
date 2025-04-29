@@ -29,6 +29,11 @@ const DownloadAnalysisButton: React.FC<DownloadAnalysisButtonProps> = ({ result 
     }
   };
   
+  // New function specifically for summary risk that doesn't include color styling
+  const getSummaryRiskStyle = (): string => {
+    return 'font-weight: 500;';
+  };
+  
   const isRecommendationMeaningful = (recommendation?: string) => {
     if (!recommendation) return false;
     const trimmedRecommendation = recommendation.trim().toLowerCase();
@@ -94,7 +99,7 @@ const DownloadAnalysisButton: React.FC<DownloadAnalysisButtonProps> = ({ result 
             <p style="line-height: 1.6; font-size: 15px; margin-bottom: 16px;">${result.summary}</p>
             <div style="display: flex; gap: 5px; align-items: center;">
               <p style="font-size: 15px;"><strong>Gesamtrisiko:</strong></p>
-              <span style="${getRiskClass(result.overallRisk)}">${result.overallRisk}</span>
+              <span style="${getSummaryRiskStyle()}">${result.overallRisk}</span>
             </div>
           </div>
 

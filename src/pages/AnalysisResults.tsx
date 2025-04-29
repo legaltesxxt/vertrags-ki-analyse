@@ -61,6 +61,11 @@ const AnalysisResults = () => {
     }
   };
   
+  // New function specifically for summary risk that doesn't include color styling
+  const getSummaryRiskStyle = (): string => {
+    return 'font-weight: 500;';
+  };
+  
   const isRecommendationMeaningful = (recommendation?: string) => {
     if (!recommendation) return false;
     const trimmedRecommendation = recommendation.trim().toLowerCase();
@@ -135,7 +140,7 @@ const AnalysisResults = () => {
             <p style="line-height: 1.6; font-size: 15px; margin-bottom: 16px;">${structuredResult.summary}</p>
             <div style="display: flex; gap: 5px; align-items: center;">
               <p style="font-size: 15px;"><strong>Gesamtrisiko:</strong></p>
-              <span style="${getRiskClass(structuredResult.overallRisk)}">${structuredResult.overallRisk}</span>
+              <span style="${getSummaryRiskStyle()}">${structuredResult.overallRisk}</span>
             </div>
           </div>
 
