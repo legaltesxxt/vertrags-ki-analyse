@@ -13,6 +13,7 @@ interface DownloadAnalysisButtonProps {
 const DownloadAnalysisButton: React.FC<DownloadAnalysisButtonProps> = ({ result }) => {
   const { toast } = useToast();
 
+  // This function is kept for the web interface, but not used in PDF generation
   const getRiskClass = (risk: string): string => {
     switch (risk.toLowerCase()) {
       case 'niedrig':
@@ -29,7 +30,12 @@ const DownloadAnalysisButton: React.FC<DownloadAnalysisButtonProps> = ({ result 
     }
   };
   
-  // New function specifically for summary risk that doesn't include color styling
+  // Function for PDF risk styling without colors
+  const getPDFRiskStyle = (): string => {
+    return 'padding: 3px 10px; border-radius: 12px; font-weight: 500; border: 1px solid #DADCE0;';
+  };
+  
+  // Function for summary risk styling without colors
   const getSummaryRiskStyle = (): string => {
     return 'font-weight: 500;';
   };
@@ -49,7 +55,7 @@ const DownloadAnalysisButton: React.FC<DownloadAnalysisButtonProps> = ({ result 
         `<li><a href="#clause-${index}" style="color: #1a5f7a; text-decoration: none;">${clause.title}</a></li>`
       ).join('');
 
-      // Create clauses HTML
+      // Create clauses HTML - using getPDFRiskStyle instead of getRiskClass
       const clausesHTML = result.clauses.map((clause, index) => `
         <div id="clause-${index}" style="margin-bottom: 32px; padding: 20px; border: 1px solid #eee; border-radius: 12px; break-inside: avoid;">
           <h3 style="color: #1a5f7a; margin-bottom: 16px; font-size: 18px; border-bottom: 1px solid #e5f4f9; padding-bottom: 10px;">${clause.title}</h3>
@@ -61,7 +67,7 @@ const DownloadAnalysisButton: React.FC<DownloadAnalysisButtonProps> = ({ result 
           
           <div style="display: flex; gap: 5px; margin-bottom: 12px; align-items: center;">
             <span><strong>Risikoeinstufung:</strong></span>
-            <span style="${getRiskClass(clause.risk)}">${clause.risk}</span>
+            <span style="${getPDFRiskStyle()}">${clause.risk}</span>
           </div>
           
           <div style="margin-bottom: 16px;">
