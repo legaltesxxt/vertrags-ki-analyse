@@ -30,9 +30,9 @@ const DownloadAnalysisButton: React.FC<DownloadAnalysisButtonProps> = ({ result 
     }
   };
   
-  // Function for PDF risk styling without colors
+  // Function for PDF risk styling without colors or borders
   const getPDFRiskStyle = (): string => {
-    return 'padding: 3px 10px; border-radius: 12px; font-weight: 500; border: 1px solid #DADCE0;';
+    return 'padding: 3px 10px; border-radius: 12px; font-weight: 500;';
   };
   
   // Function for summary risk styling without colors
@@ -132,9 +132,19 @@ const DownloadAnalysisButton: React.FC<DownloadAnalysisButtonProps> = ({ result 
       const opt = {
         margin: 15,
         filename: 'vertragsanalyse.pdf',
-        image: { type: 'jpeg', quality: 1 },
-        html2canvas: { scale: 2, useCORS: true, logging: false },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+        image: { type: 'jpeg', quality: 0.98 }, // Increased image quality
+        html2canvas: { 
+          scale: 4, // Increased scale from 2 to 4 for better quality
+          useCORS: true, 
+          logging: false,
+          letterRendering: true // Improved text rendering
+        },
+        jsPDF: { 
+          unit: 'mm', 
+          format: 'a4', 
+          orientation: 'portrait',
+          compress: false // Better quality with no compression
+        },
         pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
       };
 
