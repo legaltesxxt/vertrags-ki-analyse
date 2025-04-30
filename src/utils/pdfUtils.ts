@@ -13,12 +13,20 @@ export const getSummaryRiskStyle = (): string => {
   return 'font-weight: 500;';
 };
 
+// Clean recommendation text by removing "---" and similar patterns
+export const cleanRecommendationText = (recommendation?: string): string => {
+  if (!recommendation) return '';
+  
+  // Remove "---" at the end of the text
+  return recommendation.replace(/\s*---\s*$/, '').trim();
+};
+
 export const isRecommendationMeaningful = (recommendation?: string): boolean => {
   if (!recommendation) return false;
-  const trimmedRecommendation = recommendation.trim().toLowerCase();
-  return trimmedRecommendation !== '' && 
-         trimmedRecommendation !== '---' && 
-         trimmedRecommendation !== 'keine änderungen erforderlich.';
+  const cleanedRecommendation = cleanRecommendationText(recommendation).toLowerCase();
+  return cleanedRecommendation !== '' && 
+         cleanedRecommendation !== 'keine änderungen erforderlich.' &&
+         cleanedRecommendation !== 'keiner';
 };
 
 export const generatePDF = async (
@@ -33,7 +41,11 @@ export const generatePDF = async (
     ).join('');
 
     // Create clauses HTML - using getPDFRiskStyle instead of getRiskClass
-    const clausesHTML = result.clauses.map((clause, index) => `
+    const clausesHTML = result.clauses.map((clause, index) => {
+      // Clean the recommendation text
+      const cleanedRecommendation = cleanRecommendationText(clause.recommendation);
+      
+      return `
       <div id="clause-${index}" style="margin-bottom: 32px; padding: 20px; border: 1px solid #eee; border-radius: 12px; break-inside: avoid;">
         <h3 style="color: #1a5f7a; margin-bottom: 16px; font-size: 18px; border-bottom: 1px solid #e5f4f9; padding-bottom: 10px;">${clause.title}</h3>
         
@@ -60,14 +72,19 @@ export const generatePDF = async (
             ''}
         </div>
         
-        ${isRecommendationMeaningful(clause.recommendation) ? `
+        ${isRecommendationMeaningful(cleanedRecommendation) ? `
         <div style="margin-bottom: 8px; padding: 12px; background-color: #F5FBFD; border-radius: 8px; border-left: 3px solid #0F83A9;">
           <p style="margin-bottom: 8px; font-size: 14px;"><strong>Empfehlung:</strong></p>
-          <p style="font-size: 14px; line-height: 1.5;">${clause.recommendation}</p>
+          <p style="font-size: 14px; line-height: 1.5;">${cleanedRecommendation}</p>
+        </div>
+        ` : cleanedRecommendation.toLowerCase() === 'keiner' ? `
+        <div style="margin-bottom: 8px; padding: 12px; background-color: #F5FBFD; border-radius: 8px; border-left: 3px solid #0F83A9;">
+          <p style="margin-bottom: 8px; font-size: 14px;"><strong>Empfehlung:</strong></p>
+          <p style="font-size: 14px; line-height: 1.5;">Keiner</p>
         </div>
         ` : ''}
       </div>
-    `).join('');
+    `}).join('');
 
     const element = document.createElement('div');
     element.innerHTML = `

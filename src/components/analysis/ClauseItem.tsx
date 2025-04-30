@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { 
   AccordionItem,
@@ -8,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { ExternalLink, BookOpen, FileText, Lightbulb, CheckCircle, HelpCircle, AlertCircle } from 'lucide-react';
 import { AnalysisClause } from '@/types/analysisTypes';
 import { cn } from '@/lib/utils';
+import { cleanRecommendationText, isRecommendationMeaningful } from '@/utils/pdfUtils';
 
 interface ClauseItemProps {
   clause: AnalysisClause;
@@ -46,14 +48,8 @@ const ClauseItem: React.FC<ClauseItemProps> = ({ clause }) => {
     }
   };
 
-  const isRecommendationMeaningful = (recommendation?: string) => {
-    if (!recommendation) return false;
-    const trimmedRecommendation = recommendation.trim().toLowerCase();
-    return trimmedRecommendation !== '' && 
-           trimmedRecommendation !== '---' && 
-           trimmedRecommendation !== 'keine änderungen erforderlich.' &&
-           trimmedRecommendation !== 'keiner ---';
-  };
+  // Get the cleaned recommendation text
+  const cleanedRecommendation = clause.recommendation ? cleanRecommendationText(clause.recommendation) : '';
 
   return (
     <AccordionItem value={clause.id} className="border-legal-primary/10">
@@ -112,17 +108,17 @@ const ClauseItem: React.FC<ClauseItemProps> = ({ clause }) => {
             )}
           </div>
           
-          {isRecommendationMeaningful(clause.recommendation) ? (
+          {isRecommendationMeaningful(cleanedRecommendation) ? (
             <div className="p-4 bg-white rounded-lg border border-slate-200">
               <div className="flex items-center gap-2 mb-2">
                 <Lightbulb size={16} className="text-legal-secondary" />
                 <h5 className="text-sm font-medium text-legal-secondary">Empfehlung</h5>
               </div>
               <p className="text-sm text-slate-700 leading-relaxed">
-                {clause.recommendation === "Keiner" ? "Keiner" : clause.recommendation}
+                {cleanedRecommendation.toLowerCase() === "keiner" ? "Keiner" : cleanedRecommendation}
               </p>
             </div>
-          ) : clause.recommendation === "Keiner" || clause.recommendation === "Keiner ---" ? (
+          ) : cleanedRecommendation.toLowerCase() === "keiner" ? (
             <div className="p-4 bg-white rounded-lg border border-slate-200">
               <div className="flex items-center gap-2 mb-2">
                 <Lightbulb size={16} className="text-legal-secondary" />
