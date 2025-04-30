@@ -1,8 +1,6 @@
-
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Shield, Lock, FileText } from 'lucide-react';
-
 const FeatureCards = () => {
   return <div className="grid md:grid-cols-3 gap-6 mb-10">
       <Card className="bg-white border-border/50 shadow-sm">
@@ -24,7 +22,7 @@ const FeatureCards = () => {
             <Lock size={24} />
           </div>
           <h3 className="font-medium text-lg mb-2">Sichere Verarbeitung</h3>
-          <p className="text-slate-600 text-sm">Ihre hochgeladenen Dokumente werden über sichere Verbindungen verarbeitet, jedoch läuft die Analyse durch externe Server für prä­zi­se Analyseergebnisse.</p>
+          <p className="text-slate-600 text-sm">Ihre hochgeladenen Dokumente werden über sichere Verbindungen verarbeitet und werden in keinem Schritt von uns gespeichert.</p>
         </CardContent>
       </Card>
       
