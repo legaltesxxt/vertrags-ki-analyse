@@ -9,7 +9,7 @@ import { useAnalysisData } from '@/hooks/useAnalysisData';
 import { generatePDF } from '@/utils/pdfUtils';
 
 const AnalysisResults = () => {
-  const { toast } = useToast();
+  const toast = useToast(); // Get the full toast object
   const { analysisOutput, structuredResult, hasContent } = useAnalysisData();
 
   // This function is kept for the web interface, but not used in PDF generation
@@ -31,7 +31,7 @@ const AnalysisResults = () => {
 
   const downloadFullAnalysisPDF = async () => {
     if (!structuredResult) {
-      toast({
+      toast.toast({
         title: "Kein Analyseergebnis",
         description: "Es sind keine Analyseergebnisse zum Herunterladen verfügbar.",
         variant: "destructive"
@@ -39,7 +39,7 @@ const AnalysisResults = () => {
       return;
     }
 
-    await generatePDF(structuredResult, 'vollstaendige_vertragsanalyse.pdf', { toast });
+    await generatePDF(structuredResult, 'vollstaendige_vertragsanalyse.pdf', toast);
   };
 
   return (

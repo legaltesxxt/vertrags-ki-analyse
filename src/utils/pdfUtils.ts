@@ -24,7 +24,7 @@ export const isRecommendationMeaningful = (recommendation?: string): boolean => 
 export const generatePDF = async (
   result: AnalysisResult,
   filename: string = 'vertragsanalyse.pdf',
-  toast: ReturnType<typeof useToast>
+  toastObj: ReturnType<typeof useToast>
 ): Promise<void> => {
   try {
     // Create table of contents
@@ -127,13 +127,13 @@ export const generatePDF = async (
 
     await html2pdf().from(element).set(opt).save();
     
-    toast.toast({
+    toastObj.toast({
       title: "PDF erstellt",
       description: "Die Analyse wurde erfolgreich als PDF heruntergeladen.",
     });
   } catch (error) {
     console.error("PDF export error:", error);
-    toast.toast({
+    toastObj.toast({
       title: "Fehler beim PDF-Export",
       description: "Beim Erstellen der PDF ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.",
       variant: "destructive",
