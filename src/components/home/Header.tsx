@@ -22,11 +22,11 @@ const Header = () => {
         Unsere Plattform analysiert Schweizer Arbeits- und Mietverträge mithilfe modernster künstlicher Intelligenz 
       </p>
       
-      <div className="flex flex-col items-center justify-center gap-4 md:flex-row">
+      <div className="flex flex-col items-center justify-center gap-4">
         <Button 
           onClick={scrollToFileUpload}
-          className="bg-legal-risk-high hover:bg-legal-risk-high/90 text-white px-6 py-6 text-lg font-medium rounded-lg"
-          size="lg"
+          className="bg-legal-primary hover:bg-legal-primary/90 text-white px-5 py-2 text-base font-medium rounded-lg"
+          size="default"
         >
           Vertrag jetzt kostenlos prüfen
         </Button>
@@ -36,8 +36,8 @@ const Header = () => {
         <Button 
           onClick={() => navigate('/demo-analysis')}
           variant="outline" 
-          className="border-legal-primary/20 hover:bg-legal-tertiary text-legal-primary px-6 py-6 text-lg font-medium rounded-lg"
-          size="lg"
+          className="border-legal-primary/20 hover:bg-legal-tertiary text-legal-primary px-5 py-2 text-base font-medium rounded-lg"
+          size="default"
         >
           Demo Analyse ansehen
         </Button>
