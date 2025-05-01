@@ -1,10 +1,49 @@
+
 import React from 'react';
+import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
+
 const Header = () => {
-  return <section className="mb-12 text-center animate-fade-in">
+  const navigate = useNavigate();
+  
+  const scrollToFileUpload = () => {
+    const fileUploadSection = document.querySelector('.bg-white.rounded-xl');
+    if (fileUploadSection) {
+      fileUploadSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  return (
+    <section className="mb-12 text-center animate-fade-in">
       <h1 className="text-4xl font-bold text-legal-primary mb-3">
         Unsere KI-gestützte Vertragsanalyse
       </h1>
-      <p className="text-slate-600 max-w-3xl mx-auto mb-8 text-lg leading-relaxed">Unsere Plattform analysiert Schweizer Arbeits- und Mietverträge mithilfe modernster künstlicher Intelligenz </p>
-    </section>;
+      <p className="text-slate-600 max-w-3xl mx-auto mb-8 text-lg leading-relaxed">
+        Unsere Plattform analysiert Schweizer Arbeits- und Mietverträge mithilfe modernster künstlicher Intelligenz 
+      </p>
+      
+      <div className="flex flex-col items-center justify-center gap-4 md:flex-row">
+        <Button 
+          onClick={scrollToFileUpload}
+          className="bg-legal-risk-high hover:bg-legal-risk-high/90 text-white px-6 py-6 text-lg font-medium rounded-lg"
+          size="lg"
+        >
+          Vertrag jetzt kostenlos prüfen
+        </Button>
+        
+        <span className="text-slate-500 font-medium px-4">Oder</span>
+        
+        <Button 
+          onClick={() => navigate('/demo-analysis')}
+          variant="outline" 
+          className="border-legal-primary/20 hover:bg-legal-tertiary text-legal-primary px-6 py-6 text-lg font-medium rounded-lg"
+          size="lg"
+        >
+          Demo Analyse ansehen
+        </Button>
+      </div>
+    </section>
+  );
 };
+
 export default Header;
