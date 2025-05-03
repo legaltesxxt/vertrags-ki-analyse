@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { FileText, Search, CheckCircle } from 'lucide-react';
 import { Card } from '@/components/ui/card';
@@ -17,7 +18,7 @@ const ProcessSteps = () => {
     description: "Erhalten Sie eine detaillierte rechtliche Bewertung"
   }];
 
-  return <section className="my-16">
+  return <section id="how-it-works" className="my-16">
       <h2 className="text-2xl font-semibold text-legal-primary text-center mb-12">So funktioniert's :</h2>
       
       <div className="grid md:grid-cols-3 gap-8 relative">
