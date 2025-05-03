@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Upload, Info, FileText, Mail } from 'lucide-react';
+import { Upload, Info, FileText, Mail, HelpCircle } from 'lucide-react';
 
 const NavigationTabs = () => {
   const location = useLocation();
@@ -51,6 +51,17 @@ const NavigationTabs = () => {
               <Link to="/demo-analysis" className="flex items-center gap-2 px-4 py-2">
                 <FileText size={18} />
                 <span className="whitespace-nowrap">Demo-Analyse</span>
+              </Link>
+            </TabsTrigger>
+            
+            <TabsTrigger 
+              value="/faq"
+              className="data-[state=active]:bg-legal-primary data-[state=active]:text-white"
+              asChild
+            >
+              <Link to="/faq" className="flex items-center gap-2 px-4 py-2">
+                <HelpCircle size={18} />
+                <span className="whitespace-nowrap">Häufig gestellte Fragen</span>
               </Link>
             </TabsTrigger>
             
