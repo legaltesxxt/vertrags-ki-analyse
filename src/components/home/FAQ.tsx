@@ -1,3 +1,4 @@
+
 import React from 'react';
 import {
   Accordion,
@@ -18,6 +19,10 @@ const faqData = [
   {
     question: "Muss ich mich registrieren, um eine Analyse zu erhalten?",
     answer: "Nein. In der aktuellen Phase kannst du deinen Vertrag einfach hochladen und die Analyse direkt erhalten – ganz ohne Konto oder Registrierung."
+  },
+  {
+    question: "Ist es auch möglich Bilder von meinem Vertrag hochzuladend?",
+    answer: "Aktuell noch nicht. Doch wir arbeiten an einer Lösung!"
   },
   {
     question: "Wie lange dauert die Analyse?",
