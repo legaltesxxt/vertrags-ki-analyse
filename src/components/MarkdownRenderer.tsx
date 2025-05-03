@@ -3,6 +3,14 @@ import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { AlertTriangle, CheckCircle, HelpCircle, Info, FileText, BookOpen, Lightbulb } from 'lucide-react';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 interface MarkdownRendererProps {
   content: string;
@@ -81,6 +89,28 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
     ),
     strong: ({ node, ...props }: any) => (
       <strong className="font-semibold" {...props} />
+    ),
+    table: ({ node, ...props }: any) => (
+      <div className="my-6 overflow-x-auto">
+        <Table className="w-full border-collapse bg-white rounded-lg shadow-sm">
+          {props.children}
+        </Table>
+      </div>
+    ),
+    thead: ({ node, ...props }: any) => (
+      <TableHeader className="bg-legal-tertiary/20">{props.children}</TableHeader>
+    ),
+    tbody: ({ node, ...props }: any) => (
+      <TableBody>{props.children}</TableBody>
+    ),
+    tr: ({ node, ...props }: any) => (
+      <TableRow className="border-b border-gray-200 hover:bg-slate-50/70">{props.children}</TableRow>
+    ),
+    th: ({ node, ...props }: any) => (
+      <TableHead className="py-3 px-4 text-left font-medium text-legal-primary text-sm">{props.children}</TableHead>
+    ),
+    td: ({ node, ...props }: any) => (
+      <TableCell className="py-3 px-4 text-sm text-slate-700">{props.children}</TableCell>
     ),
   };
 
