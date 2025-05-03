@@ -1,15 +1,13 @@
-
 import React from 'react';
 import { Shield } from 'lucide-react';
 import Navbar from '@/components/Navbar';
-
 interface AnalysisLayoutProps {
   children: React.ReactNode;
 }
-
-const AnalysisLayout: React.FC<AnalysisLayoutProps> = ({ children }) => {
-  return (
-    <div className="min-h-screen flex flex-col bg-slate-50">
+const AnalysisLayout: React.FC<AnalysisLayoutProps> = ({
+  children
+}) => {
+  return <div className="min-h-screen flex flex-col bg-slate-50">
       <Navbar />
 
       <main className="flex-1 container mx-auto px-4 py-6 md:py-10 max-w-5xl">
@@ -27,14 +25,12 @@ const AnalysisLayout: React.FC<AnalysisLayoutProps> = ({ children }) => {
               </div>
             </div>
             <div className="mt-4 md:mt-0 text-xs text-white/70">
-              <p>API: OpenAI GPT-4 Turbo | Hosting: Supabase | Automatisierung: n8n</p>
+              
               <p className="text-center mt-2">© {new Date().getFullYear()} VertragsAnalyse. Alle Rechte vorbehalten.</p>
             </div>
           </div>
         </div>
       </footer>
-    </div>
-  );
+    </div>;
 };
-
 export default AnalysisLayout;
