@@ -11,6 +11,12 @@ import UploadContract from "./pages/UploadContract";
 import Legal from "./pages/Legal";
 import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
+import Impressum from "./pages/Impressum";
+import Datenschutz from "./pages/Datenschutz";
+import AGB from "./pages/AGB";
+import FAQ from "./pages/FAQ";
+import Blog from "./pages/Blog";
+import WerteEthik from "./pages/WerteEthik";
 
 const queryClient = new QueryClient();
 
@@ -27,6 +33,15 @@ const App = () => (
           <Route path="/upload-contract" element={<UploadContract />} />
           <Route path="/legal" element={<Legal />} />
           <Route path="/contact" element={<Contact />} />
+          
+          {/* New routes */}
+          <Route path="/impressum" element={<Impressum />} />
+          <Route path="/datenschutz" element={<Datenschutz />} />
+          <Route path="/agb" element={<AGB />} />
+          <Route path="/faq" element={<FAQ />} />
+          <Route path="/blog" element={<Blog />} />
+          <Route path="/werte-ethik" element={<WerteEthik />} />
+          
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

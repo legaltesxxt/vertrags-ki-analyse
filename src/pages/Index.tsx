@@ -5,7 +5,7 @@ import FileUpload from '@/components/FileUpload';
 import { useN8nWebhook } from '@/hooks/useN8nWebhook';
 import { useToast } from '@/hooks/use-toast';
 import Header from '@/components/home/Header';
-import Footer from '@/components/home/Footer';
+import Footer from '@/components/Footer';
 import FeatureCards from '@/components/features/FeatureCards';
 import ProcessSteps from '@/components/home/ProcessSteps';
 import AnalysisSection from '@/components/analysis/AnalysisSection';
