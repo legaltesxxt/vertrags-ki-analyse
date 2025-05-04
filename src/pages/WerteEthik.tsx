@@ -14,7 +14,7 @@ Bei *Legal AI* glauben wir, dass Technologie nur dann sinnvoll ist, wenn sie im 
 ## Unsere Grundprinzipien
 
 ### 1. Transparenz statt Blackbox  
-Wir legen offen, wie unsere Analysen funktionieren: Jede Einschaetzung basiert auf klaren Kriterien und wird verstaendlich dargestellt. Unser Ziel ist es, dir nicht nur Ergebnisse zu liefern, sondern auch deren Grundlage nachvollziehbar zu machen.
+Wir legen offen, wie unsere Analysen funktionieren: Jede Einschätzung basiert auf klaren Kriterien und wird verstaendlich dargestellt. Unser Ziel ist es, dir nicht nur Ergebnisse zu liefern, sondern auch deren Grundlage nachvollziehbar zu machen.
 
 ### 2. Datenschutz als Prioritaet  
 Deine Dokumente gehoeren dir. Hochgeladene Vertraege werden ausschliesslich fuer die Analyse verwendet und **sofort danach geloescht**. Wir speichern keine Inhalte und respektieren deine Privatsphaere in vollem Umfang.
