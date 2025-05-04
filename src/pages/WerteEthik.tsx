@@ -17,7 +17,7 @@ Bei *Legal AI* glauben wir, dass Technologie nur dann sinnvoll ist, wenn sie im 
 Wir legen offen, wie unsere Analysen funktionieren: Jede Einschätzung basiert auf klaren Kriterien und wird verständlich dargestellt. Unser Ziel ist es, dir nicht nur Ergebnisse zu liefern, sondern auch deren Grundlage nachvollziehbar zu machen.
 
 ### 2. Datenschutz als Priorität  
-Deine Dokumente gehören dir. Hochgeladene Verträge werden ausschließlich für die Analyse verwendet und **sofort danach gelöscht**. Wir speichern keine Inhalte und respektieren deine Privatsphäre in vollem Umfang.
+Deine Dokumente gehören dir. Hochgeladene Verträge werden ausschliesslich für die Analyse verwendet und **sofort danach gelöscht**. Wir speichern keine Inhalte und respektieren deine Privatsphäre in vollem Umfang.
 
 ### 3. Keine Rechtsberatung  
 Unsere Analysen bieten eine erste Orientierung, ersetzen jedoch keine individuelle Rechtsberatung. Für verbindliche Auskünfte empfehlen wir, einen qualifizierten Juristen zu konsultieren.
