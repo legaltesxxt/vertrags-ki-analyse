@@ -31,7 +31,7 @@ Technologie ist ein Werkzeug – kein Ersatz für menschliches Urteilsvermögen.
 ## Unser Engagement
 
 - **Offene Kommunikation:** Wir informieren dich über Änderungen, Updates und neue Funktionen.  
-- **Kontinuierliche Verbesserung:** Dein Feedback fließt direkt in die Weiterentwicklung unserer Dienste ein.  
+- **Kontinuierliche Verbesserung:** Dein Feedback fliesst direkt in die Weiterentwicklung unserer Dienste ein.  
 - **Ethik als Leitlinie:** Unsere Entscheidungen orientieren sich an ethischen Standards und dem Wohl unserer Nutzer.
 
 ---
