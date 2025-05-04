@@ -1,18 +1,27 @@
 
 import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Upload, Info, FileText, Mail, HelpCircle } from 'lucide-react';
 
 const NavigationTabs = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState(location.pathname);
 
   const handleSoFunktioniertClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
-    const element = document.getElementById('how-it-works');
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
+    
+    // Check if we're already on the homepage
+    if (location.pathname === '/') {
+      // If we're on the homepage, scroll to the element
+      const element = document.getElementById('how-it-works');
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    } else {
+      // If we're not on the homepage, navigate to the homepage with the anchor
+      navigate('/#how-it-works', { replace: true });
     }
   };
 
