@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
@@ -25,7 +24,7 @@ const AnalysisSection: React.FC<AnalysisSectionProps> = ({
   if (isAnalyzing) {
     return (
       <div className="bg-white rounded-xl shadow-sm p-8 border border-border/50 mb-10 animate-fade-in">
-        <AnalysisProgress progress={50} />
+        <AnalysisProgress />
       </div>
     );
   }

@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 export default {
@@ -66,7 +65,6 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-				// Legal-spezifische Farben - modernisiert und professioneller
 				legal: {
 					primary: '#005B7F',    // Petrol-Blau für professionellen Look
 					secondary: '#0F83A9',  // Helles Petrol für Sekundärelemente
@@ -108,6 +106,10 @@ export default {
 				'fade-in': {
 					'0%': { opacity: '0' },
 					'100%': { opacity: '1' },
+				},
+				'indeterminateProgress': {
+					'0%': { transform: 'translateX(-100%)' },
+					'100%': { transform: 'translateX(400%)' }
 				}
 			},
 			animation: {
@@ -115,6 +117,7 @@ export default {
 				'accordion-up': 'accordion-up 0.2s ease-out',
 				'pulse-gentle': 'pulse-gentle 2s ease-in-out infinite',
 				'fade-in': 'fade-in 0.6s ease-out',
+				'indeterminate': 'indeterminateProgress 1.5s infinite cubic-bezier(0.65, 0.815, 0.735, 0.395)'
 			}
 		}
 	},
