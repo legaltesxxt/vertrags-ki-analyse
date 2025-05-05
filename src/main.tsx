@@ -3,6 +3,14 @@ import { createRoot } from 'react-dom/client'
 import App from './App.tsx'
 import './index.css'
 
+// Extend the Window interface to include gaOptout
+declare global {
+  interface Window {
+    gaOptout: () => void;
+    ['ga-disable-G-SR9PMHBZ68']: boolean;
+  }
+}
+
 const root = createRoot(document.getElementById("root")!);
 root.render(<App />);
 
