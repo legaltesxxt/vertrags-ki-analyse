@@ -6,12 +6,13 @@ import { FileText } from 'lucide-react';
 import { useN8nWebhook } from '@/hooks/useN8nWebhook';
 import AnalysisLayout from '@/components/analysis/AnalysisLayout';
 import FileUpload from '@/components/FileUpload';
+import AnalysisSection from '@/components/analysis/AnalysisSection';
 
 const UploadContract = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const { sendToN8n, isLoading: isSendingToN8n, resetError } = useN8nWebhook();
+  const { sendToN8n, isLoading: isSendingToN8n, error, resetError } = useN8nWebhook();
 
   const handleFileSelected = useCallback(async (file: File) => {
     setSelectedFile(file);
@@ -90,6 +91,15 @@ const UploadContract = () => {
         <div className="bg-white rounded-xl shadow-sm p-8 border border-border/50 mb-10">
           <FileUpload onFileSelected={handleFileSelected} isAnalyzing={isSendingToN8n} />
         </div>
+        
+        {/* Add AnalysisSection to show progress during analysis */}
+        <AnalysisSection 
+          isAnalyzing={isSendingToN8n}
+          webhookError={error}
+          webhookResult={null}
+          useRealAnalysis={true}
+          onReset={resetError}
+        />
         
         <div className="text-sm text-slate-500 text-center max-w-xl mx-auto">
           <p>Ihre Daten werden sicher verarbeitet und nach der Analyse automatisch gelöscht. 

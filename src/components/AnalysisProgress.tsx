@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { Progress } from '@/components/ui/progress';
 import { Loader2 } from 'lucide-react';
 
 interface AnalysisProgressProps {
