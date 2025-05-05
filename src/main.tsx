@@ -21,4 +21,12 @@ window.addEventListener('load', () => {
       }
     }, 300);
   }
+  
+  // Google Analytics opt-out function
+  window.gaOptout = function() {
+    document.cookie = 'ga-disable-G-SR9PMHBZ68=true; expires=Thu, 31 Dec 2099 23:59:59 UTC; path=/';
+    window['ga-disable-G-SR9PMHBZ68'] = true;
+    alert('Google Analytics wurde für diese Webseite deaktiviert.');
+  };
 });
+
