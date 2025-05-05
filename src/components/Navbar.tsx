@@ -5,16 +5,17 @@ import { Link } from 'react-router-dom';
 import NavigationTabs from './NavigationTabs';
 
 const Navbar: React.FC = () => {
-  return <>
+  return (
+    <>
       <nav className="bg-white border-b border-border/80 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-20">
+          <div className="flex justify-between h-16">
             <div className="flex items-center">
               <Link to="/" className="flex items-center group">
                 <img 
+                  src="/lovable-uploads/b80ac0b1-5bd9-41b9-ad68-c2b9255486ce.png" 
                   alt="Vertragsklar Logo" 
-                  src="/lovable-uploads/b1acbe02-b569-4f2f-a561-aec2a0aca1a6.png" 
-                  className="h-20 py-2 mr-3 transition-opacity group-hover:opacity-90 object-contain" 
+                  className="h-10 mr-2 transition-opacity group-hover:opacity-90"
                 />
               </Link>
             </div>
@@ -28,6 +29,8 @@ const Navbar: React.FC = () => {
         </div>
       </nav>
       <NavigationTabs />
-    </>;
+    </>
+  );
 };
+
 export default Navbar;
