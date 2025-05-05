@@ -3,6 +3,7 @@ import React from 'react';
 import AnalysisLayout from '@/components/analysis/AnalysisLayout';
 import { HelpCircle } from 'lucide-react';
 import FAQComponent from '@/components/home/FAQ';
+import FeedbackForm from '@/components/FeedbackForm';
 
 const FAQ = () => {
   return (
@@ -19,6 +20,13 @@ const FAQ = () => {
         </div>
 
         <FAQComponent />
+
+        <div className="mt-16 mb-10">
+          <h2 className="text-2xl font-light text-legal-primary text-center mb-8">
+            Weitere Fragen? Kontaktieren Sie uns
+          </h2>
+          <FeedbackForm />
+        </div>
       </div>
     </AnalysisLayout>
   );

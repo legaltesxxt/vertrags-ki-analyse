@@ -1,23 +1,50 @@
+
 import React from 'react';
 import AnalysisLayout from '@/components/analysis/AnalysisLayout';
 import { Mail, Phone, MapPin } from 'lucide-react';
+import FeedbackForm from '@/components/FeedbackForm';
+
 const Contact = () => {
-  return <AnalysisLayout>
+  return (
+    <AnalysisLayout>
       <div className="max-w-3xl mx-auto">
         <div className="text-center mb-10">
           <div className="inline-block bg-legal-tertiary p-4 rounded-full mb-4">
             <Mail className="h-10 w-10 text-legal-primary" />
           </div>
           <h1 className="text-3xl font-light text-legal-primary mb-2">Kontakt</h1>
-          <p className="text-slate-600 max-w-xl mx-auto">Haben Sie Fragen oder Feedback für uns? Nehmen Sie gerne Kontakt mit uns auf.</p>
+          <p className="text-slate-600 max-w-xl mx-auto">
+            Haben Sie Fragen oder Feedback für uns? Nehmen Sie gerne Kontakt mit uns auf.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+          <div className="flex flex-col items-center p-6 bg-white rounded-xl shadow-sm border border-border/50">
+            <Mail className="h-8 w-8 text-legal-primary mb-2" />
+            <h3 className="text-lg font-medium mb-1">E-Mail</h3>
+            <p className="text-slate-600 text-center">info@vertragsklar.ch</p>
+          </div>
+          
+          <div className="flex flex-col items-center p-6 bg-white rounded-xl shadow-sm border border-border/50">
+            <Phone className="h-8 w-8 text-legal-primary mb-2" />
+            <h3 className="text-lg font-medium mb-1">Telefon</h3>
+            <p className="text-slate-600 text-center">+41 123 456 789</p>
+          </div>
+          
+          <div className="flex flex-col items-center p-6 bg-white rounded-xl shadow-sm border border-border/50">
+            <MapPin className="h-8 w-8 text-legal-primary mb-2" />
+            <h3 className="text-lg font-medium mb-1">Adresse</h3>
+            <p className="text-slate-600 text-center">Musterstrasse 123<br />8000 Zürich<br />Schweiz</p>
+          </div>
         </div>
 
         <div className="bg-white rounded-xl shadow-sm p-8 border border-border/50 mb-10">
-          <p className="text-center text-slate-500">
-            Diese Seite wird in Kürze mit Kontaktinformationen gefüllt.
-          </p>
+          <h2 className="text-xl font-medium text-legal-primary mb-6">Schreiben Sie uns</h2>
+          <FeedbackForm />
         </div>
       </div>
-    </AnalysisLayout>;
+    </AnalysisLayout>
+  );
 };
+
 export default Contact;
