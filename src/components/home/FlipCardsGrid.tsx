@@ -1,8 +1,9 @@
+
 import React from 'react';
 import FlipCard from './FlipCard';
 
 const toolsData = [{
-  title: "Unser Tool",
+  title: "Vertragsklar",
   description: "LegalAI verbindet spezialisiertes Wissen im Schweizer Vertragsrecht mit modernster KI-Technologie. Innerhalb von wenigen Minuten erhalten Nutzer eine präzise Risikobewertung ihres Vertrags inklusive detaillierter Hervorhebung kritischer Klauseln. Der Service bietet schnelle, verständliche und konkrete Hinweise, die sofort umsetzbar sind. Ideal für Einzelpersonen und KMUs, die schnelle Klarheit und Sicherheit bei Verträgen benötigen.",
   comparison: {
     expertise: {
