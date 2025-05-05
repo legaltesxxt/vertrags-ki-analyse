@@ -13,7 +13,7 @@ const Blog = () => {
           </div>
           <h1 className="text-3xl font-light text-legal-primary mb-2">Blog</h1>
           <p className="text-slate-600 max-w-xl mx-auto">
-            Aktuelle Artikel und Neuigkeiten rund um LegalAI und Vertragsrecht.
+            Aktuelle Artikel und Neuigkeiten rund um Vertragsklar und Vertragsrecht.
           </p>
         </div>
 

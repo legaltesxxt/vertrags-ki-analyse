@@ -39,7 +39,7 @@ const Footer = () => {
         </div>
         
         <div className="border-t border-white/20 pt-6 mt-2 text-center">
-          <p className="text-white/90">© 2025 LegalAI – Gegründet in der Schweiz 🇨🇭</p>
+          <p className="text-white/90">© 2025 Vertragsklar – Gegründet in der Schweiz 🇨🇭</p>
         </div>
       </div>
     </footer>

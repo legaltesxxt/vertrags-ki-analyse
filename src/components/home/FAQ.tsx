@@ -9,8 +9,8 @@ import {
 
 const faqData = [
   {
-    question: "Was ist LegalAI?",
-    answer: "LegalAI nutzt moderne KI-Technologie, um Verträge schnell und zuverlässig auf Risiken zu prüfen. Innerhalb von wenigen Minuten erhältst du eine Risikoeinschätzung, Handlungsbedarf, kritische Klauseln werden hervorgehoben und du bekommst eine klare Einschätzung – speziell angepasst auf das Schweizer Recht."
+    question: "Was ist Vertragsklar?",
+    answer: "Vertragsklar nutzt moderne KI-Technologie, um Verträge schnell und zuverlässig auf Risiken zu prüfen. Innerhalb von wenigen Minuten erhältst du eine Risikoeinschätzung, Handlungsbedarf, kritische Klauseln werden hervorgehoben und du bekommst eine klare Einschätzung – speziell angepasst auf das Schweizer Recht."
   },
   {
     question: "Welche Verträge kann ich prüfen lassen?",
@@ -45,7 +45,7 @@ const faqData = [
     answer: "Während der Beta-Phase ist die Nutzung kostenlos. Später wird die Analyse je nach Vertragstyp und Funktionsumfang zu einem fairen Preis angeboten (Pay-per-Use)."
   },
   {
-    question: "Ist LegalAI ein Ersatz für einen Anwalt?",
+    question: "Ist Vertragsklar ein Ersatz für einen Anwalt?",
     answer: "Nein. Unser Tool dient der schnellen Risikoerkennung und Unterstützung bei der Vertragsprüfung. Bei komplexen oder kritischen Fällen empfehlen wir weiterhin die individuelle Beratung durch einen Rechtsanwalt."
   }
 ];

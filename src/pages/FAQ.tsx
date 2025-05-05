@@ -14,7 +14,7 @@ const FAQ = () => {
           </div>
           <h1 className="text-3xl font-light text-legal-primary mb-2">Häufig gestellte Fragen</h1>
           <p className="text-slate-600 max-w-xl mx-auto">
-            Antworten auf die wichtigsten Fragen rund um LegalAI.
+            Antworten auf die wichtigsten Fragen rund um Vertragsklar.
           </p>
         </div>
 
