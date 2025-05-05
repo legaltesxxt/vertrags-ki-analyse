@@ -12,8 +12,8 @@ export function useN8nWebhook() {
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
-  // Die konfigurierte n8n Webhook URL
-  const webhookUrl = "https://vertrags.app.n8n.cloud/webhook-test/Vertrags-analyse";
+  // Die konfigurierte n8n Webhook URL - updated to production URL
+  const webhookUrl = "https://vertrags.app.n8n.cloud/webhook/Vertrags-analyse";
 
   const sendToN8n = useCallback(async (file: File): Promise<WebhookResponse> => {
     if (!webhookUrl) {
