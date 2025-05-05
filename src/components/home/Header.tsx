@@ -22,7 +22,7 @@ const Header = () => {
           Vertrag jetzt kostenlos prüfen
         </Button>
         
-        <span className="text-slate-500 font-medium px-4">Oder</span>
+        <span className="text-slate-500 font-medium px-4">oder</span>
         
         <Button onClick={() => navigate('/demo-analysis')} variant="outline" className="border-legal-primary/20 hover:bg-legal-tertiary text-legal-primary px-5 py-2 text-base font-medium rounded-lg" size="default">
           Demo Analyse ansehen
