@@ -1,7 +1,9 @@
+
 import React from 'react';
 import { Shield } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import NavigationTabs from './NavigationTabs';
+
 const Navbar: React.FC = () => {
   return <>
       <nav className="bg-white border-b border-border/80 shadow-sm">
@@ -12,7 +14,11 @@ const Navbar: React.FC = () => {
                 <div className="mr-3">
                   <img src="/lovable-uploads/182bda48-4c66-464f-87bf-26446b4891c1.png" alt="VertragsAnalyse Logo" className="h-12 w-auto" />
                 </div>
-                <span className="font-semibold text-xl tracking-tight text-legal-primary group-hover:text-legal-secondary transition-colors text-left">Vertragsklar</span>
+                <img 
+                  src="/lovable-uploads/162860b3-88b7-4c0f-a362-cb1d826d699b.png" 
+                  alt="Vertragsklar Text Logo" 
+                  className="h-8 w-auto group-hover:opacity-80 transition-opacity" 
+                />
               </Link>
             </div>
             <div className="flex items-center">
@@ -27,4 +33,5 @@ const Navbar: React.FC = () => {
       <NavigationTabs />
     </>;
 };
+
 export default Navbar;
