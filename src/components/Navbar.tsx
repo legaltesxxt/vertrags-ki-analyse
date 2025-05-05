@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { FileText, Shield } from 'lucide-react';
+import { Shield } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import NavigationTabs from './NavigationTabs';
 
@@ -12,8 +12,12 @@ const Navbar: React.FC = () => {
           <div className="flex justify-between h-16">
             <div className="flex items-center">
               <Link to="/" className="flex items-center group">
-                <div className="bg-legal-primary p-1.5 rounded text-white mr-3">
-                  <FileText className="h-5 w-5" />
+                <div className="mr-3">
+                  <img 
+                    src="/lovable-uploads/182bda48-4c66-464f-87bf-26446b4891c1.png" 
+                    alt="VertragsAnalyse Logo" 
+                    className="h-8 w-auto"
+                  />
                 </div>
                 <span className="font-semibold text-xl tracking-tight text-legal-primary group-hover:text-legal-secondary transition-colors">
                   VertragsAnalyse
