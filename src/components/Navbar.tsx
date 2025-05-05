@@ -1,7 +1,9 @@
+
 import React from 'react';
-import { Shield } from 'lucide-react';
+import { Shield, FileText } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import NavigationTabs from './NavigationTabs';
+
 const Navbar: React.FC = () => {
   return <>
       <nav className="bg-white border-b border-border/80 shadow-sm">
@@ -9,9 +11,14 @@ const Navbar: React.FC = () => {
           <div className="flex justify-between h-16">
             <div className="flex items-center">
               <Link to="/" className="flex items-center group">
-                
+                <FileText 
+                  size={28} 
+                  className="text-legal-primary mr-2.5 group-hover:text-legal-secondary transition-colors" 
+                  strokeWidth={2}
+                  aria-hidden="true"
+                />
                 <span className="font-semibold text-xl tracking-tight text-legal-primary group-hover:text-legal-secondary transition-colors">
-                  VertragsAnalyse
+                  Vertragsklar
                 </span>
               </Link>
             </div>
@@ -27,4 +34,5 @@ const Navbar: React.FC = () => {
       <NavigationTabs />
     </>;
 };
+
 export default Navbar;
