@@ -16,7 +16,7 @@ const Navbar: React.FC = () => {
                   <img 
                     src="/lovable-uploads/182bda48-4c66-464f-87bf-26446b4891c1.png" 
                     alt="VertragsAnalyse Logo" 
-                    className="h-8 w-auto"
+                    className="h-12 w-auto"
                   />
                 </div>
                 <span className="font-semibold text-xl tracking-tight text-legal-primary group-hover:text-legal-secondary transition-colors">
