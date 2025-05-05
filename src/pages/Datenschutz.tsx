@@ -46,7 +46,7 @@ TLS‑Verschlüsselung, Zugriffsbeschränkung, automatische Löschung der Vertr�
 Auskunft, Berichtigung, Löschung, Datenportabilität, Widerspruch. Anfragen an [PLATZHALTER E‑Mail].  
   
 ## 8 – Beschwerderecht  
-Eidgenössische Datenschutz‑ und Öffentlichkeitsbeauftragte (EDÖB) oder EU‑Aufsichtsbehörde.  
+Eidgenössische Datenschutz‑ und Öffentlichkeitsbeauftragte (EDÖB).  
   
 ## 9 – Änderungen  
 Wir aktualisieren diese Erklärung bei Bedarf. Aktuelle Version auf dieser Seite.  
