@@ -17,6 +17,7 @@ import AGB from "./pages/AGB";
 import FAQ from "./pages/FAQ";
 import Blog from "./pages/Blog";
 import WerteEthik from "./pages/WerteEthik";
+import CookieConsent from "./components/CookieConsent";
 
 const queryClient = new QueryClient();
 
@@ -45,6 +46,7 @@ const App = () => (
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
+        <CookieConsent />
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

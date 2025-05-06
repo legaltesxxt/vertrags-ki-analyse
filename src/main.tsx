@@ -37,4 +37,3 @@ window.addEventListener('load', () => {
     alert('Google Analytics wurde für diese Webseite deaktiviert.');
   };
 });
-

@@ -18,6 +18,14 @@
     <meta name="twitter:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
     
     <!-- Google tag (gtag.js) -->
+    <script>
+      window['ga-disable-G-SR9PMHBZ68'] = true; // Disable by default until consent
+      
+      // Check if consent was previously given
+      if(localStorage.getItem('cookie-consent') === 'true') {
+        window['ga-disable-G-SR9PMHBZ68'] = false; // Enable GA if consent exists
+      }
+    </script>
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-SR9PMHBZ68"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
