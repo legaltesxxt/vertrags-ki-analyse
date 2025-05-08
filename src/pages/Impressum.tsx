@@ -1,7 +1,8 @@
 
 import React from 'react';
 import AnalysisLayout from '@/components/analysis/AnalysisLayout';
-import { Building } from 'lucide-react';
+import { Building, Mail, User } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
 
 const Impressum = () => {
   return (
@@ -17,11 +18,38 @@ const Impressum = () => {
           </p>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm p-8 border border-border/50 mb-10">
-          <p className="text-center text-slate-500">
-            Diese Seite wird in Kürze mit Inhalten gefüllt.
-          </p>
-        </div>
+        <Card className="bg-white rounded-xl shadow-sm border border-border/50 mb-10">
+          <CardContent className="p-8">
+            <div className="space-y-6">
+              <div>
+                <h2 className="text-xl font-medium text-legal-primary mb-2">Unternehmensangaben</h2>
+                <div className="pl-4 border-l-2 border-legal-tertiary">
+                  <p className="text-slate-700">Vertragsklar</p>
+                  <p className="text-slate-700">Schatzacher 16</p>
+                  <p className="text-slate-700">2564 Bellmund, Schweiz</p>
+                </div>
+              </div>
+              
+              <div className="flex items-start gap-3">
+                <Mail className="text-legal-primary mt-1" size={18} />
+                <div>
+                  <h3 className="font-medium text-legal-primary">E-Mail</h3>
+                  <a href="mailto:info@vertragsklar.ch" className="text-legal-secondary hover:underline">
+                    info@vertragsklar.ch
+                  </a>
+                </div>
+              </div>
+              
+              <div className="flex items-start gap-3">
+                <User className="text-legal-primary mt-1" size={18} />
+                <div>
+                  <h3 className="font-medium text-legal-primary">Vertretungsberechtigt</h3>
+                  <p className="text-slate-700">Alex Dalla Bona (Geschäftsführer)</p>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </AnalysisLayout>
   );
