@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Shield, FileText } from 'lucide-react';
+import { Shield } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import NavigationTabs from './NavigationTabs';
 
@@ -11,11 +11,12 @@ const Navbar: React.FC = () => {
           <div className="flex justify-between h-16">
             <div className="flex items-center">
               <Link to="/" className="flex items-center group">
-                <FileText 
-                  size={28} 
-                  className="text-legal-primary mr-2.5 group-hover:text-legal-secondary transition-colors" 
-                  strokeWidth={2}
-                  aria-hidden="true"
+                <img 
+                  src="/vertragsklar-logo.png" 
+                  alt="Vertragsklar Logo" 
+                  className="h-9 w-9 mr-2.5 group-hover:opacity-80 transition-opacity"
+                  width="36"
+                  height="36"
                 />
                 <span className="font-semibold text-xl tracking-tight text-legal-primary group-hover:text-legal-secondary transition-colors">
                   Vertragsklar
