@@ -24,7 +24,7 @@ const Impressum = () => {
               <div>
                 <h2 className="text-xl font-medium text-legal-primary mb-2">Unternehmensangaben</h2>
                 <div className="pl-4 border-l-2 border-legal-tertiary">
-                  <p className="text-slate-700">Vertragsklar</p>
+                  <p className="text-slate-700">Vertragsklar (Startup)</p>
                   <p className="text-slate-700">Schatzacher 16</p>
                   <p className="text-slate-700">2564 Bellmund, Schweiz</p>
                 </div>
