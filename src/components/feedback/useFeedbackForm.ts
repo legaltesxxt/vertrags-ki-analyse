@@ -38,6 +38,7 @@ export const useFeedbackForm = () => {
   };
 
   const onSubmit = async (data: FormValues) => {
+    console.log('Form submission started with data:', data);
     setIsSubmitting(true);
     
     try {
@@ -49,13 +50,10 @@ export const useFeedbackForm = () => {
       
       if (selectedImage) {
         formData.append('image', selectedImage);
+        console.log('Image attached to form data:', selectedImage.name);
       }
 
       console.log('Sende Formular-Daten an Webhook:', webhookUrl);
-      console.log('Formular-Daten:', {
-        ...data,
-        imageIncluded: selectedImage ? true : false
-      });
       
       // Senden der Daten an den Webhook
       const response = await fetch(webhookUrl, {
@@ -63,23 +61,26 @@ export const useFeedbackForm = () => {
         body: formData,
       });
       
+      console.log('Webhook response status:', response.status);
+      
       if (!response.ok) {
         throw new Error(`Fehler beim Senden: ${response.status} ${response.statusText}`);
       }
       
+      console.log('Form submitted successfully');
       setIsSuccess(true);
       form.reset();
       removeImage();
       
       toast({
         title: "Vielen Dank!",
-        description: "Ihr Feedback wurde erfolgreich übermittelt.",
+        description: "Ihr Feedback wurde erfolgreich übermittelt. Wir melden uns bald bei Ihnen.",
       });
       
-      // Reset success state after 3 seconds
+      // Reset success state after 5 seconds to allow users to read the message
       setTimeout(() => {
         setIsSuccess(false);
-      }, 3000);
+      }, 5000);
       
     } catch (error) {
       console.error('Error submitting feedback:', error);

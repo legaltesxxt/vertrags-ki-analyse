@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { UseFormReturn } from 'react-hook-form';
 import { z } from 'zod';
@@ -23,6 +22,7 @@ interface FeedbackFormFieldsProps {
   imagePreview: string | null;
   onImageChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onRemoveImage: () => void;
+  onSubmit: (data: FormValues) => Promise<void>;
 }
 
 const FeedbackFormFields: React.FC<FeedbackFormFieldsProps> = ({ 
@@ -30,10 +30,11 @@ const FeedbackFormFields: React.FC<FeedbackFormFieldsProps> = ({
   isSubmitting, 
   imagePreview, 
   onImageChange, 
-  onRemoveImage 
+  onRemoveImage,
+  onSubmit
 }) => {
   return (
-    <form onSubmit={form.handleSubmit(() => {})} className="space-y-6">
+    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
       <FormField
         control={form.control}
         name="name"

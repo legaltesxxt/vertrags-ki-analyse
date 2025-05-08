@@ -30,7 +30,8 @@ const FeedbackForm: React.FC = () => {
               imagePreview={imagePreview}
               onImageChange={handleImageChange}
               onRemoveImage={removeImage}
-              />
+              onSubmit={onSubmit}
+            />
           </Form>
         )}
       </CardContent>

@@ -9,7 +9,8 @@ const SuccessMessage: React.FC = () => {
         <CheckCircle className="h-12 w-12 text-green-600" />
       </div>
       <h3 className="text-xl font-medium text-gray-900 mb-2">Feedback übermittelt!</h3>
-      <p className="text-gray-600">Vielen Dank für Ihre Nachricht. Wir werden uns so schnell wie möglich bei Ihnen melden.</p>
+      <p className="text-gray-600 mb-2">Vielen Dank für Ihre Nachricht. Wir schätzen Ihr Feedback sehr.</p>
+      <p className="text-gray-600">Unser Team wird sich so schnell wie möglich, spätestens innerhalb von 48 Stunden, bei Ihnen melden.</p>
     </div>
   );
 };
