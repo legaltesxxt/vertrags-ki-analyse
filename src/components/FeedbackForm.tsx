@@ -25,7 +25,9 @@ const FeedbackForm: React.FC = () => {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const { toast } = useToast();
-  const [webhookUrl, setWebhookUrl] = useState<string>('');
+  
+  // Fest definierter Webhook URL für das Feedback-Formular
+  const webhookUrl = 'https://vertrags.app.n8n.cloud/webhook-test/feedback-form';
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -63,27 +65,21 @@ const FeedbackForm: React.FC = () => {
         formData.append('image', selectedImage);
       }
 
-      // Here we would send the data to a webhook URL if it was provided
-      // For now, we're just simulating a successful submission
-      console.log('Form data to be sent:', {
+      console.log('Sende Formular-Daten an Webhook:', webhookUrl);
+      console.log('Formular-Daten:', {
         ...data,
         imageIncluded: selectedImage ? true : false
       });
       
-      // Simulating API call with a timeout
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Senden der Daten an den Webhook
+      const response = await fetch(webhookUrl, {
+        method: 'POST',
+        body: formData,
+      });
       
-      // Here's where we would send the actual request when a webhook URL is configured
-      // if (webhookUrl) {
-      //   const response = await fetch(webhookUrl, {
-      //     method: 'POST',
-      //     body: formData,
-      //   });
-      //   
-      //   if (!response.ok) {
-      //     throw new Error('Failed to submit feedback');
-      //   }
-      // }
+      if (!response.ok) {
+        throw new Error(`Fehler beim Senden: ${response.status} ${response.statusText}`);
+      }
       
       setIsSuccess(true);
       form.reset();
