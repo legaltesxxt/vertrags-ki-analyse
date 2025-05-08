@@ -1,5 +1,5 @@
 
-import { useState, ChangeEvent } from 'react';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useToast } from '@/components/ui/use-toast';
@@ -8,8 +8,6 @@ import { FormValues, formSchema } from './FeedbackFormFields';
 export const useFeedbackForm = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
-  const [selectedImage, setSelectedImage] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const { toast } = useToast();
   
   // Fest definierter Webhook URL für das Feedback-Formular
@@ -24,34 +22,16 @@ export const useFeedbackForm = () => {
     }
   });
 
-  const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      setSelectedImage(file);
-      setImagePreview(URL.createObjectURL(file));
-    }
-  };
-
-  const removeImage = () => {
-    setSelectedImage(null);
-    setImagePreview(null);
-  };
-
   const onSubmit = async (data: FormValues) => {
     console.log('Form submission started with data:', data);
     setIsSubmitting(true);
     
     try {
-      // Prepare form data including optional image
+      // Prepare form data without image
       const formData = new FormData();
       formData.append('name', data.name);
       formData.append('email', data.email);
       formData.append('message', data.message);
-      
-      if (selectedImage) {
-        formData.append('image', selectedImage);
-        console.log('Image attached to form data:', selectedImage.name);
-      }
 
       console.log('Sende Formular-Daten an Webhook:', webhookUrl);
       
@@ -70,7 +50,6 @@ export const useFeedbackForm = () => {
       console.log('Form submitted successfully');
       setIsSuccess(true);
       form.reset();
-      removeImage();
       
       toast({
         title: "Vielen Dank!",
@@ -98,9 +77,6 @@ export const useFeedbackForm = () => {
     form,
     isSubmitting,
     isSuccess,
-    imagePreview,
-    handleImageChange,
-    removeImage,
     onSubmit
   };
 };

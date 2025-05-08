@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { UseFormReturn } from 'react-hook-form';
 import { z } from 'zod';
@@ -6,9 +7,8 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Loader2, Upload } from 'lucide-react';
-import ImageUpload from './ImageUpload';
 
-const formSchema = z.object({
+export const formSchema = z.object({
   name: z.string().min(2, { message: 'Name muss mindestens 2 Zeichen lang sein.' }),
   email: z.string().email({ message: 'Bitte geben Sie eine gültige E-Mail-Adresse ein.' }),
   message: z.string().min(10, { message: 'Ihre Nachricht sollte mindestens 10 Zeichen enthalten.' })
@@ -19,18 +19,12 @@ export type FormValues = z.infer<typeof formSchema>;
 interface FeedbackFormFieldsProps {
   form: UseFormReturn<FormValues>;
   isSubmitting: boolean;
-  imagePreview: string | null;
-  onImageChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  onRemoveImage: () => void;
   onSubmit: (data: FormValues) => Promise<void>;
 }
 
 const FeedbackFormFields: React.FC<FeedbackFormFieldsProps> = ({ 
   form, 
   isSubmitting, 
-  imagePreview, 
-  onImageChange, 
-  onRemoveImage,
   onSubmit
 }) => {
   return (
@@ -79,12 +73,6 @@ const FeedbackFormFields: React.FC<FeedbackFormFieldsProps> = ({
             <FormMessage />
           </FormItem>
         )}
-      />
-      
-      <ImageUpload 
-        imagePreview={imagePreview}
-        onImageChange={onImageChange}
-        onRemoveImage={onRemoveImage}
       />
       
       <Button 

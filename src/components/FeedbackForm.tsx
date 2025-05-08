@@ -11,9 +11,6 @@ const FeedbackForm: React.FC = () => {
     form,
     isSubmitting,
     isSuccess,
-    imagePreview,
-    handleImageChange,
-    removeImage,
     onSubmit
   } = useFeedbackForm();
 
@@ -27,9 +24,6 @@ const FeedbackForm: React.FC = () => {
             <FeedbackFormFields
               form={form}
               isSubmitting={isSubmitting}
-              imagePreview={imagePreview}
-              onImageChange={handleImageChange}
-              onRemoveImage={removeImage}
               onSubmit={onSubmit}
             />
           </Form>
