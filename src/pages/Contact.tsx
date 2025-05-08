@@ -1,7 +1,7 @@
 
 import React from 'react';
 import AnalysisLayout from '@/components/analysis/AnalysisLayout';
-import { Mail, Phone, MapPin } from 'lucide-react';
+import { Mail, Clock, MapPin } from 'lucide-react';
 import FeedbackForm from '@/components/FeedbackForm';
 
 const Contact = () => {
@@ -26,9 +26,9 @@ const Contact = () => {
           </div>
           
           <div className="flex flex-col items-center p-6 bg-white rounded-xl shadow-sm border border-border/50">
-            <Phone className="h-8 w-8 text-legal-primary mb-2" />
-            <h3 className="text-lg font-medium mb-1">Telefon</h3>
-            <p className="text-slate-600 text-center">+41 123 456 789</p>
+            <Clock className="h-8 w-8 text-legal-primary mb-2" />
+            <h3 className="text-lg font-medium mb-1">Antwortzeit</h3>
+            <p className="text-slate-600 text-center">Innerhalb von 48 Stunden</p>
           </div>
           
           <div className="flex flex-col items-center p-6 bg-white rounded-xl shadow-sm border border-border/50">
