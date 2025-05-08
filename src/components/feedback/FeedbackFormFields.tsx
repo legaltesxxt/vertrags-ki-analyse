@@ -96,5 +96,4 @@ const FeedbackFormFields: React.FC<FeedbackFormFieldsProps> = ({
   );
 };
 
-export { formSchema };
 export default FeedbackFormFields;
