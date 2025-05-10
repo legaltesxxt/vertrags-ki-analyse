@@ -9,8 +9,8 @@ const Datenschutz = () => {
 *(Stand: Mai 2025)*  
   
 ## 1 – Verantwortliche Stelle  
-Vertragsklar – [PLATZHALTER Strasse, Nr.] – [PLATZHALTER PLZ Ort] – Schweiz  
-E‑Mail: [PLATZHALTER E‑Mail]  
+Vertragsklar – Schatzacher 16 – 2564 Bellmund – Schweiz  
+E‑Mail: info@vertragsklar.ch  
   
 ## 2 – Zweck und Umfang der Datenbearbeitung  
 Wir bieten eine KI‑gestützte Vertragsanalyse für den Schweizer Markt an. Zu diesem Zweck verarbeiten wir **ausschliesslich die Vertragsdokumente**, die du freiwillig hochlädst, sowie – bei einer kostenpflichtigen Nutzung – die erforderlichen **Zahlungs‑ und Kontaktdaten**.  
@@ -53,7 +53,7 @@ Sie haben jederzeit die Möglichkeit, Ihre Einwilligung zu widerrufen, indem Sie
 TLS‑Verschlüsselung, Zugriffsbeschränkung, automatische Löschung der Verträge.  
   
 ## 7 – Deine Rechte  
-Auskunft, Berichtigung, Löschung, Datenportabilität, Widerspruch. Anfragen an [PLATZHALTER E‑Mail].  
+Auskunft, Berichtigung, Löschung, Datenportabilität, Widerspruch. Anfragen an info@vertragsklar.ch.  
 
 ## 8 – Opt-Out aus Google Analytics
 Sie können die Erfassung durch Google Analytics verhindern, indem Sie auf folgenden Link klicken. Es wird ein Opt-Out-Cookie gesetzt, das die zukünftige Erfassung Ihrer Daten beim Besuch dieser Website verhindert:

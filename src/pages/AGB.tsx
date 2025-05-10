@@ -10,7 +10,7 @@ const AGB = () => {
 *(Stand: Mai 2025)*
 
 ## 1. Geltungsbereich  
-Diese Allgemeinen Geschäftsbedingungen (AGB) regeln das Verhältnis zwischen „Legal AI", einem Einzelunternehmen mit Sitz in [PLATZHALTER Ort, Schweiz], und natürlichen oder juristischen Personen (nachfolgend „Nutzer"), die über die Website von Legal AI eine KI-gestützte Analyse von Vertragsdokumenten in Anspruch nehmen.
+Diese Allgemeinen Geschäftsbedingungen (AGB) regeln das Verhältnis zwischen „Legal AI", einem Einzelunternehmen mit Sitz in Bellmund, Schweiz, und natürlichen oder juristischen Personen (nachfolgend „Nutzer"), die über die Website von Legal AI eine KI-gestützte Analyse von Vertragsdokumenten in Anspruch nehmen.
 
 ## 2. Leistungsumfang  
 Legal AI bietet eine automatisierte Analyse hochgeladener Verträge (z. B. Arbeits-, Miet- oder Werkverträge) durch ein KI-System (OpenAI) an. Die Analyse liefert eine Einschätzung der rechtlichen Risiken und verweist auf relevante Gesetzesartikel.
@@ -56,7 +56,7 @@ Die Analyseergebnisse und die zugrunde liegende Software bleiben geistiges Eigen
 
 ---
 
-**Legal AI** – [PLATZHALTER Adresse & E-Mail]  
+**Legal AI** – Schatzacher 16, 2564 Bellmund, info@vertragsklar.ch  
 © 2025 – Alle Rechte vorbehalten`;
 
   return (
