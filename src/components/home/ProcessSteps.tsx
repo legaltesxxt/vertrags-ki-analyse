@@ -15,7 +15,7 @@ const ProcessSteps = () => {
   }, {
     icon: <CheckCircle className="h-8 w-8 text-legal-primary" />,
     title: "Ergebnis sofort erhalten",
-    description: "Erhalten Sie eine detaillierte rechtliche Bewertung"
+    description: "Erhalten Sie eine detaillierte rechtliche Empfehlung"
   }];
 
   return <section id="how-it-works" className="my-16">
