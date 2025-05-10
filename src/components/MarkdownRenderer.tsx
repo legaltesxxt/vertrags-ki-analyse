@@ -1,11 +1,14 @@
+
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { AlertTriangle, CheckCircle, HelpCircle, Info, FileText, BookOpen, Lightbulb } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+
 interface MarkdownRendererProps {
   content: string;
 }
+
 const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
   content
 }) => {
@@ -67,8 +70,22 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
     }: any) => <li className="my-1 text-sm" {...props} />,
     a: ({
       node,
+      href,
+      children,
       ...props
-    }: any) => {},
+    }: any) => {
+      return (
+        <a 
+          href={href} 
+          className="text-legal-primary hover:text-legal-secondary underline decoration-legal-tertiary/50 hover:decoration-legal-secondary/70 transition-all" 
+          target="_blank" 
+          rel="noopener noreferrer" 
+          {...props}
+        >
+          {children}
+        </a>
+      );
+    },
     hr: ({
       node,
       ...props
@@ -115,10 +132,12 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
       ...props
     }: any) => <TableCell className="py-3 px-4 text-sm text-slate-700">{props.children}</TableCell>
   };
+
   return <div className="markdown-content prose max-w-none">
       <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>
         {content}
       </ReactMarkdown>
     </div>;
 };
+
 export default MarkdownRenderer;
