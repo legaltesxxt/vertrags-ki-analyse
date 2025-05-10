@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -75,6 +76,10 @@ export default {
 						medium: '#F0A04B',  // Orange für mittleres Risiko
 						high: '#E15759',    // Rot für hohes Risiko
 					}
+				},
+				logo: {
+					primary: '#23345A',    // RGB 35,52,90 - Logo Hauptfarbe
+					hover: '#1A273F',      // Dunklere Version für Hover-Effekt
 				}
 			},
 			borderRadius: {

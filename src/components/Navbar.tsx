@@ -12,7 +12,7 @@ const Navbar: React.FC = () => {
             <div className="flex items-center">
               <Link to="/" className="flex items-center gap-3 group">
                 <img alt="Vertragsklar Logo" className="h-12 w-12 group-hover:opacity-80 transition-opacity" width="48" height="48" src="/lovable-uploads/d2f8c74c-64f3-4726-9840-c56b7e449143.png" />
-                <span className="font-semibold text-xl tracking-tight text-legal-primary group-hover:text-legal-secondary transition-colors">
+                <span className="font-semibold text-xl tracking-tight text-logo-primary group-hover:text-logo-hover transition-colors">
                   Vertragsklar
                 </span>
               </Link>
