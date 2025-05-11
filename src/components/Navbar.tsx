@@ -10,9 +10,7 @@ const Navbar: React.FC = () => {
             <div className="flex items-center">
               <Link to="/" className="flex items-center gap-3 group">
                 
-                <span className="font-semibold text-xl tracking-tight transition-colors text-logo-primary">
-                  Vertragsklar
-                </span>
+                
               </Link>
             </div>
             <div className="flex items-center">
