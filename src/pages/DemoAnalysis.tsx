@@ -168,7 +168,7 @@ const DemoAnalysis: React.FC = () => {
   // Function to handle PDF download
   const downloadFullAnalysisPDF = async () => {
     try {
-      await generatePDF(demoAnalysisData, 'demo_vertragsanalyse.pdf', toast);
+      await generatePDF(demoAnalysisData, 'demo_vertragsklar.pdf', toast);
     } catch (error) {
       console.error("Fehler beim PDF-Export:", error);
       toast.toast({

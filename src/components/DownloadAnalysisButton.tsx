@@ -14,7 +14,7 @@ const DownloadAnalysisButton: React.FC<DownloadAnalysisButtonProps> = ({ result 
   const toast = useToast();
 
   const downloadPDF = async () => {
-    await generatePDF(result, 'vertragsanalyse.pdf', toast);
+    await generatePDF(result, 'vertragsklar.pdf', toast);
   };
 
   return (

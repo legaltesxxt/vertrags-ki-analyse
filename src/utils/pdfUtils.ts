@@ -31,7 +31,7 @@ export const isRecommendationMeaningful = (recommendation?: string): boolean => 
 
 export const generatePDF = async (
   result: AnalysisResult,
-  filename: string = 'vertragsanalyse.pdf',
+  filename: string = 'vertragsklar.pdf',
   toastObj: ReturnType<typeof useToast>
 ): Promise<void> => {
   try {
@@ -90,7 +90,7 @@ export const generatePDF = async (
     element.innerHTML = `
       <div style="font-family: Arial, sans-serif; padding: 40px; color: #333;">
         <div style="text-align: center; margin-bottom: 30px;">
-          <h1 style="color: #005B7F; margin-bottom: 10px; font-size: 28px;">Vollständige Vertragsanalyse</h1>
+          <h1 style="color: #005B7F; margin-bottom: 10px; font-size: 28px;">Vollständige Vertragsklar</h1>
           <p style="color: #666; font-size: 16px;">Rechtliche Bewertung nach Schweizer Recht</p>
         </div>
         
@@ -116,7 +116,7 @@ export const generatePDF = async (
         </div>
 
         <div style="margin-top: 40px; text-align: center; color: #666; font-size: 12px; border-top: 1px solid #eee; padding-top: 20px;">
-          <p>Erstellt mit VertragsAnalyse</p>
+          <p>Erstellt mit Vertragsklar</p>
           <p>© ${new Date().getFullYear()} Alle Rechte vorbehalten</p>
           <p style="font-size: 11px; color: #999; margin-top: 5px;">Erstellungsdatum: ${new Date().toLocaleDateString('de-CH')}</p>
         </div>
