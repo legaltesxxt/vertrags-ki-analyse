@@ -10,7 +10,7 @@ const Navbar: React.FC = () => {
           <div className="flex justify-between h-16">
             <div className="flex items-center">
               <Link to="/" className="flex items-center gap-3 group">
-                <img src="/lovable-uploads/de86665e-ff76-4383-bb57-9843faccdcf3.png" alt="Vertragsklar Logo" className="h-12 w-auto" />
+                <img src="/lovable-uploads/de86665e-ff76-4383-bb57-9843faccdcf3.png" alt="Vertragsklar Logo" className="h-10 w-auto" />
                 
               </Link>
             </div>
