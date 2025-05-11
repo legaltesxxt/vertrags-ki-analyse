@@ -12,9 +12,9 @@ const Navbar: React.FC = () => {
             <div className="flex items-center">
               <Link to="/" className="flex items-center gap-3 group">
                 <img 
-                  src="/vertragsklar-logo.png" 
+                  src="/lovable-uploads/de86665e-ff76-4383-bb57-9843faccdcf3.png" 
                   alt="Vertragsklar Logo" 
-                  className="h-9 w-auto" 
+                  className="h-8 w-auto" 
                 />
                 <span className="text-logo-primary font-semibold text-lg hidden sm:block">
                   Vertragsklar
