@@ -9,7 +9,7 @@ const WerteEthik = () => {
 
 ## Verantwortungsvoll. Transparent. Menschlich.
 
-Bei *Legal AI* glauben wir, dass Technologie nur dann sinnvoll ist, wenn sie im Dienst des Menschen steht. Unsere KI-gestützte Vertragsanalyse wurde entwickelt, um dir fundierte Einblicke zu bieten – nicht, um Entscheidungen für dich zu treffen.
+Bei *Vertragsklar* glauben wir, dass Technologie nur dann sinnvoll ist, wenn sie im Dienst des Menschen steht. Unsere KI-gestützte Vertragsanalyse wurde entwickelt, um dir fundierte Einblicke zu bieten – nicht, um Entscheidungen für dich zu treffen.
 
 ## Unsere Grundprinzipien
 
