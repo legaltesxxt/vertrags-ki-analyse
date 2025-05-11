@@ -34,7 +34,7 @@ Wir bieten eine KI‑gestützte Vertragsanalyse für den Schweizer Markt an. Zu 
 | Dienstleister  | Region | Zweck | Schutzmassnahmen |  
 |----------------|--------|-------|------------------|  
 | Supabase       | EU | Hosting & Storage | DPA, SCC |  
-| OpenAI         | USA | KI‑Analyse | DPA, SCC |  
+| OpenAI API     | Irland | KI‑Analyse | DPA, SCC |  
 | Stripe         | EU / USA | Zahlung | PCI‑DSS, SCC |  
 | Google Analytics 4 | EU / USA | Statistik | IP‑Anonymisierung, SCC |  
   
