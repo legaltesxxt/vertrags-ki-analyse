@@ -41,43 +41,6 @@ const WebhookSetup: React.FC = () => {
     // Refresh the page to apply the new webhook URL
     window.location.reload();
   };
-  return <div className="mb-6">
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogTrigger asChild>
-          
-        </DialogTrigger>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>n8n Webhook einrichten</DialogTitle>
-            <DialogDescription>
-              Geben Sie Ihre n8n Webhook-URL ein, um die Vertragsanalyse zu automatisieren.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="webhook-url" className="text-right">
-                Webhook URL
-              </Label>
-              <Input id="webhook-url" placeholder="https://n8n.example.com/webhook/..." value={webhookUrl} onChange={e => setWebhookUrl(e.target.value)} className="col-span-3" />
-            </div>
-            <div className="col-span-3">
-              <p className="text-sm text-muted-foreground">
-                In n8n: Erstellen Sie einen neuen Workflow mit einem Webhook-Trigger und kopieren Sie die Webhook-URL hierher.
-              </p>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
-              Abbrechen
-            </Button>
-            <Button type="button" onClick={saveWebhook}>
-              Speichern
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {webhookUrl}
-    </div>;
+  return;
 };
 export default WebhookSetup;
