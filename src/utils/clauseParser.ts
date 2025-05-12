@@ -12,9 +12,8 @@ export function parseClausesFromText(responseText: string): AnalysisResult {
     throw new Error("Die erhaltene Antwort ist leer oder ungültig");
   }
 
-  // Verbessertes Regex-Muster zum Erkennen von Klauseln
-  // Unterstützt verschiedene Formate und ist flexibler bei Zeilenumbrüchen
-  const clauseRegex = /###\s*(?:Klausel\s*)?(\d+)(?:\.|\:|\s*-)?[^\n]*\n(?:\s*\n)?(?:\*\*Klauseltext\:\*\*|\*\*Text\:\*\*)?\s*(.*?)(?:\n|\r\n)\s*(?:\*\*Analyse\:\*\*|\*\*Bewertung\:\*\*)\s*(.*?)(?:\n\*\*(?:Risiko-Einstufung|Risiko|Risikobewertung)\:\*\*\s*(.*?))?(?:\n\*\*(?:Gesetzliche Referenz|Gesetz|Rechtsgrundlage)\:\*\*\s*(?:\[(.*?)\]\((.*?)\)|(.*?)))?(?:\n\*\*(?:Handlungsbedarf|Empfehlung|Handlungsempfehlung)\:\*\*)?\s*(.*?)(?=\n###|\n\n###|\n---|\n\n---|\n\*\*|\n\n\*\*|$)/gs;
+  // Verbessertes Regex-Muster zum Erkennen von Klauseln mit flexibler Formatierung
+  const clauseRegex = /###\s*(?:Klausel\s*)?(\d+)(?:\.|\:|\s*-)?[^\n]*\n(?:\s*\n)?(?:\*\*Klauseltext\:\*\*|\*\*Text\:\*\*|\*\*Klauseltext\*\*)\s*([\s\S]*?)(?=\n\*\*(?:Analyse|Bewertung)|\n\n\*\*(?:Analyse|Bewertung)|\n\*\*)\s*(?:\*\*(?:Analyse|Bewertung)\:\*\*|\*\*(?:Analyse|Bewertung)\*\*)\s*([\s\S]*?)(?=\n\*\*(?:Risiko-Einstufung|Risiko|Risikobewertung)|\n\n\*\*(?:Risiko-Einstufung|Risiko|Risikobewertung)|\n\*\*)(?:\n\*\*(?:Risiko-Einstufung|Risiko|Risikobewertung)\:\*\*|\n\*\*(?:Risiko-Einstufung|Risiko|Risikobewertung)\*\*)\s*([\s\S]*?)(?=\n\*\*(?:Gesetzliche Referenz|Gesetz|Rechtsgrundlage)|\n\n\*\*(?:Gesetzliche Referenz|Gesetz|Rechtsgrundlage)|\n\*\*)(?:\n\*\*(?:Gesetzliche Referenz|Gesetz|Rechtsgrundlage)\:\*\*|\n\*\*(?:Gesetzliche Referenz|Gesetz|Rechtsgrundlage)\*\*)\s*(?:\[(.*?)\]\((.*?)\)|([\s\S]*?))(?=\n\*\*(?:Handlungsbedarf|Empfehlung|Handlungsempfehlung)|\n\n\*\*(?:Handlungsbedarf|Empfehlung|Handlungsempfehlung)|\n---|\n\n---|\n###|\n\n###|$)(?:\n\*\*(?:Handlungsbedarf|Empfehlung|Handlungsempfehlung)\:\*\*|\n\*\*(?:Handlungsbedarf|Empfehlung|Handlungsempfehlung)\*\*)?(?:\s*([\s\S]*?))?(?=\n###|\n\n###|\n---|\n\n---|\n\*\*|\n\n\*\*|$)/g;
   
   const clauses: AnalysisResult['clauses'] = [];
   let match;
@@ -32,6 +31,14 @@ export function parseClausesFromText(responseText: string): AnalysisResult {
     const lawRefText = match[5] || match[7] || '';
     const lawRefLink = match[6] || '';
     const recommendation = match[8] ? match[8].trim() : '';
+
+    console.log(`Extrahierte Daten für Klausel ${id}:`, {
+      text: text.substring(0, 50) + (text.length > 50 ? '...' : ''),
+      analysis: analysis.substring(0, 50) + (analysis.length > 50 ? '...' : ''),
+      risk: extractedRisk,
+      lawRef: lawRefText.substring(0, 50) + (lawRefText.length > 50 ? '...' : ''),
+      recommendation: recommendation.substring(0, 50) + (recommendation.length > 50 ? '...' : '')
+    });
 
     // Verbesserte Risiko-Mapping-Logik
     let risk: 'niedrig' | 'mittel' | 'hoch' | 'Rechtskonform' | 'Rechtlich fraglich' | 'Rechtlich unzulässig';
@@ -86,16 +93,79 @@ export function parseClausesFromText(responseText: string): AnalysisResult {
   console.log(`Insgesamt ${clauses.length} Klauseln erkannt`);
 
   if (clauses.length === 0) {
-    console.log("Keine Klauseln gefunden, versuche JSON-Parsing");
+    console.log("Keine Klauseln gefunden, versuche alternativen Parsing-Ansatz mit einfacherer Teilung");
+    
+    // Alternativer Ansatz mit einfacherem Split bei den Überschriften
     try {
-      const jsonResponse = JSON.parse(responseText);
-      if (Array.isArray(jsonResponse) && jsonResponse[0]?.output) {
-        return parseClausesFromText(jsonResponse[0].output);
+      const simpleSections = responseText.split(/###\s+/).filter(Boolean);
+      console.log(`Einfaches Splitting ergab ${simpleSections.length} Abschnitte`);
+      
+      if (simpleSections.length > 0) {
+        simpleSections.forEach((section, index) => {
+          const lines = section.split('\n');
+          const title = lines[0].trim();
+          
+          // Vereinfachtes Extrahieren mit flexibleren Patterns
+          const textMatch = section.match(/\*\*(?:Klauseltext|Text)\*\*(?:\s*\n|\s*\:\s*)([\s\S]*?)(?=\n\*\*|$)/m);
+          const analysisMatch = section.match(/\*\*(?:Analyse|Bewertung)\*\*(?:\s*\n|\s*\:\s*)([\s\S]*?)(?=\n\*\*|$)/m);
+          const riskMatch = section.match(/\*\*(?:Risiko-Einstufung|Risiko|Risikobewertung)\*\*(?:\s*\n|\s*\:\s*)([\s\S]*?)(?=\n\*\*|$)/m);
+          const lawRefMatch = section.match(/\*\*(?:Gesetzliche Referenz|Gesetz|Rechtsgrundlage)\*\*(?:\s*\n|\s*\:\s*)([\s\S]*?)(?=\n\*\*|$)/m);
+          const recommendationMatch = section.match(/\*\*(?:Empfehlung|Handlungsbedarf|Handlungsempfehlung)\*\*(?:\s*\n|\s*\:\s*)([\s\S]*?)(?=\n\*\*|$|[\n\s]*$)/m);
+          
+          const text = textMatch ? textMatch[1].trim() : '';
+          const analysis = analysisMatch ? analysisMatch[1].trim() : '';
+          const extractedRisk = riskMatch ? riskMatch[1].trim() : 'Rechtskonform';
+          const lawRefText = lawRefMatch ? lawRefMatch[1].trim() : '';
+          const recommendation = recommendationMatch ? recommendationMatch[1].trim() : '';
+          
+          // Risiko-Mapping wie zuvor
+          let risk: 'niedrig' | 'mittel' | 'hoch' | 'Rechtskonform' | 'Rechtlich fraglich' | 'Rechtlich unzulässig' = 'Rechtskonform';
+          if (extractedRisk.toLowerCase().includes('unzulässig')) {
+            risk = 'Rechtlich unzulässig';
+          } else if (extractedRisk.toLowerCase().includes('fraglich')) {
+            risk = 'Rechtlich fraglich';
+          }
+          
+          clauses.push({
+            id: `clause-${index + 1}`,
+            title,
+            text,
+            analysis,
+            risk,
+            lawReference: {
+              text: lawRefText,
+              link: ''
+            },
+            recommendation
+          });
+          
+          console.log(`Alternative Parsing: Klausel ${index + 1} erkannt:`, {
+            title,
+            hasText: !!text,
+            hasAnalysis: !!analysis,
+            risk,
+            hasRecommendation: !!recommendation,
+            recommendation: recommendation.substring(0, 50) + (recommendation.length > 50 ? '...' : '')
+          });
+        });
       }
-      throw new Error("Keine Klauseln gefunden und JSON Format nicht erkannt");
     } catch (e) {
-      console.error("JSON-Parsing fehlgeschlagen:", e);
-      throw new Error("Die Antwort konnte nicht als Vertragsanalyse erkannt werden");
+      console.error("Alternativer Parsing-Ansatz fehlgeschlagen:", e);
+    }
+    
+    // Wenn immer noch keine Klauseln gefunden wurden, versuche JSON-Parsing als letzten Ausweg
+    if (clauses.length === 0) {
+      console.log("Keine Klauseln gefunden, versuche JSON-Parsing");
+      try {
+        const jsonResponse = JSON.parse(responseText);
+        if (Array.isArray(jsonResponse) && jsonResponse[0]?.output) {
+          return parseClausesFromText(jsonResponse[0].output);
+        }
+        throw new Error("Keine Klauseln gefunden und JSON Format nicht erkannt");
+      } catch (e) {
+        console.error("JSON-Parsing fehlgeschlagen:", e);
+        throw new Error("Die Antwort konnte nicht als Vertragsanalyse erkannt werden");
+      }
     }
   }
 
@@ -130,4 +200,3 @@ export function parseClausesFromText(responseText: string): AnalysisResult {
     summary
   };
 }
-

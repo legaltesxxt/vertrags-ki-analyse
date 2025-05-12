@@ -50,6 +50,14 @@ const ClauseItem: React.FC<ClauseItemProps> = ({ clause }) => {
 
   // Get the cleaned recommendation text
   const cleanedRecommendation = clause.recommendation ? cleanRecommendationText(clause.recommendation) : '';
+  
+  // Debugging for recommendation rendering
+  console.log(`ClauseItem ${clause.id} recommendation:`, {
+    original: clause.recommendation,
+    cleaned: cleanedRecommendation,
+    meaningful: isRecommendationMeaningful(cleanedRecommendation),
+    willDisplay: isRecommendationMeaningful(cleanedRecommendation) || cleanedRecommendation.toLowerCase() === "keiner"
+  });
 
   return (
     <AccordionItem value={clause.id} className="border-legal-primary/10">
@@ -108,25 +116,17 @@ const ClauseItem: React.FC<ClauseItemProps> = ({ clause }) => {
             )}
           </div>
           
-          {isRecommendationMeaningful(cleanedRecommendation) ? (
+          {clause.recommendation && (
             <div className="p-4 bg-white rounded-lg border border-slate-200">
               <div className="flex items-center gap-2 mb-2">
                 <Lightbulb size={16} className="text-legal-secondary" />
                 <h5 className="text-sm font-medium text-legal-secondary">Empfehlung</h5>
               </div>
               <p className="text-sm text-slate-700 leading-relaxed">
-                {cleanedRecommendation.toLowerCase() === "keiner" ? "Keiner" : cleanedRecommendation}
+                {cleanedRecommendation}
               </p>
             </div>
-          ) : cleanedRecommendation.toLowerCase() === "keiner" ? (
-            <div className="p-4 bg-white rounded-lg border border-slate-200">
-              <div className="flex items-center gap-2 mb-2">
-                <Lightbulb size={16} className="text-legal-secondary" />
-                <h5 className="text-sm font-medium text-legal-secondary">Empfehlung</h5>
-              </div>
-              <p className="text-sm text-slate-700 leading-relaxed">Keiner</p>
-            </div>
-          ) : null}
+          )}
         </div>
       </AccordionContent>
     </AccordionItem>

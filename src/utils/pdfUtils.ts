@@ -1,4 +1,3 @@
-
 import { AnalysisResult } from '@/types/analysisTypes';
 import { useToast } from '@/hooks/use-toast';
 import html2pdf from 'html2pdf.js';
@@ -13,21 +12,65 @@ export const getSummaryRiskStyle = (): string => {
   return 'font-weight: 500;';
 };
 
-// Clean recommendation text by removing "---" and similar patterns
-export const cleanRecommendationText = (recommendation?: string): string => {
+/**
+ * Cleans recommendation text by removing common redundant phrases and formatting
+ */
+export function cleanRecommendationText(recommendation: string): string {
   if (!recommendation) return '';
-  
-  // Remove "---" at the end of the text
-  return recommendation.replace(/\s*---\s*$/, '').trim();
-};
 
-export const isRecommendationMeaningful = (recommendation?: string): boolean => {
+  // Trim whitespace and normalize
+  let cleaned = recommendation.trim();
+  
+  // Remove any trailing period if it exists
+  if (cleaned.endsWith('.')) {
+    cleaned = cleaned.slice(0, -1);
+  }
+  
+  // Remove redundant prefixes like "Empfehlung:" or "Handlungsbedarf:"
+  cleaned = cleaned.replace(/^(Empfehlung|Handlungsbedarf|Handlungsempfehlung)\s*\:?\s*/i, '');
+  
+  // Handle common cases like "Keine Anpassung notwendig"
+  if (cleaned.toLowerCase().includes('keine anpassung') || 
+      cleaned.toLowerCase().includes('keiner') || 
+      cleaned.toLowerCase().includes('keine änderung')) {
+    
+    if (cleaned.toLowerCase() === 'keine anpassung notwendig' || 
+        cleaned.toLowerCase() === 'keiner' || 
+        cleaned.toLowerCase() === 'keine anpassung erforderlich' ||
+        cleaned.toLowerCase() === 'keine änderung notwendig') {
+      return 'Keine Anpassung notwendig';
+    }
+  }
+  
+  return cleaned;
+}
+
+/**
+ * Determines if a recommendation text is meaningful enough to display
+ */
+export function isRecommendationMeaningful(recommendation: string): boolean {
   if (!recommendation) return false;
-  const cleanedRecommendation = cleanRecommendationText(recommendation).toLowerCase();
-  return cleanedRecommendation !== '' && 
-         cleanedRecommendation !== 'keine änderungen erforderlich.' &&
-         cleanedRecommendation !== 'keiner';
-};
+  
+  const normalized = recommendation.toLowerCase().trim();
+  
+  // Check for recommendation that essentially means "no action needed"
+  if (normalized === 'keiner' || 
+      normalized === 'keine' ||
+      normalized === 'keine anpassung notwendig' || 
+      normalized === 'keine anpassung erforderlich' ||
+      normalized === 'keine änderung notwendig' ||
+      normalized === 'keine änderung erforderlich') {
+    return true; // We still want to display these as "Keine Anpassung notwendig"
+  }
+  
+  // Check if it's just a dash or empty indicator
+  if (normalized === '-' || normalized === '–' || normalized === '—' || normalized === 'n/a') {
+    return false;
+  }
+  
+  // Return true if there's any actual content
+  return normalized.length > 0;
+}
 
 export const generatePDF = async (
   result: AnalysisResult,

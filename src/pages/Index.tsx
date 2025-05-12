@@ -30,20 +30,34 @@ const Index = () => {
       // Parse the response into structured analysis result
       if (Array.isArray(response.data) && response.data.length > 0 && response.data[0].output) {
         const outputText = response.data[0].output;
+        console.log("Raw output text to parse:", outputText);
         
         // Parse the markdown content into structured data
         const clauses = outputText.split('### ').filter(Boolean).map((clauseText, index) => {
           const title = clauseText.split('\n')[0].trim();
+          
+          // Improved regex patterns with more flexible matching
+          const textMatch = clauseText.match(/\*\*(?:Klauseltext|Text)\*\*(?:\s*\n|\s*\:\s*)([\s\S]*?)(?=\n\*\*|$)/m);
+          const analysisMatch = clauseText.match(/\*\*(?:Analyse|Bewertung)\*\*(?:\s*\n|\s*\:\s*)([\s\S]*?)(?=\n\*\*|$)/m);
+          const riskMatch = clauseText.match(/\*\*(?:Risiko-Einstufung|Risiko|Risikobewertung)\*\*(?:\s*\n|\s*\:\s*)([\s\S]*?)(?=\n\*\*|$)/m);
+          const lawRefMatch = clauseText.match(/\*\*(?:Gesetzliche Referenz|Gesetz|Rechtsgrundlage)\*\*(?:\s*\n|\s*\:\s*)([\s\S]*?)(?=\n\*\*|$)/m);
+          
+          // Improved recommendation matching
+          const recommendationMatch = clauseText.match(/\*\*(?:Empfehlung|Handlungsbedarf|Handlungsempfehlung)\*\*(?:\s*\n|\s*\:\s*)([\s\S]*?)(?=(?:\n\*\*|\n---|\n\n|\n$|$))/m);
+          
           const matches = {
-            text: clauseText.match(/\*\*Klauseltext\*\*\s*\n([^*]+)/m)?.[1]?.trim() || '',
-            analysis: clauseText.match(/\*\*Analyse\*\*\s*\n([^*]+)/m)?.[1]?.trim() || '',
-            risk: (clauseText.match(/\*\*Risiko-Einstufung\*\*\s*\n([^*]+)/m)?.[1]?.trim() || 'Rechtskonform') as 'Rechtskonform' | 'Rechtlich fraglich' | 'Rechtlich unzulässig',
+            text: textMatch ? textMatch[1].trim() : '',
+            analysis: analysisMatch ? analysisMatch[1].trim() : '',
+            risk: (riskMatch ? riskMatch[1].trim() : 'Rechtskonform') as 'Rechtskonform' | 'Rechtlich fraglich' | 'Rechtlich unzulässig',
             lawReference: {
-              text: clauseText.match(/\*\*Gesetzliche Referenz\*\*\s*\n([^*]+)/m)?.[1]?.trim() || '',
+              text: lawRefMatch ? lawRefMatch[1].trim() : '',
               link: ''
             },
-            recommendation: clauseText.match(/\*\*Handlungsbedarf\*\*\s*\n([^*]+)/m)?.[1]?.trim() || ''
+            recommendation: recommendationMatch ? recommendationMatch[1].trim() : ''
           };
+          
+          // Log extraction results
+          console.log(`Index page: Clause ${index + 1} recommendation:`, recommendationMatch ? recommendationMatch[1].trim() : 'Not found');
 
           return {
             id: `clause-${index + 1}`,
