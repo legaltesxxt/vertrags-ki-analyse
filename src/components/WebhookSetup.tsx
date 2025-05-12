@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -13,11 +13,23 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
+import { Settings } from 'lucide-react';
 
 const WebhookSetup: React.FC = () => {
   const [webhookUrl, setWebhookUrl] = useState('');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const { toast } = useToast();
+
+  // Beim Start prüfen, ob ein Webhook bereits gespeichert ist
+  useEffect(() => {
+    const savedWebhook = localStorage.getItem('n8nWebhookUrl');
+    if (savedWebhook) {
+      setWebhookUrl(savedWebhook);
+    } else {
+      // Set default test webhook URL if none is stored
+      setWebhookUrl("https://vertrags.app.n8n.cloud/webhook-test/Vertrags-analyse");
+    }
+  }, []);
 
   const saveWebhook = () => {
     if (!webhookUrl) {
@@ -29,8 +41,6 @@ const WebhookSetup: React.FC = () => {
       return;
     }
 
-    // In einer echten Anwendung würde hier die Webhook-URL gespeichert werden
-    // Für dieses Beispiel speichern wir es im localStorage
     localStorage.setItem('n8nWebhookUrl', webhookUrl);
     
     toast({
@@ -39,21 +49,20 @@ const WebhookSetup: React.FC = () => {
     });
     
     setIsDialogOpen(false);
+    
+    // Refresh the page to apply the new webhook URL
+    window.location.reload();
   };
-
-  // Beim Start prüfen, ob ein Webhook bereits gespeichert ist
-  React.useEffect(() => {
-    const savedWebhook = localStorage.getItem('n8nWebhookUrl');
-    if (savedWebhook) {
-      setWebhookUrl(savedWebhook);
-    }
-  }, []);
 
   return (
     <div className="mb-6">
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogTrigger asChild>
-          <Button variant="outline" className="w-full">
+          <Button 
+            variant="outline" 
+            className="w-full flex items-center gap-2 bg-amber-50 border-amber-200 hover:bg-amber-100 text-amber-800"
+          >
+            <Settings size={16} />
             n8n Webhook konfigurieren
           </Button>
         </DialogTrigger>
@@ -96,8 +105,9 @@ const WebhookSetup: React.FC = () => {
 
       {webhookUrl && (
         <div className="mt-2 p-2 bg-green-50 border border-green-200 rounded-md">
-          <p className="text-sm text-green-700">
-            n8n Webhook ist konfiguriert
+          <p className="text-sm text-green-700 flex items-center justify-between">
+            <span>n8n Webhook ist konfiguriert</span>
+            <span className="text-xs bg-green-100 px-2 py-1 rounded">{webhookUrl.split('/').pop()}</span>
           </p>
         </div>
       )}
