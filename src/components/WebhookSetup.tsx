@@ -1,24 +1,16 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
-import { 
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Settings } from 'lucide-react';
-
 const WebhookSetup: React.FC = () => {
   const [webhookUrl, setWebhookUrl] = useState('');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const { toast } = useToast();
+  const {
+    toast
+  } = useToast();
 
   // Beim Start prüfen, ob ein Webhook bereits gespeichert ist
   useEffect(() => {
@@ -30,41 +22,29 @@ const WebhookSetup: React.FC = () => {
       setWebhookUrl("https://vertrags.app.n8n.cloud/webhook-test/Vertrags-analyse");
     }
   }, []);
-
   const saveWebhook = () => {
     if (!webhookUrl) {
       toast({
         title: "Fehler",
         description: "Bitte geben Sie eine gültige Webhook-URL ein.",
-        variant: "destructive",
+        variant: "destructive"
       });
       return;
     }
-
     localStorage.setItem('n8nWebhookUrl', webhookUrl);
-    
     toast({
       title: "Webhook gespeichert",
-      description: "Ihre n8n Webhook-URL wurde erfolgreich gespeichert.",
+      description: "Ihre n8n Webhook-URL wurde erfolgreich gespeichert."
     });
-    
     setIsDialogOpen(false);
-    
+
     // Refresh the page to apply the new webhook URL
     window.location.reload();
   };
-
-  return (
-    <div className="mb-6">
+  return <div className="mb-6">
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogTrigger asChild>
-          <Button 
-            variant="outline" 
-            className="w-full flex items-center gap-2 bg-amber-50 border-amber-200 hover:bg-amber-100 text-amber-800"
-          >
-            <Settings size={16} />
-            n8n Webhook konfigurieren
-          </Button>
+          
         </DialogTrigger>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
@@ -78,13 +58,7 @@ const WebhookSetup: React.FC = () => {
               <Label htmlFor="webhook-url" className="text-right">
                 Webhook URL
               </Label>
-              <Input
-                id="webhook-url"
-                placeholder="https://n8n.example.com/webhook/..."
-                value={webhookUrl}
-                onChange={(e) => setWebhookUrl(e.target.value)}
-                className="col-span-3"
-              />
+              <Input id="webhook-url" placeholder="https://n8n.example.com/webhook/..." value={webhookUrl} onChange={e => setWebhookUrl(e.target.value)} className="col-span-3" />
             </div>
             <div className="col-span-3">
               <p className="text-sm text-muted-foreground">
@@ -103,16 +77,12 @@ const WebhookSetup: React.FC = () => {
         </DialogContent>
       </Dialog>
 
-      {webhookUrl && (
-        <div className="mt-2 p-2 bg-green-50 border border-green-200 rounded-md">
+      {webhookUrl && <div className="mt-2 p-2 bg-green-50 border border-green-200 rounded-md">
           <p className="text-sm text-green-700 flex items-center justify-between">
             <span>n8n Webhook ist konfiguriert</span>
             <span className="text-xs bg-green-100 px-2 py-1 rounded">{webhookUrl.split('/').pop()}</span>
           </p>
-        </div>
-      )}
-    </div>
-  );
+        </div>}
+    </div>;
 };
-
 export default WebhookSetup;
