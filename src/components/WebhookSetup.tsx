@@ -77,12 +77,7 @@ const WebhookSetup: React.FC = () => {
         </DialogContent>
       </Dialog>
 
-      {webhookUrl && <div className="mt-2 p-2 bg-green-50 border border-green-200 rounded-md">
-          <p className="text-sm text-green-700 flex items-center justify-between">
-            <span>n8n Webhook ist konfiguriert</span>
-            <span className="text-xs bg-green-100 px-2 py-1 rounded">{webhookUrl.split('/').pop()}</span>
-          </p>
-        </div>}
+      {webhookUrl}
     </div>;
 };
 export default WebhookSetup;
