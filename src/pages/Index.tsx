@@ -38,14 +38,30 @@ const Index = () => {
         const clauses = outputText.split('### ').filter(Boolean).map((clauseText, index) => {
           const title = clauseText.split('\n')[0].trim();
           
-          // Improved regex patterns with more flexible matching
+          // Improved regex patterns with more flexible matching for multiline content
           const textMatch = clauseText.match(/\*\*(?:Klauseltext|Text)\*\*(?:\s*\n|\s*\:\s*)([\s\S]*?)(?=\n\*\*|$)/m);
           const analysisMatch = clauseText.match(/\*\*(?:Analyse|Bewertung)\*\*(?:\s*\n|\s*\:\s*)([\s\S]*?)(?=\n\*\*|$)/m);
           const riskMatch = clauseText.match(/\*\*(?:Risiko-Einstufung|Risiko|Risikobewertung)\*\*(?:\s*\n|\s*\:\s*)([\s\S]*?)(?=\n\*\*|$)/m);
-          const lawRefMatch = clauseText.match(/\*\*(?:Gesetzliche Referenz|Gesetz|Rechtsgrundlage)\*\*(?:\s*\n|\s*\:\s*)([\s\S]*?)(?=\n\*\*|$)/m);
           
-          // Improved recommendation matching
-          const recommendationMatch = clauseText.match(/\*\*(?:Empfehlung|Handlungsbedarf|Handlungsempfehlung)\*\*(?:\s*\n|\s*\:\s*)([\s\S]*?)(?=(?:\n\*\*|\n---|\n\n|\n$|$))/m);
+          // Enhanced pattern to capture the full law reference including the article number AND the quoted text
+          const lawRefMatch = clauseText.match(/\*\*(?:Gesetzliche Referenz|Gesetz|Rechtsgrundlage)\*\*(?:\s*\n|\s*\:\s*)([\s\S]*?)(?=\n\*\*(?:Empfehlung|Handlungsbedarf|Handlungsempfehlung)|\n---|\n\n---|\n\*\*|$)/m);
+          
+          // Improved recommendation matching with more flexible pattern
+          const recommendationMatch = clauseText.match(/\*\*(?:Empfehlung|Handlungsbedarf|Handlungsempfehlung)\*\*(?:\s*\n|\s*\:\s*)([\s\S]*?)(?=(?:\n---|\n\n---|\n###|\n\n###|\n\*\*|\n\n\*\*|$))/m);
+          
+          // Log detailed extraction results for debugging
+          console.log(`Index page - Clause ${index + 1} extraction:`, {
+            title,
+            textExtracted: !!textMatch,
+            textSample: textMatch ? textMatch[1].substring(0, 30) + "..." : "Not found",
+            analysisExtracted: !!analysisMatch,
+            riskExtracted: !!riskMatch,
+            riskValue: riskMatch ? riskMatch[1].trim() : "Not found",
+            lawRefExtracted: !!lawRefMatch,
+            lawRefSample: lawRefMatch ? lawRefMatch[1].substring(0, 50) + "..." : "Not found",
+            recommendationExtracted: !!recommendationMatch,
+            recommendationSample: recommendationMatch ? recommendationMatch[1].substring(0, 30) + "..." : "Not found"
+          });
           
           const matches = {
             text: textMatch ? textMatch[1].trim() : '',
@@ -57,9 +73,6 @@ const Index = () => {
             },
             recommendation: recommendationMatch ? recommendationMatch[1].trim() : ''
           };
-          
-          // Log extraction results
-          console.log(`Index page: Clause ${index + 1} recommendation:`, recommendationMatch ? recommendationMatch[1].trim() : 'Not found');
 
           return {
             id: `clause-${index + 1}`,
@@ -78,6 +91,8 @@ const Index = () => {
           summary: 'Vertragliche Analyse abgeschlossen'
         };
 
+        console.log("Structured analysis result:", analysisResult);
+        
         navigate('/analysis-results', { 
           state: { 
             analysisResult,

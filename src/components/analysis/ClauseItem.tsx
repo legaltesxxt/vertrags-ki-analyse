@@ -48,6 +48,19 @@ const ClauseItem: React.FC<ClauseItemProps> = ({ clause }) => {
     }
   };
 
+  // Format law reference text to preserve line breaks
+  const formatLawReferenceText = (text: string) => {
+    if (!text) return '';
+    
+    // Split by line breaks and render each part
+    return text.split('\n').map((line, index) => (
+      <React.Fragment key={index}>
+        {line}
+        {index < text.split('\n').length - 1 && <br />}
+      </React.Fragment>
+    ));
+  };
+
   // Get the cleaned recommendation text
   const cleanedRecommendation = clause.recommendation ? cleanRecommendationText(clause.recommendation) : '';
   
@@ -84,7 +97,7 @@ const ClauseItem: React.FC<ClauseItemProps> = ({ clause }) => {
               <FileText size={16} className="text-legal-secondary" />
               <h5 className="text-sm font-medium text-legal-secondary">Klauseltext</h5>
             </div>
-            <p className="text-sm text-slate-700 leading-relaxed">{clause.text}</p>
+            <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-line">{clause.text}</p>
           </div>
           
           <div className="flex flex-col md:flex-row md:items-start gap-5">
@@ -93,7 +106,7 @@ const ClauseItem: React.FC<ClauseItemProps> = ({ clause }) => {
                 <BookOpen size={16} className="text-legal-secondary" />
                 <h5 className="text-sm font-medium text-legal-secondary">Analyse</h5>
               </div>
-              <p className="text-sm text-slate-700 leading-relaxed">{clause.analysis}</p>
+              <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-line">{clause.analysis}</p>
             </div>
           </div>
           
@@ -102,7 +115,9 @@ const ClauseItem: React.FC<ClauseItemProps> = ({ clause }) => {
               <BookOpen size={16} className="text-legal-primary" />
               <h5 className="text-sm font-medium text-legal-primary">Gesetzliche Referenz</h5>
             </div>
-            <p className="text-sm text-slate-700 leading-relaxed">{clause.lawReference.text}</p>
+            <div className="text-sm text-slate-700 leading-relaxed">
+              {formatLawReferenceText(clause.lawReference.text)}
+            </div>
             {clause.lawReference.link && (
               <a 
                 href={clause.lawReference.link} 
@@ -116,13 +131,13 @@ const ClauseItem: React.FC<ClauseItemProps> = ({ clause }) => {
             )}
           </div>
           
-          {clause.recommendation && (
+          {clause.recommendation && isRecommendationMeaningful(cleanedRecommendation) && (
             <div className="p-4 bg-white rounded-lg border border-slate-200">
               <div className="flex items-center gap-2 mb-2">
                 <Lightbulb size={16} className="text-legal-secondary" />
                 <h5 className="text-sm font-medium text-legal-secondary">Empfehlung</h5>
               </div>
-              <p className="text-sm text-slate-700 leading-relaxed">
+              <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-line">
                 {cleanedRecommendation}
               </p>
             </div>

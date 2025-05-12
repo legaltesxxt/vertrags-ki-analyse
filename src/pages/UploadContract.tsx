@@ -7,6 +7,7 @@ import { useN8nWebhook } from '@/hooks/useN8nWebhook';
 import AnalysisLayout from '@/components/analysis/AnalysisLayout';
 import FileUpload from '@/components/FileUpload';
 import AnalysisSection from '@/components/analysis/AnalysisSection';
+import WebhookSetup from '@/components/WebhookSetup';
 
 const UploadContract = () => {
   const navigate = useNavigate();
@@ -20,35 +21,38 @@ const UploadContract = () => {
     const response = await sendToN8n(file);
       
     if (response.success && response.data) {
-      console.log("Webhook response received:", response.data);
+      console.log("Webhook response received in UploadContract:", response.data);
       
       // Parse the response into structured analysis result
       if (Array.isArray(response.data) && response.data.length > 0 && response.data[0].output) {
         const outputText = response.data[0].output;
-        console.log("Raw output text to parse:", outputText);
+        console.log("Raw output text to parse in UploadContract:", outputText);
         
         // Parse the markdown content into structured data
         const clauses = outputText.split('### ').filter(Boolean).map((clauseText, index) => {
           const title = clauseText.split('\n')[0].trim();
           
-          // Improved regex patterns with more flexible matching
+          // Improved regex patterns with more flexible matching for multiline content
           const textMatch = clauseText.match(/\*\*(?:Klauseltext|Text)\*\*(?:\s*\n|\s*\:\s*)([\s\S]*?)(?=\n\*\*|$)/m);
           const analysisMatch = clauseText.match(/\*\*(?:Analyse|Bewertung)\*\*(?:\s*\n|\s*\:\s*)([\s\S]*?)(?=\n\*\*|$)/m);
           const riskMatch = clauseText.match(/\*\*(?:Risiko-Einstufung|Risiko|Risikobewertung)\*\*(?:\s*\n|\s*\:\s*)([\s\S]*?)(?=\n\*\*|$)/m);
-          const lawRefMatch = clauseText.match(/\*\*(?:Gesetzliche Referenz|Gesetz|Rechtsgrundlage)\*\*(?:\s*\n|\s*\:\s*)([\s\S]*?)(?=\n\*\*|$)/m);
           
-          // Improved recommendation matching - more flexible pattern
-          const recommendationMatch = clauseText.match(/\*\*(?:Empfehlung|Handlungsbedarf|Handlungsempfehlung)\*\*(?:\s*\n|\s*\:\s*)([\s\S]*?)(?=(?:\n\*\*|\n---|\n\n|\n$|$))/m);
+          // Enhanced pattern to capture the full law reference including the article number AND the quoted text
+          const lawRefMatch = clauseText.match(/\*\*(?:Gesetzliche Referenz|Gesetz|Rechtsgrundlage)\*\*(?:\s*\n|\s*\:\s*)([\s\S]*?)(?=\n\*\*(?:Empfehlung|Handlungsbedarf|Handlungsempfehlung)|\n---|\n\n---|\n\*\*|$)/m);
+          
+          // Improved recommendation matching with more flexible pattern
+          const recommendationMatch = clauseText.match(/\*\*(?:Empfehlung|Handlungsbedarf|Handlungsempfehlung)\*\*(?:\s*\n|\s*\:\s*)([\s\S]*?)(?=(?:\n---|\n\n---|\n###|\n\n###|\n\*\*|\n\n\*\*|$))/m);
           
           // Log extraction results for debugging
-          console.log(`Clause ${index + 1} extraction:`, { 
-            title, 
-            hasText: !!textMatch, 
-            hasAnalysis: !!analysisMatch, 
+          console.log(`UploadContract - Clause ${index + 1} extraction:`, {
+            title,
+            hasText: !!textMatch,
+            hasAnalysis: !!analysisMatch,
             hasRisk: !!riskMatch,
-            hasLawRef: !!lawRefMatch, 
+            hasLawRef: !!lawRefMatch,
+            lawRefContent: lawRefMatch ? lawRefMatch[1].trim().substring(0, 50) + "..." : "Not found",
             hasRecommendation: !!recommendationMatch,
-            recommendationText: recommendationMatch ? recommendationMatch[1].trim() : 'Not found'
+            recommendationText: recommendationMatch ? recommendationMatch[1].trim().substring(0, 50) + "..." : "Not found"
           });
           
           const matches = {
@@ -79,7 +83,7 @@ const UploadContract = () => {
           summary: 'Vertragliche Analyse abgeschlossen'
         };
         
-        console.log("Structured analysis result:", analysisResult);
+        console.log("Structured analysis result in UploadContract:", analysisResult);
 
         navigate('/analysis-results', { 
           state: { 
@@ -113,6 +117,10 @@ const UploadContract = () => {
         </div>
 
         <div className="bg-white rounded-xl shadow-sm p-8 border border-border/50 mb-10">
+          <div className="flex flex-col md:flex-row justify-between items-start gap-4 mb-6">
+            <h2 className="text-2xl font-semibold text-legal-primary">PDF hochladen</h2>
+            <WebhookSetup />
+          </div>
           <FileUpload onFileSelected={handleFileSelected} isAnalyzing={isSendingToN8n} />
         </div>
         

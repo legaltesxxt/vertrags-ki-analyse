@@ -57,13 +57,24 @@ export function useN8nWebhook() {
         console.log("JSON-Antwort vom Webhook erhalten:", data);
         
         // Prüfen, ob die Antwort eine leere Analyse enthält
-        if (!data || !data[0]?.output) {
+        if (!data || (Array.isArray(data) && (!data.length || !data[0]?.output))) {
           const errorMsg = "Keine gültige Analyse vom Server erhalten";
           setError(errorMsg);
           return { 
             success: false, 
             error: errorMsg 
           };
+        }
+        
+        // Protokolliere die genaue Struktur der JSON-Antwort für bessere Fehleranalyse
+        if (Array.isArray(data) && data.length > 0 && data[0].output) {
+          console.log("Webhook Response Format:", {
+            isArray: Array.isArray(data),
+            length: data.length,
+            firstItem: data[0],
+            hasOutput: !!data[0].output,
+            outputLength: data[0].output?.length
+          });
         }
         
         // Direkte Weiterleitung der unveränderten Response
@@ -100,7 +111,7 @@ export function useN8nWebhook() {
     } finally {
       setIsLoading(false);
     }
-  }, [webhookUrl]); // Add webhookUrl to the dependency array
+  }, [webhookUrl]); 
 
   const resetError = useCallback(() => {
     setError(null);
