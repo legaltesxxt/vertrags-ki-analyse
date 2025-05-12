@@ -43,10 +43,10 @@ const Index = () => {
           const analysisMatch = clauseText.match(/\*\*(?:Analyse|Bewertung)\*\*(?:\s*\n|\s*\:\s*)([\s\S]*?)(?=\n\*\*|$)/m);
           const riskMatch = clauseText.match(/\*\*(?:Risiko-Einstufung|Risiko|Risikobewertung)\*\*(?:\s*\n|\s*\:\s*)([\s\S]*?)(?=\n\*\*|$)/m);
           
-          // Enhanced pattern to capture the full law reference including the article number AND the quoted text
-          const lawRefMatch = clauseText.match(/\*\*(?:Gesetzliche Referenz|Gesetz|Rechtsgrundlage)\*\*(?:\s*\n|\s*\:\s*)([\s\S]*?)(?=\n\*\*(?:Empfehlung|Handlungsbedarf|Handlungsempfehlung)|\n---|\n\n---|\n\*\*|$)/m);
+          // Enhanced pattern specifically for law references - capture everything including quotes and line breaks
+          const lawRefMatch = clauseText.match(/\*\*(?:Gesetzliche Referenz|Gesetz|Rechtsgrundlage)\*\*(?:\s*\n|\s*\:\s*)([\s\S]*?)(?=\n\*\*(?:Empfehlung|Handlungsbedarf|Handlungsempfehlung)|\n---|\n\n---|\n###|\n\n###|$)/m);
           
-          // Improved recommendation matching with more flexible pattern
+          // Improved recommendation matching
           const recommendationMatch = clauseText.match(/\*\*(?:Empfehlung|Handlungsbedarf|Handlungsempfehlung)\*\*(?:\s*\n|\s*\:\s*)([\s\S]*?)(?=(?:\n---|\n\n---|\n###|\n\n###|\n\*\*|\n\n\*\*|$))/m);
           
           // Log detailed extraction results for debugging
@@ -58,7 +58,8 @@ const Index = () => {
             riskExtracted: !!riskMatch,
             riskValue: riskMatch ? riskMatch[1].trim() : "Not found",
             lawRefExtracted: !!lawRefMatch,
-            lawRefSample: lawRefMatch ? lawRefMatch[1].substring(0, 50) + "..." : "Not found",
+            lawRefSample: lawRefMatch ? lawRefMatch[1].substring(0, 100) + (lawRefMatch[1].length > 100 ? "..." : "") : "Not found",
+            lawRefIncludesQuotes: lawRefMatch ? (lawRefMatch[1].includes('"') || lawRefMatch[1].includes('„')) : false,
             recommendationExtracted: !!recommendationMatch,
             recommendationSample: recommendationMatch ? recommendationMatch[1].substring(0, 30) + "..." : "Not found"
           });
@@ -92,6 +93,8 @@ const Index = () => {
         };
 
         console.log("Structured analysis result:", analysisResult);
+        console.log("Sample law reference from first clause:", 
+          analysisResult.clauses[0]?.lawReference?.text?.substring(0, 150) + "...");
         
         navigate('/analysis-results', { 
           state: { 

@@ -32,25 +32,26 @@ const UploadContract = () => {
         const clauses = outputText.split('### ').filter(Boolean).map((clauseText, index) => {
           const title = clauseText.split('\n')[0].trim();
           
-          // Improved regex patterns with more flexible matching for multiline content
+          // Same improved regex patterns as in Index.tsx
           const textMatch = clauseText.match(/\*\*(?:Klauseltext|Text)\*\*(?:\s*\n|\s*\:\s*)([\s\S]*?)(?=\n\*\*|$)/m);
           const analysisMatch = clauseText.match(/\*\*(?:Analyse|Bewertung)\*\*(?:\s*\n|\s*\:\s*)([\s\S]*?)(?=\n\*\*|$)/m);
           const riskMatch = clauseText.match(/\*\*(?:Risiko-Einstufung|Risiko|Risikobewertung)\*\*(?:\s*\n|\s*\:\s*)([\s\S]*?)(?=\n\*\*|$)/m);
           
-          // Enhanced pattern to capture the full law reference including the article number AND the quoted text
-          const lawRefMatch = clauseText.match(/\*\*(?:Gesetzliche Referenz|Gesetz|Rechtsgrundlage)\*\*(?:\s*\n|\s*\:\s*)([\s\S]*?)(?=\n\*\*(?:Empfehlung|Handlungsbedarf|Handlungsempfehlung)|\n---|\n\n---|\n\*\*|$)/m);
+          // Enhanced pattern specifically for law references
+          const lawRefMatch = clauseText.match(/\*\*(?:Gesetzliche Referenz|Gesetz|Rechtsgrundlage)\*\*(?:\s*\n|\s*\:\s*)([\s\S]*?)(?=\n\*\*(?:Empfehlung|Handlungsbedarf|Handlungsempfehlung)|\n---|\n\n---|\n###|\n\n###|$)/m);
           
-          // Improved recommendation matching with more flexible pattern
+          // Improved recommendation pattern
           const recommendationMatch = clauseText.match(/\*\*(?:Empfehlung|Handlungsbedarf|Handlungsempfehlung)\*\*(?:\s*\n|\s*\:\s*)([\s\S]*?)(?=(?:\n---|\n\n---|\n###|\n\n###|\n\*\*|\n\n\*\*|$))/m);
           
-          // Log extraction results for debugging
+          // Detailed logging
           console.log(`UploadContract - Clause ${index + 1} extraction:`, {
             title,
             hasText: !!textMatch,
             hasAnalysis: !!analysisMatch,
             hasRisk: !!riskMatch,
             hasLawRef: !!lawRefMatch,
-            lawRefContent: lawRefMatch ? lawRefMatch[1].trim().substring(0, 50) + "..." : "Not found",
+            lawRefContent: lawRefMatch ? lawRefMatch[1].trim().substring(0, 100) + "..." : "Not found",
+            lawRefIncludesQuotes: lawRefMatch ? (lawRefMatch[1].includes('"') || lawRefMatch[1].includes('„')) : false,
             hasRecommendation: !!recommendationMatch,
             recommendationText: recommendationMatch ? recommendationMatch[1].trim().substring(0, 50) + "..." : "Not found"
           });
@@ -84,6 +85,8 @@ const UploadContract = () => {
         };
         
         console.log("Structured analysis result in UploadContract:", analysisResult);
+        console.log("Sample law reference from first clause:", 
+          analysisResult.clauses[0]?.lawReference?.text?.substring(0, 150) + "...");
 
         navigate('/analysis-results', { 
           state: { 

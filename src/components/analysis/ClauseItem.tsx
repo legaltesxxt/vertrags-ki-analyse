@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { 
   AccordionItem,
   AccordionTrigger,
@@ -16,6 +16,15 @@ interface ClauseItemProps {
 }
 
 const ClauseItem: React.FC<ClauseItemProps> = ({ clause }) => {
+  useEffect(() => {
+    // Debug logging to check law reference content
+    console.log(`ClauseItem ${clause.id} law reference:`, {
+      rawText: clause.lawReference.text,
+      hasQuotes: clause.lawReference.text?.includes('"') || clause.lawReference.text?.includes('„'),
+      length: clause.lawReference.text?.length
+    });
+  }, [clause]);
+
   const getRiskIcon = (risk: 'niedrig' | 'mittel' | 'hoch' | 'Rechtskonform' | 'Rechtlich fraglich' | 'Rechtlich unzulässig') => {
     switch (risk) {
       case 'niedrig':
@@ -48,30 +57,35 @@ const ClauseItem: React.FC<ClauseItemProps> = ({ clause }) => {
     }
   };
 
-  // Format law reference text to preserve line breaks
+  // Format law reference text to preserve line breaks and formatting
   const formatLawReferenceText = (text: string) => {
     if (!text) return '';
     
-    // Split by line breaks and render each part
-    return text.split('\n').map((line, index) => (
-      <React.Fragment key={index}>
-        {line}
-        {index < text.split('\n').length - 1 && <br />}
-      </React.Fragment>
-    ));
+    // Log the raw text before splitting
+    console.log(`Formatting law reference for ${clause.id}:`, text);
+
+    // Handle different types of line breaks
+    const lines = text.split(/\n|\r\n/);
+    
+    return lines.map((line, index) => {
+      // Preserve quotes and special characters
+      const trimmedLine = line.trim();
+      
+      // Log each line for debugging
+      console.log(`Line ${index} (${trimmedLine.length} chars):`, trimmedLine);
+      
+      return (
+        <React.Fragment key={index}>
+          {trimmedLine}
+          {index < lines.length - 1 && <br />}
+        </React.Fragment>
+      );
+    });
   };
 
   // Get the cleaned recommendation text
   const cleanedRecommendation = clause.recommendation ? cleanRecommendationText(clause.recommendation) : '';
   
-  // Debugging for recommendation rendering
-  console.log(`ClauseItem ${clause.id} recommendation:`, {
-    original: clause.recommendation,
-    cleaned: cleanedRecommendation,
-    meaningful: isRecommendationMeaningful(cleanedRecommendation),
-    willDisplay: isRecommendationMeaningful(cleanedRecommendation) || cleanedRecommendation.toLowerCase() === "keiner"
-  });
-
   return (
     <AccordionItem value={clause.id} className="border-legal-primary/10">
       <AccordionTrigger className="hover:bg-slate-50 px-4 py-3 rounded-lg transition-all">
@@ -115,7 +129,7 @@ const ClauseItem: React.FC<ClauseItemProps> = ({ clause }) => {
               <BookOpen size={16} className="text-legal-primary" />
               <h5 className="text-sm font-medium text-legal-primary">Gesetzliche Referenz</h5>
             </div>
-            <div className="text-sm text-slate-700 leading-relaxed">
+            <div className="text-sm text-slate-700 leading-relaxed whitespace-pre-line">
               {formatLawReferenceText(clause.lawReference.text)}
             </div>
             {clause.lawReference.link && (

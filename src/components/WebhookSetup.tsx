@@ -7,6 +7,8 @@ import { useToast } from '@/components/ui/use-toast';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Settings } from 'lucide-react';
 
+const DEFAULT_WEBHOOK_URL = "https://vertrags.app.n8n.cloud/webhook-test/Vertrags-analyse";
+
 const WebhookSetup: React.FC = () => {
   const [webhookUrl, setWebhookUrl] = useState('');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -16,10 +18,13 @@ const WebhookSetup: React.FC = () => {
   useEffect(() => {
     const savedWebhook = localStorage.getItem('n8nWebhookUrl');
     if (savedWebhook) {
+      console.log("Geladene Webhook URL:", savedWebhook);
       setWebhookUrl(savedWebhook);
     } else {
       // Set default test webhook URL if none is stored
-      setWebhookUrl("https://vertrags.app.n8n.cloud/webhook-test/Vertrags-analyse");
+      console.log("Keine gespeicherte Webhook URL gefunden, verwende Standard-URL");
+      setWebhookUrl(DEFAULT_WEBHOOK_URL);
+      localStorage.setItem('n8nWebhookUrl', DEFAULT_WEBHOOK_URL);
     }
   }, []);
 
@@ -32,15 +37,24 @@ const WebhookSetup: React.FC = () => {
       });
       return;
     }
+    
+    console.log("Speichere Webhook URL:", webhookUrl);
     localStorage.setItem('n8nWebhookUrl', webhookUrl);
+    
     toast({
       title: "Webhook gespeichert",
       description: "Ihre n8n Webhook-URL wurde erfolgreich gespeichert."
     });
+    
     setIsDialogOpen(false);
 
     // Refresh the page to apply the new webhook URL
     window.location.reload();
+  };
+
+  const resetToDefault = () => {
+    setWebhookUrl(DEFAULT_WEBHOOK_URL);
+    console.log("Webhook URL auf Standard zurückgesetzt");
   };
 
   return (
@@ -77,13 +91,27 @@ const WebhookSetup: React.FC = () => {
           </div>
         </div>
         
-        <DialogFooter>
-          <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
-            Abbrechen
+        <DialogFooter className="flex justify-between">
+          <Button 
+            variant="outline" 
+            onClick={resetToDefault}
+            type="button" 
+            className="mr-auto"
+          >
+            Standard
           </Button>
-          <Button onClick={saveWebhook}>
-            Speichern
-          </Button>
+          <div>
+            <Button 
+              variant="outline" 
+              onClick={() => setIsDialogOpen(false)}
+              className="mr-2"
+            >
+              Abbrechen
+            </Button>
+            <Button onClick={saveWebhook}>
+              Speichern
+            </Button>
+          </div>
         </DialogFooter>
       </DialogContent>
     </Dialog>

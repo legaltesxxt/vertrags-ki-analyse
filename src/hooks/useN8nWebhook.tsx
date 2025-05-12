@@ -73,7 +73,18 @@ export function useN8nWebhook() {
             length: data.length,
             firstItem: data[0],
             hasOutput: !!data[0].output,
-            outputLength: data[0].output?.length
+            outputLength: data[0].output?.length,
+            outputSample: data[0].output?.substring(0, 200) + "..."
+          });
+          
+          // Check for legal references in the output to debug
+          const hasLawRefs = data[0].output.includes("**Gesetzliche Referenz**") || 
+                             data[0].output.includes("**Gesetz**") || 
+                             data[0].output.includes("**Rechtsgrundlage**");
+          
+          console.log("Legal reference check:", {
+            hasLawRefs,
+            includesQuotes: data[0].output.includes('"') || data[0].output.includes('„')
           });
         }
         
