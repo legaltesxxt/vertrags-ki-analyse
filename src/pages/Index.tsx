@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
@@ -12,7 +11,6 @@ import ProcessSteps from '@/components/home/ProcessSteps';
 import AnalysisSection from '@/components/analysis/AnalysisSection';
 import FlipCardsGrid from '@/components/home/FlipCardsGrid';
 import FAQ from '@/components/home/FAQ';
-import WebhookSetup from '@/components/WebhookSetup';
 
 const Index = () => {
   const navigate = useNavigate();
@@ -134,7 +132,6 @@ const Index = () => {
         <div className="bg-white rounded-xl shadow-sm p-8 border border-border/50 mb-10">
           <div className="flex flex-col md:flex-row justify-between items-start gap-4 mb-6">
             <h2 className="text-2xl font-semibold text-legal-primary">PDF-Vertrag hochladen</h2>
-            <WebhookSetup />
           </div>
           <FileUpload onFileSelected={handleFileSelected} isAnalyzing={isSendingToN8n} />
         </div>

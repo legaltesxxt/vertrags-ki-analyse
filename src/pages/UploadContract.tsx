@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
@@ -7,7 +6,6 @@ import { useN8nWebhook } from '@/hooks/useN8nWebhook';
 import AnalysisLayout from '@/components/analysis/AnalysisLayout';
 import FileUpload from '@/components/FileUpload';
 import AnalysisSection from '@/components/analysis/AnalysisSection';
-import WebhookSetup from '@/components/WebhookSetup';
 
 const UploadContract = () => {
   const navigate = useNavigate();
@@ -122,7 +120,6 @@ const UploadContract = () => {
         <div className="bg-white rounded-xl shadow-sm p-8 border border-border/50 mb-10">
           <div className="flex flex-col md:flex-row justify-between items-start gap-4 mb-6">
             <h2 className="text-2xl font-semibold text-legal-primary">PDF hochladen</h2>
-            <WebhookSetup />
           </div>
           <FileUpload onFileSelected={handleFileSelected} isAnalyzing={isSendingToN8n} />
         </div>
