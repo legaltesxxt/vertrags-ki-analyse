@@ -10,6 +10,7 @@ export function useN8nWebhook() {
   const [isLoading, setIsLoading] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [errorTimeStamp, setErrorTimeStamp] = useState<number | null>(null);
   const { toast } = useToast();
 
   // Get the stored webhook URL or use the test URL as fallback
@@ -22,12 +23,14 @@ export function useN8nWebhook() {
     if (!webhookUrl) {
       const errorMsg = "Webhook URL ist nicht konfiguriert";
       setError(errorMsg);
+      setErrorTimeStamp(Date.now());
       return { success: false, error: errorMsg };
     }
 
     setIsLoading(true);
     setAnalysisResult(null);
     setError(null);
+    setErrorTimeStamp(null);
 
     try {
       // FormData erstellen für den Datei-Upload
@@ -45,6 +48,7 @@ export function useN8nWebhook() {
       if (!response.ok) {
         const errorMsg = `HTTP Error: ${response.status} - Verbindung zum Server fehlgeschlagen`;
         setError(errorMsg);
+        setErrorTimeStamp(Date.now());
         throw new Error(errorMsg);
       }
       
@@ -60,6 +64,7 @@ export function useN8nWebhook() {
         if (!data || (Array.isArray(data) && (!data.length || !data[0]?.output))) {
           const errorMsg = "Keine gültige Analyse vom Server erhalten";
           setError(errorMsg);
+          setErrorTimeStamp(Date.now());
           return { 
             success: false, 
             error: errorMsg 
@@ -86,6 +91,10 @@ export function useN8nWebhook() {
             hasLawRefs,
             includesQuotes: data[0].output.includes('"') || data[0].output.includes('„')
           });
+          
+          // Reset error state on successful response
+          setError(null);
+          setErrorTimeStamp(null);
         }
         
         // Direkte Weiterleitung der unveränderten Response
@@ -101,11 +110,16 @@ export function useN8nWebhook() {
         if (!responseText || responseText.trim() === "") {
           const errorMsg = "Leere Antwort vom Server erhalten";
           setError(errorMsg);
+          setErrorTimeStamp(Date.now());
           return { 
             success: false, 
             error: errorMsg 
           };
         }
+        
+        // Reset error state on successful response
+        setError(null);
+        setErrorTimeStamp(null);
         
         // Text-Antwort in ein strukturiertes Format umwandeln oder direkt zurückgeben
         return {
@@ -117,6 +131,7 @@ export function useN8nWebhook() {
     } catch (error) {
       const errorMsg = String(error);
       setError(errorMsg);
+      setErrorTimeStamp(Date.now());
       console.error("Fehler beim Senden zum n8n Webhook:", errorMsg);
       return { success: false, error: errorMsg };
     } finally {
@@ -125,8 +140,39 @@ export function useN8nWebhook() {
   }, [webhookUrl]); 
 
   const resetError = useCallback(() => {
-    setError(null);
-  }, []);
+    // Check if minimum display time has passed (5 minutes = 300000 ms)
+    const minTimeMs = 300000; // 5 minutes in milliseconds
+    const currentTime = Date.now();
+    const timeElapsed = errorTimeStamp ? currentTime - errorTimeStamp : minTimeMs;
+    
+    if (timeElapsed >= minTimeMs) {
+      setError(null);
+      setErrorTimeStamp(null);
+    } else {
+      console.log(`Fehler kann erst nach 5 Minuten zurückgesetzt werden. Verbleibende Zeit: ${Math.ceil((minTimeMs - timeElapsed) / 1000)} Sekunden`);
+    }
+  }, [errorTimeStamp]);
 
-  return { sendToN8n, isLoading, analysisResult, error, resetError };
+  const getRemainingErrorTime = useCallback(() => {
+    if (!errorTimeStamp) return 0;
+    
+    const minTimeMs = 300000; // 5 minutes in milliseconds
+    const currentTime = Date.now();
+    const timeElapsed = currentTime - errorTimeStamp;
+    const remainingMs = Math.max(0, minTimeMs - timeElapsed);
+    
+    return Math.ceil(remainingMs / 1000); // Return remaining time in seconds
+  }, [errorTimeStamp]);
+
+  const canResetError = useCallback(() => {
+    if (!errorTimeStamp) return true;
+    
+    const minTimeMs = 300000; // 5 minutes in milliseconds
+    const currentTime = Date.now();
+    const timeElapsed = currentTime - errorTimeStamp;
+    
+    return timeElapsed >= minTimeMs;
+  }, [errorTimeStamp]);
+
+  return { sendToN8n, isLoading, analysisResult, error, resetError, getRemainingErrorTime, canResetError };
 }

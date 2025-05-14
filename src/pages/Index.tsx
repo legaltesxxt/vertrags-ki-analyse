@@ -1,9 +1,10 @@
+
 import React, { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import FileUpload from '@/components/FileUpload';
 import { useN8nWebhook } from '@/hooks/useN8nWebhook';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@/components/ui/use-toast';
 import Header from '@/components/home/Header';
 import Footer from '@/components/Footer';
 import FeatureCards from '@/components/features/FeatureCards';
@@ -15,7 +16,15 @@ import FAQ from '@/components/home/FAQ';
 const Index = () => {
   const navigate = useNavigate();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const { sendToN8n, isLoading: isSendingToN8n, analysisResult: webhookResult, error: webhookError, resetError } = useN8nWebhook();
+  const { 
+    sendToN8n, 
+    isLoading: isSendingToN8n, 
+    analysisResult: webhookResult, 
+    error: webhookError, 
+    resetError,
+    getRemainingErrorTime,
+    canResetError
+  } = useN8nWebhook();
   const [useRealAnalysis, setUseRealAnalysis] = useState(true);
   const { toast } = useToast();
 
@@ -142,6 +151,8 @@ const Index = () => {
           webhookResult={webhookResult}
           useRealAnalysis={useRealAnalysis}
           onReset={handleReset}
+          getRemainingErrorTime={getRemainingErrorTime}
+          canResetError={canResetError}
         />
       </main>
       

@@ -1,3 +1,4 @@
+
 import React, { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
@@ -11,7 +12,14 @@ const UploadContract = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const { sendToN8n, isLoading: isSendingToN8n, error, resetError } = useN8nWebhook();
+  const { 
+    sendToN8n, 
+    isLoading: isSendingToN8n, 
+    error, 
+    resetError, 
+    getRemainingErrorTime, 
+    canResetError 
+  } = useN8nWebhook();
 
   const handleFileSelected = useCallback(async (file: File) => {
     setSelectedFile(file);
@@ -131,6 +139,8 @@ const UploadContract = () => {
           webhookResult={null}
           useRealAnalysis={true}
           onReset={resetError}
+          getRemainingErrorTime={getRemainingErrorTime}
+          canResetError={canResetError}
         />
         
         <div className="text-sm text-slate-500 text-center max-w-xl mx-auto">
