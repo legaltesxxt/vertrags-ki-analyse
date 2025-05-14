@@ -10,8 +10,8 @@ export const useFeedbackForm = () => {
   const [isSuccess, setIsSuccess] = useState(false);
   const { toast } = useToast();
   
-  // Fest definierter Webhook URL für das Feedback-Formular
-  const webhookUrl = 'https://vertrags.app.n8n.cloud/webhook-test/feedback-form';
+  // Updated webhook URL für das Feedback-Formular
+  const webhookUrl = 'https://vertrags.app.n8n.cloud/webhook/feedback-form';
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
