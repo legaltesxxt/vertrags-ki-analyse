@@ -38,21 +38,24 @@ const UploadContract = () => {
         const clauses = outputText.split('### ').filter(Boolean).map((clauseText, index) => {
           const title = clauseText.split('\n')[0].trim();
           
-          // Same improved regex patterns as in Index.tsx
-          const textMatch = clauseText.match(/\*\*(?:Klauseltext|Text)\*\*(?:\s*\n|\s*\:\s*)([\s\S]*?)(?=\n\*\*|$)/m);
-          const analysisMatch = clauseText.match(/\*\*(?:Analyse|Bewertung)\*\*(?:\s*\n|\s*\:\s*)([\s\S]*?)(?=\n\*\*|$)/m);
-          const riskMatch = clauseText.match(/\*\*(?:Risiko-Einstufung|Risiko|Risikobewertung)\*\*(?:\s*\n|\s*\:\s*)([\s\S]*?)(?=\n\*\*|$)/m);
+          // Improved regex patterns with better boundary conditions for full text extraction
+          const textMatch = clauseText.match(/\*\*(?:Klauseltext|Text)\*\*(?:\s*\n|\s*\:\s*)([\s\S]*?)(?=\n\*\*(?:Analyse|Bewertung)|\n\n\*\*(?:Analyse|Bewertung)|\s*$)/m);
+          const analysisMatch = clauseText.match(/\*\*(?:Analyse|Bewertung)\*\*(?:\s*\n|\s*\:\s*)([\s\S]*?)(?=\n\*\*(?:Risiko-Einstufung|Risiko|Risikobewertung)|\n\n\*\*(?:Risiko-Einstufung|Risiko|Risikobewertung)|\s*$)/m);
+          const riskMatch = clauseText.match(/\*\*(?:Risiko-Einstufung|Risiko|Risikobewertung)\*\*(?:\s*\n|\s*\:\s*)([\s\S]*?)(?=\n\*\*(?:Gesetzliche Referenz|Gesetz|Rechtsgrundlage)|\n\n\*\*(?:Gesetzliche Referenz|Gesetz|Rechtsgrundlage)|\s*$)/m);
           
           // Enhanced pattern specifically for law references
-          const lawRefMatch = clauseText.match(/\*\*(?:Gesetzliche Referenz|Gesetz|Rechtsgrundlage)\*\*(?:\s*\n|\s*\:\s*)([\s\S]*?)(?=\n\*\*(?:Empfehlung|Handlungsbedarf|Handlungsempfehlung)|\n---|\n\n---|\n###|\n\n###|$)/m);
+          const lawRefMatch = clauseText.match(/\*\*(?:Gesetzliche Referenz|Gesetz|Rechtsgrundlage)\*\*(?:\s*\n|\s*\:\s*)([\s\S]*?)(?=\n\*\*(?:Empfehlung|Handlungsbedarf|Handlungsempfehlung)|\n\n\*\*(?:Empfehlung|Handlungsbedarf|Handlungsempfehlung)|\n---|\n\n---|\s*$)/m);
           
-          // Improved recommendation pattern
-          const recommendationMatch = clauseText.match(/\*\*(?:Empfehlung|Handlungsbedarf|Handlungsempfehlung)\*\*(?:\s*\n|\s*\:\s*)([\s\S]*?)(?=(?:\n---|\n\n---|\n###|\n\n###|\n\*\*|\n\n\*\*|$))/m);
+          // Improved recommendation matching
+          const recommendationMatch = clauseText.match(/\*\*(?:Empfehlung|Handlungsbedarf|Handlungsempfehlung)\*\*(?:\s*\n|\s*\:\s*)([\s\S]*?)(?=\n---|\n\n---|\n###|\n\n###|\s*$)/m);
           
-          // Detailed logging
-          console.log(`UploadContract - Clause ${index + 1} extraction:`, {
-            title,
-            hasText: !!textMatch,
+          // Enhanced debugging output
+          console.log(`UploadContract - Clause ${index + 1} (${title}) extraction:`, {
+            fullClauseTextLen: clauseText.length,
+            fullClauseTextSample: clauseText.substring(0, 200) + "...",
+            textExtracted: !!textMatch,
+            textSample: textMatch ? textMatch[1].trim().substring(0, 100) + (textMatch[1].length > 100 ? "..." : "") : "Not found",
+            textLength: textMatch ? textMatch[1].trim().length : 0,
             hasAnalysis: !!analysisMatch,
             hasRisk: !!riskMatch,
             hasLawRef: !!lawRefMatch,
@@ -91,8 +94,8 @@ const UploadContract = () => {
         };
         
         console.log("Structured analysis result in UploadContract:", analysisResult);
-        console.log("Sample law reference from first clause:", 
-          analysisResult.clauses[0]?.lawReference?.text?.substring(0, 150) + "...");
+        console.log("First clause text length:", analysisResult.clauses[0]?.text?.length);
+        console.log("First clause text preview:", analysisResult.clauses[0]?.text?.substring(0, 200));
 
         navigate('/analyse-ergebnisse', { 
           state: { 
