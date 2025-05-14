@@ -31,11 +31,11 @@ const NavigationTabs = () => {
         <Tabs defaultValue={location.pathname} className="w-full">
           <TabsList className="w-full h-14 bg-white rounded-lg shadow-sm justify-between overflow-x-auto">
             <TabsTrigger 
-              value="/upload-contract"
+              value="/vertrag-hochladen"
               className="data-[state=active]:bg-legal-primary data-[state=active]:text-white"
               asChild
             >
-              <Link to="/upload-contract" className="flex items-center gap-2 px-4 py-2">
+              <Link to="/vertrag-hochladen" className="flex items-center gap-2 px-4 py-2">
                 <Upload size={18} />
                 <span className="whitespace-nowrap">Analyse starten</span>
               </Link>
@@ -53,11 +53,11 @@ const NavigationTabs = () => {
             </TabsTrigger>
             
             <TabsTrigger 
-              value="/demo-analysis"
+              value="/demo-analyse"
               className="data-[state=active]:bg-legal-primary data-[state=active]:text-white"
               asChild
             >
-              <Link to="/demo-analysis" className="flex items-center gap-2 px-4 py-2">
+              <Link to="/demo-analyse" className="flex items-center gap-2 px-4 py-2">
                 <FileText size={18} />
                 <span className="whitespace-nowrap">Demo-Analyse</span>
               </Link>
@@ -75,11 +75,11 @@ const NavigationTabs = () => {
             </TabsTrigger>
             
             <TabsTrigger 
-              value="/contact"
+              value="/kontakt"
               className="data-[state=active]:bg-legal-primary data-[state=active]:text-white"
               asChild
             >
-              <Link to="/contact" className="flex items-center gap-2 px-4 py-2">
+              <Link to="/kontakt" className="flex items-center gap-2 px-4 py-2">
                 <Mail size={18} />
                 <span className="whitespace-nowrap">Kontakt</span>
               </Link>

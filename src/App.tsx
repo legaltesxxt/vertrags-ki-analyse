@@ -29,11 +29,11 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
-          <Route path="/analysis-results" element={<AnalysisResults />} />
-          <Route path="/demo-analysis" element={<DemoAnalysis />} />
-          <Route path="/upload-contract" element={<UploadContract />} />
-          <Route path="/legal" element={<Legal />} />
-          <Route path="/contact" element={<Contact />} />
+          <Route path="/analyse-ergebnisse" element={<AnalysisResults />} />
+          <Route path="/demo-analyse" element={<DemoAnalysis />} />
+          <Route path="/vertrag-hochladen" element={<UploadContract />} />
+          <Route path="/rechtliches" element={<Legal />} />
+          <Route path="/kontakt" element={<Contact />} />
           
           {/* New routes */}
           <Route path="/impressum" element={<Impressum />} />
@@ -42,6 +42,13 @@ const App = () => (
           <Route path="/faq" element={<FAQ />} />
           <Route path="/blog" element={<Blog />} />
           <Route path="/werte-ethik" element={<WerteEthik />} />
+          
+          {/* Legacy routes for backward compatibility */}
+          <Route path="/analysis-results" element={<AnalysisResults />} />
+          <Route path="/demo-analysis" element={<DemoAnalysis />} />
+          <Route path="/upload-contract" element={<UploadContract />} />
+          <Route path="/legal" element={<Legal />} />
+          <Route path="/contact" element={<Contact />} />
           
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

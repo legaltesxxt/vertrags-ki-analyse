@@ -94,7 +94,7 @@ const Index = () => {
         console.log("Sample law reference from first clause:", 
           analysisResult.clauses[0]?.lawReference?.text?.substring(0, 150) + "...");
         
-        navigate('/analysis-results', { 
+        navigate('/analyse-ergebnisse', { 
           state: { 
             analysisResult,
             analysisOutput: outputText
