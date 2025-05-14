@@ -17,11 +17,15 @@ interface ClauseItemProps {
 
 const ClauseItem: React.FC<ClauseItemProps> = ({ clause }) => {
   useEffect(() => {
-    // Debug logging to check law reference content
-    console.log(`ClauseItem ${clause.id} law reference:`, {
-      rawText: clause.lawReference.text,
+    // Enhanced debug logging to check content
+    console.log(`ClauseItem ${clause.id} content:`, {
+      id: clause.id,
+      title: clause.title,
+      textLength: clause.text?.length || 0,
+      textFirstChars: clause.text?.substring(0, 100),
+      textLastChars: clause.text?.length > 100 ? `...${clause.text?.substring(clause.text.length - 100)}` : '',
+      lawReferenceLength: clause.lawReference.text?.length || 0,
       hasQuotes: clause.lawReference.text?.includes('"') || clause.lawReference.text?.includes('„'),
-      length: clause.lawReference.text?.length
     });
   }, [clause]);
 
@@ -61,18 +65,12 @@ const ClauseItem: React.FC<ClauseItemProps> = ({ clause }) => {
   const formatLawReferenceText = (text: string) => {
     if (!text) return '';
     
-    // Log the raw text before splitting
-    console.log(`Formatting law reference for ${clause.id}:`, text);
-
     // Handle different types of line breaks
     const lines = text.split(/\n|\r\n/);
     
     return lines.map((line, index) => {
       // Preserve quotes and special characters
       const trimmedLine = line.trim();
-      
-      // Log each line for debugging
-      console.log(`Line ${index} (${trimmedLine.length} chars):`, trimmedLine);
       
       return (
         <React.Fragment key={index}>

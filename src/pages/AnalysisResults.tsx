@@ -12,6 +12,27 @@ const AnalysisResults = () => {
   const toast = useToast(); // Get the full toast object
   const { analysisOutput, structuredResult, hasContent } = useAnalysisData();
 
+  // Log the structured result for debugging
+  React.useEffect(() => {
+    if (structuredResult) {
+      console.log("AnalysisResults - Structured Result:", {
+        totalClauses: structuredResult.clauses.length,
+        overallRisk: structuredResult.overallRisk,
+        firstClauseLength: structuredResult.clauses[0]?.text?.length || 0,
+        firstClausePreview: structuredResult.clauses[0]?.text?.substring(0, 200) || 'N/A'
+      });
+
+      // Log details of each clause
+      structuredResult.clauses.forEach((clause, index) => {
+        console.log(`Clause ${index + 1} - ${clause.title}:`, {
+          id: clause.id,
+          textLength: clause.text.length,
+          textPreview: clause.text.substring(0, 100) + (clause.text.length > 100 ? '...' : '')
+        });
+      });
+    }
+  }, [structuredResult]);
+
   // This function is kept for the web interface, but not used in PDF generation
   const getRiskClass = (risk: string): string => {
     switch (risk.toLowerCase()) {

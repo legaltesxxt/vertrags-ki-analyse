@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import FileUpload from '@/components/FileUpload';
 import { useN8nWebhook } from '@/hooks/useN8nWebhook';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import Header from '@/components/home/Header';
 import Footer from '@/components/Footer';
 import FeatureCards from '@/components/features/FeatureCards';
@@ -12,6 +12,7 @@ import ProcessSteps from '@/components/home/ProcessSteps';
 import AnalysisSection from '@/components/analysis/AnalysisSection';
 import FlipCardsGrid from '@/components/home/FlipCardsGrid';
 import FAQ from '@/components/home/FAQ';
+import { parseClausesFromText } from '@/utils/clauseParser';
 
 const Index = () => {
   const navigate = useNavigate();
@@ -41,79 +42,31 @@ const Index = () => {
         const outputText = response.data[0].output;
         console.log("Raw output text to parse:", outputText);
         
-        // Parse the markdown content into structured data
-        const clauses = outputText.split('### ').filter(Boolean).map((clauseText, index) => {
-          const title = clauseText.split('\n')[0].trim();
+        try {
+          // Use the unified parsing logic from clauseParser
+          const analysisResult = parseClausesFromText(outputText);
           
-          // Improved regex patterns with better boundary conditions for full text extraction
-          // Specifically modified to capture text until the next section heading
-          const textMatch = clauseText.match(/\*\*(?:Klauseltext|Text)\*\*(?:\s*\n|\s*\:\s*)([\s\S]*?)(?=\n\*\*(?:Analyse|Bewertung)|\n\n\*\*(?:Analyse|Bewertung)|\s*$)/m);
-          const analysisMatch = clauseText.match(/\*\*(?:Analyse|Bewertung)\*\*(?:\s*\n|\s*\:\s*)([\s\S]*?)(?=\n\*\*(?:Risiko-Einstufung|Risiko|Risikobewertung)|\n\n\*\*(?:Risiko-Einstufung|Risiko|Risikobewertung)|\s*$)/m);
-          const riskMatch = clauseText.match(/\*\*(?:Risiko-Einstufung|Risiko|Risikobewertung)\*\*(?:\s*\n|\s*\:\s*)([\s\S]*?)(?=\n\*\*(?:Gesetzliche Referenz|Gesetz|Rechtsgrundlage)|\n\n\*\*(?:Gesetzliche Referenz|Gesetz|Rechtsgrundlage)|\s*$)/m);
-          
-          // Enhanced pattern specifically for law references with proper boundaries
-          const lawRefMatch = clauseText.match(/\*\*(?:Gesetzliche Referenz|Gesetz|Rechtsgrundlage)\*\*(?:\s*\n|\s*\:\s*)([\s\S]*?)(?=\n\*\*(?:Empfehlung|Handlungsbedarf|Handlungsempfehlung)|\n\n\*\*(?:Empfehlung|Handlungsbedarf|Handlungsempfehlung)|\n---|\n\n---|\s*$)/m);
-          
-          // Improved recommendation matching with correct boundaries
-          const recommendationMatch = clauseText.match(/\*\*(?:Empfehlung|Handlungsbedarf|Handlungsempfehlung)\*\*(?:\s*\n|\s*\:\s*)([\s\S]*?)(?=\n---|\n\n---|\n###|\n\n###|\s*$)/m);
-          
-          // Enhanced logging to debug extraction issues
-          console.log(`Index page - Clause ${index + 1} (${title}) extraction:`, {
-            fullClauseTextLen: clauseText.length,
-            fullClauseTextSample: clauseText.substring(0, 200) + "...",
-            textExtracted: !!textMatch,
-            textSample: textMatch ? textMatch[1].trim().substring(0, 100) + (textMatch[1].length > 100 ? "..." : "") : "Not found",
-            textLength: textMatch ? textMatch[1].trim().length : 0,
-            analysisExtracted: !!analysisMatch,
-            analysisLength: analysisMatch ? analysisMatch[1].trim().length : 0,
-            riskExtracted: !!riskMatch,
-            riskValue: riskMatch ? riskMatch[1].trim() : "Not found",
-            lawRefExtracted: !!lawRefMatch,
-            lawRefSample: lawRefMatch ? lawRefMatch[1].trim().substring(0, 100) + (lawRefMatch[1].length > 100 ? "..." : "") : "Not found",
-            lawRefLength: lawRefMatch ? lawRefMatch[1].trim().length : 0,
-            recommendationExtracted: !!recommendationMatch,
-            recommendationSample: recommendationMatch ? recommendationMatch[1].trim().substring(0, 100) + (recommendationMatch[1].length > 100 ? "..." : "") : "Not found"
-          });
-          
-          const matches = {
-            text: textMatch ? textMatch[1].trim() : '',
-            analysis: analysisMatch ? analysisMatch[1].trim() : '',
-            risk: (riskMatch ? riskMatch[1].trim() : 'Rechtskonform') as 'Rechtskonform' | 'Rechtlich fraglich' | 'Rechtlich unzulässig',
-            lawReference: {
-              text: lawRefMatch ? lawRefMatch[1].trim() : '',
-              link: ''
-            },
-            recommendation: recommendationMatch ? recommendationMatch[1].trim() : ''
-          };
-
-          return {
-            id: `clause-${index + 1}`,
-            title,
-            ...matches
-          };
-        });
-
-        const analysisResult = {
-          clauses,
-          overallRisk: clauses.some(c => c.risk === 'Rechtlich unzulässig') 
-            ? 'Rechtlich unzulässig' 
-            : clauses.some(c => c.risk === 'Rechtlich fraglich') 
-              ? 'Rechtlich fraglich' 
-              : 'Rechtskonform',
-          summary: 'Vertragliche Analyse abgeschlossen'
-        };
-
-        console.log("Structured analysis result:", analysisResult);
-        console.log("First clause text length:", analysisResult.clauses[0]?.text?.length);
-        console.log("First clause text preview:", analysisResult.clauses[0]?.text?.substring(0, 200));
-        
-        navigate('/analyse-ergebnisse', { 
-          state: { 
-            analysisResult,
-            analysisOutput: outputText
+          console.log("Structured analysis result:", analysisResult);
+          if (analysisResult.clauses.length > 0) {
+            console.log("First clause text length:", analysisResult.clauses[0]?.text?.length);
+            console.log("First clause text preview:", analysisResult.clauses[0]?.text?.substring(0, 200));
           }
-        });
-        return;
+
+          navigate('/analyse-ergebnisse', { 
+            state: { 
+              analysisResult,
+              analysisOutput: outputText
+            }
+          });
+          return;
+        } catch (error) {
+          console.error("Error parsing clauses:", error);
+          toast({
+            title: "Fehler bei der Analyse",
+            description: "Die Analyseergebnisse konnten nicht korrekt verarbeitet werden.",
+            variant: "destructive",
+          });
+        }
       }
     } else {
       console.error("Error sending file to n8n:", response.error);
