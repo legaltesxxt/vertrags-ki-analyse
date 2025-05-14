@@ -1,15 +1,20 @@
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useToast } from '@/components/ui/use-toast';
 import { parseClausesFromText } from '../utils/clauseParser';
 import { WebhookResponse, AnalysisResult } from '../types/analysisTypes';
 
 export type { AnalysisClause, AnalysisResult } from '../types/analysisTypes';
 
+// Constants for error timeout
+const ERROR_DISPLAY_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
+const ERROR_STORAGE_KEY = 'webhook_error_timestamp';
+
 export function useN8nWebhook() {
   const [isLoading, setIsLoading] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [errorTimestamp, setErrorTimestamp] = useState<number | null>(null);
   const { toast } = useToast();
 
   // Get the stored webhook URL or use the test URL as fallback
@@ -18,16 +23,41 @@ export function useN8nWebhook() {
   
   console.log("Using webhook URL:", webhookUrl);
 
+  // Load error timestamp from localStorage on mount
+  useEffect(() => {
+    const storedErrorData = localStorage.getItem(ERROR_STORAGE_KEY);
+    if (storedErrorData) {
+      try {
+        const { error, timestamp } = JSON.parse(storedErrorData);
+        const timeRemaining = timestamp + ERROR_DISPLAY_DURATION - Date.now();
+        
+        // Only restore if there's time remaining
+        if (timeRemaining > 0) {
+          setError(error);
+          setErrorTimestamp(timestamp);
+        } else {
+          // Clear storage if time has expired
+          localStorage.removeItem(ERROR_STORAGE_KEY);
+        }
+      } catch (e) {
+        // If any parsing error occurs, remove the item
+        localStorage.removeItem(ERROR_STORAGE_KEY);
+      }
+    }
+  }, []);
+
   const sendToN8n = useCallback(async (file: File): Promise<WebhookResponse> => {
     if (!webhookUrl) {
       const errorMsg = "Webhook URL ist nicht konfiguriert";
-      setError(errorMsg);
+      setErrorWithTimestamp(errorMsg);
       return { success: false, error: errorMsg };
     }
 
     setIsLoading(true);
     setAnalysisResult(null);
     setError(null);
+    setErrorTimestamp(null);
+    localStorage.removeItem(ERROR_STORAGE_KEY);
 
     try {
       // FormData erstellen für den Datei-Upload
@@ -44,7 +74,7 @@ export function useN8nWebhook() {
       
       if (!response.ok) {
         const errorMsg = `HTTP Error: ${response.status} - Verbindung zum Server fehlgeschlagen`;
-        setError(errorMsg);
+        setErrorWithTimestamp(errorMsg);
         throw new Error(errorMsg);
       }
       
@@ -59,7 +89,7 @@ export function useN8nWebhook() {
         // Prüfen, ob die Antwort eine leere Analyse enthält
         if (!data || (Array.isArray(data) && (!data.length || !data[0]?.output))) {
           const errorMsg = "Keine gültige Analyse vom Server erhalten";
-          setError(errorMsg);
+          setErrorWithTimestamp(errorMsg);
           return { 
             success: false, 
             error: errorMsg 
@@ -100,7 +130,7 @@ export function useN8nWebhook() {
         
         if (!responseText || responseText.trim() === "") {
           const errorMsg = "Leere Antwort vom Server erhalten";
-          setError(errorMsg);
+          setErrorWithTimestamp(errorMsg);
           return { 
             success: false, 
             error: errorMsg 
@@ -116,7 +146,7 @@ export function useN8nWebhook() {
       
     } catch (error) {
       const errorMsg = String(error);
-      setError(errorMsg);
+      setErrorWithTimestamp(errorMsg);
       console.error("Fehler beim Senden zum n8n Webhook:", errorMsg);
       return { success: false, error: errorMsg };
     } finally {
@@ -124,9 +154,58 @@ export function useN8nWebhook() {
     }
   }, [webhookUrl]); 
 
-  const resetError = useCallback(() => {
-    setError(null);
+  // Helper function to set error with timestamp
+  const setErrorWithTimestamp = useCallback((errorMsg: string) => {
+    const timestamp = Date.now();
+    setError(errorMsg);
+    setErrorTimestamp(timestamp);
+    
+    // Store in localStorage to persist across page reloads
+    localStorage.setItem(ERROR_STORAGE_KEY, JSON.stringify({
+      error: errorMsg,
+      timestamp: timestamp
+    }));
   }, []);
 
-  return { sendToN8n, isLoading, analysisResult, error, resetError };
+  // Calculate time remaining (in milliseconds)
+  const getTimeRemaining = useCallback((): number => {
+    if (!errorTimestamp) return 0;
+    
+    const elapsed = Date.now() - errorTimestamp;
+    const remaining = Math.max(0, ERROR_DISPLAY_DURATION - elapsed);
+    return remaining;
+  }, [errorTimestamp]);
+
+  // Check if error can be reset
+  const canResetError = useCallback((): boolean => {
+    return getTimeRemaining() === 0;
+  }, [getTimeRemaining]);
+
+  const resetError = useCallback(() => {
+    // Only allow reset if display time has passed
+    if (canResetError()) {
+      setError(null);
+      setErrorTimestamp(null);
+      localStorage.removeItem(ERROR_STORAGE_KEY);
+    } else {
+      // Show toast message when trying to reset too early
+      const remainingSeconds = Math.ceil(getTimeRemaining() / 1000);
+      toast({
+        title: "Fehler kann noch nicht zurückgesetzt werden",
+        description: `Bitte warten Sie noch ${remainingSeconds} Sekunden.`,
+        variant: "destructive",
+      });
+    }
+  }, [canResetError, getTimeRemaining, toast]);
+
+  return { 
+    sendToN8n, 
+    isLoading, 
+    analysisResult, 
+    error, 
+    resetError,
+    getTimeRemaining,
+    canResetError,
+    ERROR_DISPLAY_DURATION
+  };
 }
