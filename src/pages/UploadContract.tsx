@@ -11,14 +11,7 @@ const UploadContract = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const { 
-    sendToN8n, 
-    isLoading: isSendingToN8n, 
-    error, 
-    resetError,
-    getTimeRemaining,
-    canResetError
-  } = useN8nWebhook();
+  const { sendToN8n, isLoading: isSendingToN8n, error, resetError } = useN8nWebhook();
 
   const handleFileSelected = useCallback(async (file: File) => {
     setSelectedFile(file);
@@ -138,8 +131,6 @@ const UploadContract = () => {
           webhookResult={null}
           useRealAnalysis={true}
           onReset={resetError}
-          getTimeRemaining={getTimeRemaining}
-          canResetError={canResetError}
         />
         
         <div className="text-sm text-slate-500 text-center max-w-xl mx-auto">
