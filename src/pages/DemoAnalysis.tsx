@@ -9,7 +9,7 @@ import { generatePDF } from '@/utils/pdfUtils';
 import { AnalysisResult } from '@/types/analysisTypes';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { FileText, PlusCircle } from 'lucide-react';
+import { FileText, Home } from 'lucide-react';
 
 // Empty initial state for the demo analysis
 const emptyAnalysisData: AnalysisResult = {
@@ -18,7 +18,7 @@ const emptyAnalysisData: AnalysisResult = {
   summary: ''
 };
 
-// Arbeitsvertrag demo data (parsed from provided JSON)
+// Arbeitsvertrag demo data
 const arbeitsvertragDemo: AnalysisResult = {
   clauses: [
     {
@@ -158,6 +158,158 @@ const arbeitsvertragDemo: AnalysisResult = {
   summary: "Es wurden 11 Klauseln analysiert. 2 Klauseln wurden als rechtlich fraglich eingestuft. Diese betreffen die Überstundenregelung und das Konkurrenzverbot. Die übrigen 9 Klauseln sind rechtskonform."
 };
 
+// Mietvertrag demo data (parsed from provided JSON)
+const mietvertragDemo: AnalysisResult = {
+  clauses: [
+    {
+      id: "clause-1",
+      title: "Vertragsparteien",
+      text: "Vertragsparteien Vermieter(in): Herr Stefan Frei Frei Immobilien AG Bahnhofstrasse 10 8001 Zürich Mieter(in): Herr Luca Schmid Wiesenweg 45 3074 Muri bei Bern",
+      risk: "Rechtskonform",
+      analysis: "In dieser Klausel werden die Vermieter- und Mieterdaten samt Adressen vollständig aufgeführt. Das ist notwendig für die klare Zuordnung und Identität der Vertragspartner. Sie entspricht dem Zweck eines Mietvertrags gemäss OR Art. 253, nach welchem sich der Vermieter verpflichtet, dem Mieter eine Sache zum Gebrauch zu überlassen, und der Mieter dafür einen Mietzins zu leisten.",
+      lawReference: {
+        text: "OR Art. 253: Durch den Mietvertrag verpflichtet sich der Vermieter, dem Mieter eine Sache zum Gebrauch zu überlassen, und der Mieter, dem Vermieter dafür einen Mietzins zu leisten.",
+        link: ""
+      },
+      recommendation: "Die Angabe der Vertragsparteien ist korrekt und vollständig. Es besteht kein Anpassungsbedarf. Nächster Schritt: Keine weitere Massnahme nötig."
+    },
+    {
+      id: "clause-2",
+      title: "Mietobjekt",
+      text: "Mietobjekt 4-Zimmer-Wohnung, 3. Obergeschoss, Top Nr. 12 Waldstrasse 56, 3012 Bern Kellerabteil Nr. K12, 1 Tiefgaragenplatz Nr. 21",
+      risk: "Rechtskonform",
+      analysis: "Das Mietobjekt wird umfassend bestimmt: Anzahl Zimmer, Lage, Adresse sowie Nebenräume und Parkplatz werden konkret erwähnt. Die Schriftform ist laut OR Art. 255 dann erforderlich, wenn sie eine Partei verlangt. Die genaue Beschreibung schafft Rechtssicherheit über den Mietgegenstand.",
+      lawReference: {
+        text: "OR Art. 255: Der Mietvertrag muss, wenn er für Wohn- oder Geschäftsräume abgeschlossen wird, schriftlich abgefasst sein, wenn ihn eine Partei verlangt.",
+        link: ""
+      },
+      recommendation: "Das Mietobjekt ist klar und nachvollziehbar definiert. Keine Anpassung erforderlich."
+    },
+    {
+      id: "clause-3",
+      title: "Mietdauer",
+      text: "Mietdauer Beginn: 1. September 2025 Unbefristetes Mietverhältnis mit einer ordentlichen Kündigungsfrist von 6 Monaten auf Ende jedes Quartals.",
+      risk: "Rechtskonform",
+      analysis: "Das Mietverhältnis ist unbefristet, was grundsätzlich gemäss OR Art. 255 zulässig ist. Die gesetzliche Kündigungsfrist für Wohnräume beträgt nach OR Art. 266c allerdings drei Monate, sofern nicht etwas anderes vereinbart oder ortsüblich ist. Hier wird eine längere Kündigungsfrist (6 Monate) festgelegt, was vertraglich erlaubt ist. Allerdings könnte dies für den Mieter eine nachteilige Regelung darstellen. Eine solche Verlängerung ist rechtlich zulässig, solange keine missbräuchliche Benachteiligung vorliegt.",
+      lawReference: {
+        text: "OR Art. 255: Wird nichts anderes vereinbart, so ist der Mietvertrag auf unbestimmte Zeit geschlossen.\nOR Art. 266a: Ein auf unbestimmte Zeit abgeschlossenes Mietverhältnis kann von jeder Partei unter Einhaltung der gesetzlichen oder vertraglich vereinbarten Fristen gekündigt werden.\nOR Art. 266c: Die Kündigungsfrist für Wohnräume beträgt drei Monate, sofern nicht etwas anderes vereinbart oder ortsüblich ist.",
+        link: ""
+      },
+      recommendation: "Der Vertrag ist diesbezüglich rechtsgültig, da schriftlich eine andere als die gesetzliche Kündigungsfrist vereinbart wurde. Mieter sollten sich allerdings der längeren Bindungsdauer bewusst sein. Ggf. mit dem Vermieter über flexiblere Kündigungsmodalitäten sprechen, falls dies gewünscht wird."
+    },
+    {
+      id: "clause-4",
+      title: "Mietzins und Nebenkosten",
+      text: "Mietzins und Nebenkosten Nettomietzins Wohnung: CHF 2'500.– Garagenplatz: CHF 250.– Akonto Nebenkosten: CHF 300.– Total monatlich zahlbar: CHF 3'050.– Zahlbar bis spätestens am 5. Werktag eines jeden Monats.",
+      risk: "Rechtskonform",
+      analysis: "Der Gesamtbetrag ist klar aufgeschlüsselt (Miete, Garagenplatz, Nebenkosten) und die Zahlungsfrist ist präzise angegeben. Laut OR Art. 257 sind Nebenkosten zu bezahlen, wenn sie verabredet oder ortsüblich sind. OR Art. 266b regelt die Fälligkeit standardmässig auf Monatsende im Voraus, aber abweichende vertragliche Fristen wie hier (5. Werktag) sind erlaubt.",
+      lawReference: {
+        text: "OR Art. 257: Der Mieter hat dem Vermieter den Mietzins sowie, sofern verabredet oder ortsüblich, die Nebenkosten zu bezahlen.\nOR Art. 266b: Der Mietzins ist spätestens am Ende jedes Monats im Voraus zu entrichten, wenn nichts anderes verabredet oder ortsüblich ist.",
+        link: ""
+      },
+      recommendation: "Die Regelung ist eindeutig und stimmt mit dem Gesetz überein. Keine weiteren Massnahmen nötig."
+    },
+    {
+      id: "clause-5",
+      title: "Mietzinsdepot",
+      text: "Mietzinsdepot Drei Monatsmieten (CHF 9'150.–) auf ein Mietkautionskonto bei der Berner Kantonalbank bis spätestens 10 Tage vor Mietbeginn.",
+      risk: "Rechtskonform",
+      analysis: "Das hinterlegte Depot überschreitet nicht die Obergrenze von drei Monatsmieten, wie es OR Art. 257e vorsieht. Die Anlage auf einem separaten Konto auf den Namen des Mieters ist verlangt und entspricht den gesetzlichen Vorgaben.",
+      lawReference: {
+        text: "OR Art. 257e: Hat der Mieter einer Wohn- oder Geschäftsräumlichkeit eine Kaution zu leisten, so darf diese den Betrag von drei Monatsmieten nicht übersteigen. Sie ist auf einem Sparkonto oder Depot auf den Namen des Mieters bei einer Bank anzulegen.",
+        link: ""
+      },
+      recommendation: "Die Klausel entspricht dem Gesetz. Überprüfen, ob das Konto tatsächlich auf den eigenen Namen eröffnet wird. Ggf. Bestätigung der Bank verlangen."
+    },
+    {
+      id: "clause-6",
+      title: "Kleinreparaturen",
+      text: "Kleinreparaturen Der Mieter verpflichtet sich, sämtliche Reparaturen bis zu einem Betrag von CHF 500.– pro Fall selbst zu tragen, unabhängig von der Ursache des Schadens.",
+      risk: "Rechtlich fraglich",
+      analysis: "Gemäss OR Art. 259 und 259a ist der Mieter nur für kleine Mängel zu gewöhnlichen Unterhaltsarbeiten (Kleinstreparaturen) verantwortlich. Die Grenze von CHF 500 pro Fall wird in der Praxis häufig akzeptiert, jedoch muss zwischen gewöhnlichem Unterhalt (z.B. Dichtungen, Glühbirnen) und Schäden ohne Verschulden/Abnutzung (z.B. Materialfehler) unterschieden werden. Die Formulierung „unabhängig von der Ursache des Schadens" ist problematisch: Der Mieter darf nur für durch ihn verursachte bzw. zum gewöhnlichen Unterhalt gehörende kleine Mängel verpflichtet werden. Für Defekte, die nicht seinem Verantwortungsbereich oder dem normalen Unterhalt zuzurechnen sind, bleibt der Vermieter zuständig.",
+      lawReference: {
+        text: "OR Art. 259: Der Vermieter hat die Sache in einem zum vorausgesetzten Gebrauch tauglichen Zustand zu übergeben und zu erhalten.\nOR Art. 259a: Der Mieter ist zur Behebung von kleinen Mängeln verpflichtet, die im Laufe des Mietverhältnisses durch gewöhnlichen Unterhalt entstehen.",
+        link: ""
+      },
+      recommendation: "Text prüfen und allenfalls abändern: „unabhängig von der Ursache des Schadens" sollte gestrichen oder präzisiert werden, da der Vermieter für nicht durch den Mieter verursachte Schäden aufkommen muss. Im Zweifel Anpassung verlangen."
+    },
+    {
+      id: "clause-7",
+      title: "Nutzung",
+      text: "Nutzung Das Mietobjekt darf ausschliesslich zu Wohnzwecken genutzt werden. Jegliche Haustierhaltung ist untersagt.",
+      risk: "Rechtlich fraglich",
+      analysis: "Die ausschliessliche Nutzung zu Wohnzwecken ist zulässig, sofern keine gewerbliche oder andere Nutzung erfolgen soll. Das generelle Verbot der Haustierhaltung ist jedoch als kritisch anzusehen: Gemäss Rechtsprechung ist ein absolutes Verbot von Kleintieren wie Fischen, Hamstern oder kleinen Vögeln zu streng. Ein solches Totalverbot könnte als unzulässige Einschränkung ausgelegt werden, da der Mieter in der Regel ein Recht auf Kleintiere hat, vorausgesetzt, es entsteht keine Störung.",
+      lawReference: {
+        text: "OR Art. 257f Abs. 2: Der Mieter hat bei der Ausübung seiner Rechte Rücksicht auf die Hausbewohner, auf den Vermieter und auf die anderen Mieter zu nehmen.\nOR Art. 260: Der Mieter darf die Sache nur mit Zustimmung des Vermieters untervermieten.",
+        link: ""
+      },
+      recommendation: "Klausel sollte überprüft und angepasst werden: Einschränkung bei Haustieren wäre auf problematische Tiere zu beschränken. Gegen ein absolutes Verbot von ungefährlichen Kleintieren hätte der Mieter vermutlich rechtliche Handhabe."
+    },
+    {
+      id: "clause-8",
+      title: "Schlüssel",
+      text: "Schlüssel 3 Wohnungsschlüssel, 1 Briefkastenschlüssel, 1 Garagenfernbedienung. Verlust ist sofort zu melden. Ersatzkosten trägt der Mieter.",
+      risk: "Rechtskonform",
+      analysis: "Die Schlüsselanzahl ist klar bezeichnet. Das Melden eines Verlustes ist eine Selbstverständlichkeit. Die Verpflichtung, die Ersatzkosten im Verlustfall zu tragen, ist grundsätzlich zulässig, sofern kein Verschulden des Vermieters besteht. Die Schadenersatzpflicht gemäss OR Art. 97 ist in solchen Situationen gerechtfertigt, da sie auf Pflichtverletzung des Mieters abstellt.",
+      lawReference: {
+        text: "OR Art. 257f Abs. 1: Der Mieter hat die Mietsache sorgfältig zu gebrauchen.\nOR Art. 97: Schadenersatzpflicht bei Nichterfüllung – Wer einen Vertrag nicht erfüllt, ist zum Ersatz des daraus entstehenden Schadens verpflichtet.",
+        link: ""
+      },
+      recommendation: "Keine Beanstandung. Auf sorgfältigen Umgang mit den Schlüsseln achten."
+    },
+    {
+      id: "clause-9",
+      title: "Hausordnung",
+      text: "Hausordnung Die beigefügte Hausordnung ist Bestandteil dieses Vertrags. Verstösse können zur fristlosen Kündigung führen.",
+      risk: "Rechtskonform",
+      analysis: "Die Einbeziehung der Hausordnung ist üblich und sinnvoll. Die Möglichkeit einer fristlosen Kündigung ist jedoch nur nach erfolgloser Abmahnung und bei schwerwiegenden oder wiederholten Verstösse zulässig, gemäss OR Art. 257f Abs. 3. Die Klausel ist in Verbindung mit der gesetzlichen Regelung korrekt zu handhaben, solange vor einer Kündigung (ausser bei schweren Fällen) eine Abmahnung erfolgt.",
+      lawReference: {
+        text: "OR Art. 257f Abs. 2: Der Mieter hat bei der Ausübung seiner Rechte Rücksicht auf die Hausbewohner, auf den Vermieter und auf die anderen Mieter zu nehmen.\nOR Art. 257f Abs. 3: Verletzung dieser Pflicht berechtigt den Vermieter nach erfolgloser Abmahnung zur ausserordentlichen Kündigung.",
+        link: ""
+      },
+      recommendation: "Verständnis der Hausordnung sicherstellen. Bei Unsicherheiten über die Schwere eines Verstosses genaue Prüfung und ggf. Beratung suchen."
+    },
+    {
+      id: "clause-10",
+      title: "Besucherregelung",
+      text: "Besucherregelung Übernachtungsbesuche von mehr als 3 Nächten pro Monat bedürfen der schriftlichen Zustimmung des Vermieters.",
+      risk: "Rechtlich unzulässig",
+      analysis: "Für eine solche Beschränkung gibt es keine gesetzliche Grundlage. Die Rechtsprechung sieht das normale Einladen und gelegentliche Übernachten von Besuch als Teil des Wohngebrauchs. Eine quantitative Beschränkung auf drei Nächte pro Monat ist klar übermässig und unverhältnismässig, da sie das Privatleben des Mieters unzulässig einschränkt. Solche Klauseln werden oft als nichtig betrachtet.",
+      lawReference: {
+        text: "Gesetzlich nicht explizit geregelt: Für Beschränkung von Besucheraufenthalten enthält das Gesetz keine explizite Regelung.",
+        link: ""
+      },
+      recommendation: "Diese Klausel sollte ersatzlos gestrichen werden, da sie das Recht des Mieters auf Privatleben unangemessen beschneidet."
+    },
+    {
+      id: "clause-11",
+      title: "Gerichtsstand",
+      text: "Gerichtsstand Gerichtsstand ist Bern. Es gilt Schweizer Recht.",
+      risk: "Rechtskonform",
+      analysis: "Laut ZPO Art. 33 Absatz 1 ist für mietrechtliche Streitigkeiten der Ort der gelegenen Sache zuständig. Das Mietobjekt befindet sich in Bern, womit die Gerichtsstandsregelung korrekt ist. Schweizer Recht ist zudem zwingend, da sich das Mietobjekt in der Schweiz befindet (IPRG Art. 116).",
+      lawReference: {
+        text: "ZPO Art. 33 Abs. 1: Für Streitigkeiten aus Mietverhältnissen über Wohn- oder Geschäftsräume ist das Gericht am Ort der gelegenen Sache zuständig.\nIPRG Art. 116: Das Mietverhältnis über unbewegliche Sachen unterliegt dem Recht des Staates, in dem sich die Sache befindet (Schweizer Recht für Liegenschaften in der Schweiz).",
+        link: ""
+      },
+      recommendation: "Entspricht den gesetzlichen Vorgaben. Keine Änderungen nötig."
+    },
+    {
+      id: "clause-12",
+      title: "Schlussbestimmungen",
+      text: "Schlussbestimmungen Änderungen bedürfen der Schriftform. Sollten einzelne Bestimmungen ungültig sein, bleibt der Rest wirksam.",
+      risk: "Rechtskonform",
+      analysis: "Die Schriftformklausel entspricht OR Art. 16 und ist zulässig. Die sog. salvatorische Klausel wird gesetzlich zwar nicht explizit geregelt, jedoch von der Rechtsprechung anerkannt (Teilnichtigkeit). Kein Verstoss gegen zwingende Vorschriften.",
+      lawReference: {
+        text: "OR Art. 16: Sind die Parteien über die schriftliche Form einig, so vermutet es das Gesetz, dass sie die Einhaltung der Form als Gültigkeitserfordernis betrachten.\nOR Art. 20: Ist der Vertrag zum vornherein widerrechtlich oder unsittlich oder enthält er einen zum voraus bestimmten unmöglichen Inhalt, so ist er nichtig.\nGesetzlich nicht explizit geregelt: Die Salvatorische Klausel (Teilnichtigkeit) ist im Gesetz nicht direkt geregelt, wird aber anerkannt.",
+        link: ""
+      },
+      recommendation: "Die Bestimmungen sind branchenüblich und korrekt. Keine Anpassung erforderlich."
+    }
+  ],
+  overallRisk: "Rechtlich unzulässig",
+  summary: "Es wurden 12 Klauseln analysiert. 1 Klausel wurde als rechtlich unzulässig eingestuft (Besucherregelung). 2 Klauseln wurden als rechtlich fraglich bewertet (Kleinreparaturen und Haustierhaltung). Die übrigen 9 Klauseln sind rechtskonform."
+};
+
 const DemoAnalysis: React.FC = () => {
   const toast = useToast();
   const [currentTab, setCurrentTab] = useState<string>("arbeitsvertrag");
@@ -173,7 +325,7 @@ const DemoAnalysis: React.FC = () => {
 
   // Function to generate markdown from analysis data
   const generateMarkdownOutput = (data: AnalysisResult) => {
-    let markdownContent = `# ${currentTab === "arbeitsvertrag" ? "Arbeitsvertrag" : "Vertragsanalyse"}\n\n`;
+    let markdownContent = `# ${currentTab === "arbeitsvertrag" ? "Arbeitsvertrag" : "Mietvertrag"}\n\n`;
     markdownContent += `## Zusammenfassung\n${data.summary}\n\n`;
     
     data.clauses.forEach(clause => {
@@ -201,8 +353,10 @@ const DemoAnalysis: React.FC = () => {
     setCurrentTab(tab);
     if (tab === "arbeitsvertrag") {
       updateAnalysisData(arbeitsvertragDemo);
+    } else if (tab === "mietvertrag") {
+      updateAnalysisData(mietvertragDemo);
     } else {
-      // Set empty data for the placeholder tab
+      // Set empty data for any other tab
       updateAnalysisData(emptyAnalysisData);
     }
   };
@@ -220,9 +374,12 @@ const DemoAnalysis: React.FC = () => {
 
     try {
       // Use a custom filename based on the selected tab
-      const filename = currentTab === "arbeitsvertrag" 
-        ? 'arbeitsvertrag_demo_analyse.pdf' 
-        : 'demo_vertragsklar.pdf';
+      let filename = 'demo_vertragsklar.pdf';
+      if (currentTab === "arbeitsvertrag") {
+        filename = 'arbeitsvertrag_demo_analyse.pdf';
+      } else if (currentTab === "mietvertrag") {
+        filename = 'mietvertrag_demo_analyse.pdf';
+      }
         
       await generatePDF(demoAnalysisData, filename, toast);
     } catch (error) {
@@ -249,14 +406,14 @@ const DemoAnalysis: React.FC = () => {
             <FileText size={16} />
             Arbeitsvertrag
           </TabsTrigger>
-          <TabsTrigger value="zweiteAnalyse" className="flex items-center gap-2">
-            <PlusCircle size={16} />
-            Zweite Demo-Analyse
+          <TabsTrigger value="mietvertrag" className="flex items-center gap-2">
+            <Home size={16} />
+            Mietvertrag
           </TabsTrigger>
         </TabsList>
       </Tabs>
 
-      {currentTab === "arbeitsvertrag" ? (
+      {hasLoaded && (
         <>
           <AnalysisHeader 
             structuredResult={demoAnalysisData} 
@@ -275,20 +432,6 @@ const DemoAnalysis: React.FC = () => {
             onDownloadPDF={downloadFullAnalysisPDF}
           />
         </>
-      ) : (
-        <div className="mt-8 p-8 bg-white rounded-xl shadow-sm border border-slate-200/50">
-          <div className="text-center p-10">
-            <h2 className="text-2xl font-medium text-slate-800 mb-4">Zweite Demo-Analyse</h2>
-            <p className="text-slate-500">
-              Hier wird die zweite Demo-Analyse erscheinen. Im nächsten Schritt können Sie die JSON-Ausgabe für diese Analyse bereitstellen.
-            </p>
-            <div className="mt-6">
-              <Button variant="outline" onClick={() => handleTabChange("arbeitsvertrag")}>
-                Zurück zur Arbeitsvertrag-Analyse
-              </Button>
-            </div>
-          </div>
-        </div>
       )}
     </AnalysisLayout>
   );
