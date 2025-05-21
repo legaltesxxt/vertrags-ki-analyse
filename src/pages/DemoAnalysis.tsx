@@ -158,7 +158,7 @@ const arbeitsvertragDemo: AnalysisResult = {
   summary: "Es wurden 11 Klauseln analysiert. 2 Klauseln wurden als rechtlich fraglich eingestuft. Diese betreffen die Überstundenregelung und das Konkurrenzverbot. Die übrigen 9 Klauseln sind rechtskonform."
 };
 
-// Mietvertrag demo data (parsed from provided JSON)
+// Mietvertrag demo data
 const mietvertragDemo: AnalysisResult = {
   clauses: [
     {
