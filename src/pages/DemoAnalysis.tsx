@@ -226,12 +226,12 @@ const mietvertragDemo: AnalysisResult = {
       title: "Kleinreparaturen",
       text: "Kleinreparaturen Der Mieter verpflichtet sich, sämtliche Reparaturen bis zu einem Betrag von CHF 500.– pro Fall selbst zu tragen, unabhängig von der Ursache des Schadens.",
       risk: "Rechtlich fraglich",
-      analysis: "Gemäss OR Art. 259 und 259a ist der Mieter nur für kleine Mängel zu gewöhnlichen Unterhaltsarbeiten (Kleinstreparaturen) verantwortlich. Die Grenze von CHF 500 pro Fall wird in der Praxis häufig akzeptiert, jedoch muss zwischen gewöhnlichem Unterhalt (z.B. Dichtungen, Glühbirnen) und Schäden ohne Verschulden/Abnutzung (z.B. Materialfehler) unterschieden werden. Die Formulierung „unabhängig von der Ursache des Schadens" ist problematisch: Der Mieter darf nur für durch ihn verursachte bzw. zum gewöhnlichen Unterhalt gehörende kleine Mängel verpflichtet werden. Für Defekte, die nicht seinem Verantwortungsbereich oder dem normalen Unterhalt zuzurechnen sind, bleibt der Vermieter zuständig.",
+      analysis: "Gemäss OR Art. 259 und 259a ist der Mieter nur für kleine Mängel zu gewöhnlichen Unterhaltsarbeiten (Kleinstreparaturen) verantwortlich. Die Grenze von CHF 500 pro Fall wird in der Praxis häufig akzeptiert, jedoch muss zwischen gewöhnlichem Unterhalt (z.B. Dichtungen, Glühbirnen) und Schäden ohne Verschulden/Abnutzung (z.B. Materialfehler) unterschieden werden. Die Formulierung \"unabhängig von der Ursache des Schadens\" ist problematisch: Der Mieter darf nur für durch ihn verursachte bzw. zum gewöhnlichen Unterhalt gehörende kleine Mängel verpflichtet werden. Für Defekte, die nicht seinem Verantwortungsbereich oder dem normalen Unterhalt zuzurechnen sind, bleibt der Vermieter zuständig.",
       lawReference: {
         text: "OR Art. 259: Der Vermieter hat die Sache in einem zum vorausgesetzten Gebrauch tauglichen Zustand zu übergeben und zu erhalten.\nOR Art. 259a: Der Mieter ist zur Behebung von kleinen Mängeln verpflichtet, die im Laufe des Mietverhältnisses durch gewöhnlichen Unterhalt entstehen.",
         link: ""
       },
-      recommendation: "Text prüfen und allenfalls abändern: „unabhängig von der Ursache des Schadens" sollte gestrichen oder präzisiert werden, da der Vermieter für nicht durch den Mieter verursachte Schäden aufkommen muss. Im Zweifel Anpassung verlangen."
+      recommendation: "Text prüfen und allenfalls abändern: \"unabhängig von der Ursache des Schadens\" sollte gestrichen oder präzisiert werden, da der Vermieter für nicht durch den Mieter verursachte Schäden aufkommen muss. Im Zweifel Anpassung verlangen."
     },
     {
       id: "clause-7",
