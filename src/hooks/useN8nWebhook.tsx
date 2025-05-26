@@ -1,4 +1,3 @@
-
 import { useState, useCallback } from 'react';
 import { useToast } from '@/components/ui/use-toast';
 import { parseClausesFromText } from '../utils/clauseParser';
@@ -15,7 +14,7 @@ export function useN8nWebhook() {
 
   // Get the stored webhook URL or use the test URL as fallback
   const storedWebhookUrl = localStorage.getItem('n8nWebhookUrl');
-  const webhookUrl = storedWebhookUrl || "https://vertrags.app.n8n.cloud/webhook-test/Vertrags-analyse";
+  const webhookUrl = storedWebhookUrl || "https://vertrags.app.n8n.cloud/webhook-test/3277c1f9-d2d0-48e5-b4b8-2cb84381f86e";
   
   console.log("Using webhook URL:", webhookUrl);
 
