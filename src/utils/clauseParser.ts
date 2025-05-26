@@ -16,8 +16,7 @@ export function parseClausesFromText(responseText: string): AnalysisResult {
 
   const clauses: AnalysisResult['clauses'] = [];
   
-  // Verbesserte Klausel-Trennung: Split by ### followed by "Klausel" and then by ---
-  // First, let's split by --- to get individual clause sections
+  // Verbesserte Klausel-Trennung mit optimierten Regex-Patterns für deutsches Format
   const sections = responseText.split(/\n---\n/).filter(section => {
     const trimmed = section.trim();
     return trimmed.length > 0 && trimmed.includes('###');
@@ -35,7 +34,7 @@ export function parseClausesFromText(responseText: string): AnalysisResult {
     
     console.log(`Gefundener Titel: "${title}"`);
     
-    // VERBESSERTE REGEX-MUSTER für deutsches Format
+    // OPTIMIERTE REGEX-MUSTER für deutsches Format
     
     // 1. Klauseltext-Extraktion - zwischen **Klauseltext** und **Analyse**
     const textPattern = /\*\*Klauseltext\*\*\s*\n([\s\S]*?)(?=\n\*\*Analyse\*\*)/;
@@ -81,7 +80,7 @@ export function parseClausesFromText(responseText: string): AnalysisResult {
     const lawRefText = lawRefMatch ? lawRefMatch[1].trim() : '';
     const recommendation = recommendationMatch ? recommendationMatch[1].trim() : '';
     
-    // VERBESSERTE Risiko-Klassifizierung für exakte Übereinstimmung
+    // PRÄZISE Risiko-Klassifizierung für exakte Übereinstimmung
     let risk: 'niedrig' | 'mittel' | 'hoch' | 'Rechtskonform' | 'Rechtlich fraglich' | 'Rechtlich unzulässig';
     
     const riskLower = extractedRisk.toLowerCase().trim();
@@ -145,30 +144,22 @@ export function parseClausesFromText(responseText: string): AnalysisResult {
     console.warn("Keine Klauseln mit Standard-Methode gefunden, versuche Fallback-Extraktion");
     
     try {
-      // Einfache Regex für eine Struktur wie "### Klausel X"
-      const fallbackSections = responseText.split(/###\s+/).filter(Boolean);
+      // Fallback: Erstelle eine einzelne Klausel mit dem gesamten Text
+      const fallbackClause = {
+        id: 'clause-fallback',
+        title: 'Vollständige Analyse',
+        text: responseText.substring(0, 500) + (responseText.length > 500 ? '...' : ''),
+        analysis: 'Die Analyse konnte nicht automatisch strukturiert werden. Bitte überprüfen Sie den vollständigen Text manuell.',
+        risk: 'Rechtlich fraglich' as const,
+        lawReference: {
+          text: 'Automatische Extraktion fehlgeschlagen',
+          link: ''
+        },
+        recommendation: 'Manuelle Überprüfung durch einen Rechtsexperten empfohlen'
+      };
       
-      fallbackSections.forEach((section, index) => {
-        const lines = section.split('\n');
-        const title = lines[0].trim();
-        
-        if (title) {
-          clauses.push({
-            id: `clause-${index + 1}`,
-            title: title || `Klausel ${index + 1}`,
-            text: section.length > title.length ? section.substring(title.length).trim() : '[Klauseltext konnte nicht extrahiert werden]',
-            analysis: 'Automatische Analyse nicht verfügbar',
-            risk: 'Rechtlich fraglich',
-            lawReference: {
-              text: 'Keine gesetzliche Referenz verfügbar',
-              link: ''
-            },
-            recommendation: 'Manuelle Überprüfung empfohlen'
-          });
-        }
-      });
-      
-      console.log(`Fallback-Extraktion: ${clauses.length} Klauseln gefunden.`);
+      clauses.push(fallbackClause);
+      console.log(`Fallback-Klausel erstellt.`);
     } catch (e) {
       console.error("Fallback-Klausel-Extraktion fehlgeschlagen:", e);
       throw new Error("Keine Klauseln konnten in der Antwort identifiziert werden");

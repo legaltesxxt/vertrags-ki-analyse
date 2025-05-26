@@ -36,7 +36,9 @@ export function useN8nWebhook() {
       const formData = new FormData();
       formData.append('file', file);
       
-      console.log(`Senden von ${file.name} an n8n Webhook: ${webhookUrl}`);
+      console.log(`=== SENDING TO WEBHOOK ===`);
+      console.log(`File: ${file.name} (${file.size} bytes)`);
+      console.log(`Webhook URL: ${webhookUrl}`);
       
       // Hier wird die tatsächliche API-Anfrage an n8n gesendet
       const response = await fetch(webhookUrl, {
@@ -44,8 +46,13 @@ export function useN8nWebhook() {
         body: formData,
       });
       
+      console.log(`=== WEBHOOK RESPONSE ===`);
+      console.log(`Status: ${response.status} ${response.statusText}`);
+      console.log(`Headers:`, Object.fromEntries(response.headers.entries()));
+      
       if (!response.ok) {
-        const errorMsg = `HTTP Error: ${response.status} - Verbindung zum Server fehlgeschlagen`;
+        const errorMsg = `HTTP Error: ${response.status} - ${response.statusText}`;
+        console.error("HTTP Error details:", errorMsg);
         setError(errorMsg);
         setErrorTimeStamp(Date.now());
         throw new Error(errorMsg);
@@ -53,15 +60,18 @@ export function useN8nWebhook() {
       
       // Prüfe, ob die Antwort JSON ist
       const contentType = response.headers.get('content-type');
+      console.log(`Content-Type: ${contentType}`);
       
       if (contentType && contentType.includes('application/json')) {
         // Wenn es JSON ist, parsen wir es als JSON
         const data = await response.json();
-        console.log("JSON-Antwort vom Webhook erhalten:", data);
+        console.log("=== JSON RESPONSE PARSED ===");
+        console.log("Full JSON response:", data);
         
         // Prüfen, ob die Antwort eine leere Analyse enthält
         if (!data || (Array.isArray(data) && (!data.length || !data[0]?.output))) {
           const errorMsg = "Keine gültige Analyse vom Server erhalten";
+          console.error("Empty analysis error:", { data, isArray: Array.isArray(data), length: data?.length });
           setError(errorMsg);
           setErrorTimeStamp(Date.now());
           return { 
@@ -72,23 +82,27 @@ export function useN8nWebhook() {
         
         // Protokolliere die genaue Struktur der JSON-Antwort für bessere Fehleranalyse
         if (Array.isArray(data) && data.length > 0 && data[0].output) {
-          console.log("Webhook Response Format:", {
+          console.log("=== VALID JSON RESPONSE STRUCTURE ===");
+          console.log("Response analysis:", {
             isArray: Array.isArray(data),
             length: data.length,
-            firstItem: data[0],
+            firstItemKeys: Object.keys(data[0]),
             hasOutput: !!data[0].output,
             outputLength: data[0].output?.length,
-            outputSample: data[0].output?.substring(0, 200) + "..."
+            outputPreview: data[0].output?.substring(0, 300) + "..."
           });
           
-          // Check for legal references in the output to debug
-          const hasLawRefs = data[0].output.includes("**Gesetzliche Referenz**") || 
-                             data[0].output.includes("**Gesetz**") || 
-                             data[0].output.includes("**Rechtsgrundlage**");
+          // Check for specific content indicators
+          const output = data[0].output;
+          const hasClauseHeaders = output.includes("### Klausel") || output.includes("###");
+          const hasLawRefs = output.includes("**Gesetzliche Referenz**");
+          const hasRiskAssessment = output.includes("**Risiko-Einstufung**");
           
-          console.log("Legal reference check:", {
+          console.log("Content indicators:", {
+            hasClauseHeaders,
             hasLawRefs,
-            includesQuotes: data[0].output.includes('"') || data[0].output.includes('„')
+            hasRiskAssessment,
+            sectionCount: (output.match(/###/g) || []).length
           });
           
           // Reset error state on successful response
@@ -104,7 +118,9 @@ export function useN8nWebhook() {
       } else {
         // Andernfalls versuchen wir, die Antwort als Text zu behandeln
         const responseText = await response.text();
-        console.log("Text-Antwort vom Webhook erhalten:", responseText);
+        console.log("=== TEXT RESPONSE ===");
+        console.log("Text response length:", responseText.length);
+        console.log("Text response preview:", responseText.substring(0, 300));
         
         if (!responseText || responseText.trim() === "") {
           const errorMsg = "Leere Antwort vom Server erhalten";
@@ -129,9 +145,10 @@ export function useN8nWebhook() {
       
     } catch (error) {
       const errorMsg = String(error);
+      console.error("=== WEBHOOK ERROR ===");
+      console.error("Error details:", error);
       setError(errorMsg);
       setErrorTimeStamp(Date.now());
-      console.error("Fehler beim Senden zum n8n Webhook:", errorMsg);
       return { success: false, error: errorMsg };
     } finally {
       setIsLoading(false);

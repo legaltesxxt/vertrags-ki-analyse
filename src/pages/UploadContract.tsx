@@ -25,26 +25,43 @@ const UploadContract = () => {
   const handleFileSelected = useCallback(async (file: File) => {
     setSelectedFile(file);
     
+    console.log("=== FILE UPLOAD START ===");
+    console.log("Selected file:", file.name, file.size, "bytes");
+    
     const response = await sendToN8n(file);
+    
+    console.log("=== WEBHOOK RESPONSE RECEIVED ===");
+    console.log("Response success:", response.success);
+    console.log("Response data:", response.data);
       
     if (response.success && response.data) {
       console.log("Webhook response received in UploadContract:", response.data);
       
-      // Parse the response into structured analysis result
+      // Handle JSON array response format
       if (Array.isArray(response.data) && response.data.length > 0 && response.data[0].output) {
         const outputText = response.data[0].output;
-        console.log("Raw output text to parse in UploadContract:", outputText);
+        console.log("=== EXTRACTED OUTPUT TEXT ===");
+        console.log("Output text length:", outputText.length);
+        console.log("Output text preview:", outputText.substring(0, 500));
         
         try {
-          // Use the unified parsing logic from clauseParser
+          // Use the parsing logic from clauseParser
           const analysisResult = parseClausesFromText(outputText);
           
-          console.log("Structured analysis result in UploadContract:", analysisResult);
+          console.log("=== PARSING SUCCESSFUL ===");
+          console.log("Structured analysis result:", analysisResult);
+          console.log("Number of clauses:", analysisResult.clauses.length);
+          
           if (analysisResult.clauses.length > 0) {
-            console.log("First clause text length:", analysisResult.clauses[0]?.text?.length);
-            console.log("First clause text preview:", analysisResult.clauses[0]?.text?.substring(0, 200));
+            console.log("First clause preview:", {
+              id: analysisResult.clauses[0].id,
+              title: analysisResult.clauses[0].title,
+              textLength: analysisResult.clauses[0].text.length,
+              risk: analysisResult.clauses[0].risk
+            });
           }
 
+          // Navigate to results page with structured data
           navigate('/analyse-ergebnisse', { 
             state: { 
               analysisResult,
@@ -53,15 +70,62 @@ const UploadContract = () => {
           });
           return;
         } catch (error) {
+          console.error("=== PARSING ERROR ===");
           console.error("Error parsing clauses in UploadContract:", error);
-          toast({
-            title: "Fehler bei der Analyse",
-            description: "Die Analyseergebnisse konnten nicht korrekt verarbeitet werden.",
-            variant: "destructive",
+          
+          // Fallback: Navigate with raw text if parsing fails
+          console.log("Using fallback: navigating with raw output text");
+          navigate('/analyse-ergebnisse', { 
+            state: { 
+              analysisOutput: outputText
+            }
           });
+          
+          toast({
+            title: "Teilweise Analyse verfügbar",
+            description: "Die Analyseergebnisse sind verfügbar, konnten aber nicht vollständig strukturiert werden.",
+            variant: "default",
+          });
+          return;
         }
       }
+      
+      // Handle other response formats
+      if (response.data.rawText) {
+        console.log("=== RAW TEXT RESPONSE ===");
+        console.log("Raw text length:", response.data.rawText.length);
+        
+        try {
+          const analysisResult = parseClausesFromText(response.data.rawText);
+          navigate('/analyse-ergebnisse', { 
+            state: { 
+              analysisResult,
+              analysisOutput: response.data.rawText
+            }
+          });
+          return;
+        } catch (error) {
+          console.error("Error parsing raw text:", error);
+          navigate('/analyse-ergebnisse', { 
+            state: { 
+              analysisOutput: response.data.rawText
+            }
+          });
+          return;
+        }
+      }
+      
+      // If no recognizable format, show error
+      console.error("=== UNRECOGNIZED RESPONSE FORMAT ===");
+      console.error("Response data:", response.data);
+      toast({
+        title: "Unbekanntes Antwortformat",
+        description: "Die Antwort vom Server konnte nicht verarbeitet werden.",
+        variant: "destructive",
+      });
+      
     } else {
+      console.error("=== WEBHOOK ERROR ===");
       console.error("Error sending file to n8n:", response.error);
       toast({
         title: "Fehler bei der Verarbeitung",
