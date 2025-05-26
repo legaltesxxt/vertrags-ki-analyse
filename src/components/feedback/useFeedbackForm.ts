@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -11,7 +10,7 @@ export const useFeedbackForm = () => {
   const { toast } = useToast();
   
   // Updated webhook URL für das Feedback-Formular
-  const webhookUrl = 'https://vertrags.app.n8n.cloud/webhook/feedback-form';
+  const webhookUrl = 'https://vertrags.app.n8n.cloud/webhook-test/3277c1f9-d2d0-48e5-b4b8-2cb84381f86e';
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
