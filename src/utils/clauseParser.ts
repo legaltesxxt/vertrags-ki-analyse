@@ -5,141 +5,183 @@ import { AnalysisResult } from "../types/analysisTypes";
  * Parst eine Textantwort vom Webhook in ein strukturiertes AnalysisResult-Objekt
  */
 export function parseClausesFromText(responseText: string): AnalysisResult {
-  console.log("Verarbeite Text-Antwort vom Webhook:", responseText);
+  console.log("=== CLAUSE PARSER START ===");
+  console.log("Input text length:", responseText.length);
+  console.log("Input text preview:", responseText.substring(0, 300));
   
   // Überprüfen, ob es sich um eine leere oder ungültige Antwort handelt
   if (!responseText || responseText.trim() === "") {
     throw new Error("Die erhaltene Antwort ist leer oder ungültig");
   }
 
-  // Vollständige Klauselextraktion mit verbesserten Regex-Mustern
   const clauses: AnalysisResult['clauses'] = [];
   
-  // Zuerst versuchen wir, die Klauseln durch die ### Überschriften zu trennen
-  const sections = responseText.split(/###\s+/).filter(Boolean);
-  console.log(`Gefundene Abschnitte: ${sections.length}`);
+  // Verbesserte Klausel-Trennung: Split by ### followed by "Klausel" and then by ---
+  // First, let's split by --- to get individual clause sections
+  const sections = responseText.split(/\n---\n/).filter(section => {
+    const trimmed = section.trim();
+    return trimmed.length > 0 && trimmed.includes('###');
+  });
   
-  if (sections.length > 0) {
-    sections.forEach((section, index) => {
-      // Extrahiere den Titel (erste Zeile)
-      const lines = section.split('\n');
-      const title = lines[0].trim();
-      
-      console.log(`Verarbeite Abschnitt ${index + 1}: "${title}"`);
-      console.log(`Abschnittstext (erste 100 Zeichen): ${section.substring(0, 100)}...`);
-      
-      // VERBESSERTE REGEX-MUSTER mit genaueren Grenzen
-      // 1. Verbesserte Klauseltext-Extraktion
-      const textMatch = section.match(/\*\*(?:Klauseltext|Text)\*\*(?:\s*\n|\s*\:\s*)([\s\S]*?)(?=\n\*\*(?:Analyse|Bewertung)|\n\n\*\*(?:Analyse|Bewertung)|\s*$)/m);
-      
-      // 2. Verbesserte Analyse-Extraktion
-      const analysisMatch = section.match(/\*\*(?:Analyse|Bewertung)\*\*(?:\s*\n|\s*\:\s*)([\s\S]*?)(?=\n\*\*(?:Risiko-Einstufung|Risiko|Risikobewertung)|\n\n\*\*(?:Risiko-Einstufung|Risiko|Risikobewertung)|\s*$)/m);
-      
-      // 3. Verbesserte Risiko-Extraktion
-      const riskMatch = section.match(/\*\*(?:Risiko-Einstufung|Risiko|Risikobewertung)\*\*(?:\s*\n|\s*\:\s*)([\s\S]*?)(?=\n\*\*(?:Gesetzliche Referenz|Gesetz|Rechtsgrundlage)|\n\n\*\*(?:Gesetzliche Referenz|Gesetz|Rechtsgrundlage)|\s*$)/m);
-      
-      // 4. Verbesserte gesetzliche Referenz-Extraktion
-      const lawRefMatch = section.match(/\*\*(?:Gesetzliche Referenz|Gesetz|Rechtsgrundlage)\*\*(?:\s*\n|\s*\:\s*)([\s\S]*?)(?=\n\*\*(?:Empfehlung|Handlungsbedarf|Handlungsempfehlung)|\n\n\*\*(?:Empfehlung|Handlungsbedarf|Handlungsempfehlung)|\n---|\n\n---|\s*$)/m);
-      
-      // 5. Verbesserte Empfehlungs-Extraktion
-      const recommendationMatch = section.match(/\*\*(?:Empfehlung|Handlungsbedarf|Handlungsempfehlung)\*\*(?:\s*\n|\s*\:\s*)([\s\S]*?)(?=\n---|\n\n---|\s*$)/m);
-      
-      // Detailliertes Logging zur Fehleranalyse
-      console.log(`Klausel ${index + 1} - Extraktionsergebnisse:`, {
-        title,
-        textExtracted: !!textMatch,
-        textLength: textMatch ? textMatch[1].trim().length : 0,
-        textPreview: textMatch ? `${textMatch[1].trim().substring(0, 100)}${textMatch[1].trim().length > 100 ? '...' : ''}` : 'Nicht gefunden',
-        analysisExtracted: !!analysisMatch,
-        riskExtracted: !!riskMatch,
-        riskValue: riskMatch ? riskMatch[1].trim() : 'Nicht gefunden',
-        lawRefExtracted: !!lawRefMatch,
-        lawRefLength: lawRefMatch ? lawRefMatch[1].trim().length : 0,
-        recommendationExtracted: !!recommendationMatch
-      });
-      
-      // Extrahierte Werte einsetzen oder Fallbacks verwenden
-      const text = textMatch ? textMatch[1].trim() : '';
-      const analysis = analysisMatch ? analysisMatch[1].trim() : '';
-      const extractedRisk = riskMatch ? riskMatch[1].trim() : 'Rechtskonform';
-      const lawRefText = lawRefMatch ? lawRefMatch[1].trim() : '';
-      const recommendation = recommendationMatch ? recommendationMatch[1].trim() : '';
-      
-      // Risiko-Klassifizierung
-      let risk: 'niedrig' | 'mittel' | 'hoch' | 'Rechtskonform' | 'Rechtlich fraglich' | 'Rechtlich unzulässig';
-      
-      if (extractedRisk.toLowerCase().includes('unzulässig') || 
-          extractedRisk.toLowerCase().includes('hoch')) {
-        risk = 'Rechtlich unzulässig';
-      } else if (extractedRisk.toLowerCase().includes('fraglich') || 
-                 extractedRisk.toLowerCase().includes('mittel') ||
-                 extractedRisk.toLowerCase().includes('zu prüfen')) {
-        risk = 'Rechtlich fraglich';
-      } else {
-        risk = 'Rechtskonform';
-      }
-      
-      // Klausel zum Ergebnis hinzufügen
-      if (title || text) { // Nur hinzufügen, wenn mindestens Titel oder Text vorhanden ist
-        clauses.push({
-          id: `clause-${index + 1}`,
-          title: title || `Klausel ${index + 1}`,
-          text,
-          analysis,
-          risk,
-          lawReference: {
-            text: lawRefText,
-            link: ''
-          },
-          recommendation
-        });
-      }
+  console.log(`Gefundene Abschnitte nach --- Trennung: ${sections.length}`);
+  
+  sections.forEach((section, index) => {
+    console.log(`\n=== VERARBEITE ABSCHNITT ${index + 1} ===`);
+    console.log(`Abschnitts-Preview: ${section.substring(0, 200)}...`);
+    
+    // Extrahiere den Titel nach ###
+    const titleMatch = section.match(/###\s+(.+?)(?:\n|$)/);
+    const title = titleMatch ? titleMatch[1].trim() : `Klausel ${index + 1}`;
+    
+    console.log(`Gefundener Titel: "${title}"`);
+    
+    // VERBESSERTE REGEX-MUSTER für deutsches Format
+    
+    // 1. Klauseltext-Extraktion - zwischen **Klauseltext** und **Analyse**
+    const textPattern = /\*\*Klauseltext\*\*\s*\n([\s\S]*?)(?=\n\*\*Analyse\*\*)/;
+    const textMatch = section.match(textPattern);
+    
+    // 2. Analyse-Extraktion - zwischen **Analyse** und **Risiko-Einstufung**
+    const analysisPattern = /\*\*Analyse\*\*\s*\n([\s\S]*?)(?=\n\*\*Risiko-Einstufung\*\*)/;
+    const analysisMatch = section.match(analysisPattern);
+    
+    // 3. Risiko-Extraktion - zwischen **Risiko-Einstufung** und **Gesetzliche Referenz**
+    const riskPattern = /\*\*Risiko-Einstufung\*\*\s*\n([\s\S]*?)(?=\n\*\*Gesetzliche Referenz\*\*)/;
+    const riskMatch = section.match(riskPattern);
+    
+    // 4. Gesetzliche Referenz-Extraktion - zwischen **Gesetzliche Referenz** und **Empfehlung**
+    const lawRefPattern = /\*\*Gesetzliche Referenz\*\*\s*\n([\s\S]*?)(?=\n\*\*Empfehlung\*\*)/;
+    const lawRefMatch = section.match(lawRefPattern);
+    
+    // 5. Empfehlung-Extraktion - nach **Empfehlung** bis Ende des Abschnitts
+    const recommendationPattern = /\*\*Empfehlung\*\*\s*\n([\s\S]*?)(?=\n---|\s*$)/;
+    const recommendationMatch = section.match(recommendationPattern);
+    
+    // Detailliertes Logging für Debugging
+    console.log(`Klausel ${index + 1} - Extraktionsergebnisse:`, {
+      title,
+      textExtracted: !!textMatch,
+      textLength: textMatch ? textMatch[1].trim().length : 0,
+      textPreview: textMatch ? `${textMatch[1].trim().substring(0, 100)}${textMatch[1].trim().length > 100 ? '...' : ''}` : 'Nicht gefunden',
+      analysisExtracted: !!analysisMatch,
+      analysisLength: analysisMatch ? analysisMatch[1].trim().length : 0,
+      riskExtracted: !!riskMatch,
+      riskValue: riskMatch ? riskMatch[1].trim() : 'Nicht gefunden',
+      lawRefExtracted: !!lawRefMatch,
+      lawRefLength: lawRefMatch ? lawRefMatch[1].trim().length : 0,
+      lawRefPreview: lawRefMatch ? `${lawRefMatch[1].trim().substring(0, 100)}${lawRefMatch[1].trim().length > 100 ? '...' : ''}` : 'Nicht gefunden',
+      recommendationExtracted: !!recommendationMatch,
+      recommendationLength: recommendationMatch ? recommendationMatch[1].trim().length : 0
     });
     
-    console.log(`Erfolgreich ${clauses.length} Klauseln extrahiert.`);
-  } else {
-    throw new Error("Keine Klauselabschnitte in der Antwort gefunden");
-  }
-  
-  // Wenn keine Klauseln gefunden wurden, versuchen wir eine alternative Methode
-  if (clauses.length === 0) {
-    console.warn("Keine Klauseln mit Standard-Methode gefunden, versuche alternative Extraktion");
+    // Extrahierte Werte verarbeiten
+    const text = textMatch ? textMatch[1].trim() : '';
+    const analysis = analysisMatch ? analysisMatch[1].trim() : '';
+    const extractedRisk = riskMatch ? riskMatch[1].trim() : 'Rechtskonform';
+    const lawRefText = lawRefMatch ? lawRefMatch[1].trim() : '';
+    const recommendation = recommendationMatch ? recommendationMatch[1].trim() : '';
     
-    // Fallback-Methode: Versuch einer einfachen Extraktion von Klauseln
+    // VERBESSERTE Risiko-Klassifizierung für exakte Übereinstimmung
+    let risk: 'niedrig' | 'mittel' | 'hoch' | 'Rechtskonform' | 'Rechtlich fraglich' | 'Rechtlich unzulässig';
+    
+    const riskLower = extractedRisk.toLowerCase().trim();
+    console.log(`Risiko-Text (lowercase): "${riskLower}"`);
+    
+    if (riskLower === 'rechtlich unzulässig' || riskLower.includes('unzulässig')) {
+      risk = 'Rechtlich unzulässig';
+    } else if (riskLower === 'rechtlich fraglich' || riskLower.includes('fraglich')) {
+      risk = 'Rechtlich fraglich';
+    } else if (riskLower === 'rechtskonform' || riskLower.includes('konform')) {
+      risk = 'Rechtskonform';
+    } else if (riskLower === 'hoch' || riskLower.includes('hohes risiko')) {
+      risk = 'hoch';
+    } else if (riskLower === 'mittel' || riskLower.includes('mittleres risiko')) {
+      risk = 'mittel';
+    } else if (riskLower === 'niedrig' || riskLower.includes('niedriges risiko')) {
+      risk = 'niedrig';
+    } else {
+      // Fallback auf Rechtskonform
+      risk = 'Rechtskonform';
+      console.log(`Unbekanntes Risiko-Format: "${extractedRisk}", verwende Fallback: ${risk}`);
+    }
+    
+    console.log(`Finales Risiko: ${risk}`);
+    
+    // Klausel erstellen, wenn mindestens Titel oder Text vorhanden ist
+    if (title && (text || analysis)) {
+      const clause = {
+        id: `clause-${index + 1}`,
+        title: title || `Klausel ${index + 1}`,
+        text,
+        analysis,
+        risk,
+        lawReference: {
+          text: lawRefText,
+          link: ''
+        },
+        recommendation
+      };
+      
+      clauses.push(clause);
+      console.log(`Klausel ${index + 1} erfolgreich erstellt:`, {
+        id: clause.id,
+        title: clause.title,
+        textLength: clause.text.length,
+        analysisLength: clause.analysis.length,
+        risk: clause.risk,
+        lawRefLength: clause.lawReference.text.length,
+        recommendationLength: clause.recommendation.length
+      });
+    } else {
+      console.log(`Klausel ${index + 1} übersprungen - unvollständige Daten`);
+    }
+  });
+  
+  console.log(`\n=== PARSING ABGESCHLOSSEN ===`);
+  console.log(`Erfolgreich ${clauses.length} Klauseln extrahiert.`);
+  
+  // Wenn keine Klauseln gefunden wurden, Fallback-Methode versuchen
+  if (clauses.length === 0) {
+    console.warn("Keine Klauseln mit Standard-Methode gefunden, versuche Fallback-Extraktion");
+    
     try {
       // Einfache Regex für eine Struktur wie "### Klausel X"
-      const clauseRegex = /#+\s+(.*?)(?=\n#+\s+|$)/gs;
-      let match;
-      let i = 0;
+      const fallbackSections = responseText.split(/###\s+/).filter(Boolean);
       
-      while ((match = clauseRegex.exec(responseText)) !== null) {
-        i++;
-        const clauseTitle = match[1].trim();
+      fallbackSections.forEach((section, index) => {
+        const lines = section.split('\n');
+        const title = lines[0].trim();
         
-        clauses.push({
-          id: `clause-${i}`,
-          title: clauseTitle || `Klausel ${i}`,
-          text: `[Klauseltext konnte nicht extrahiert werden]`,
-          analysis: '',
-          risk: 'Rechtlich fraglich', // Default-Risiko, wenn wir unsicher sind
-          lawReference: {
-            text: '',
-            link: ''
-          },
-          recommendation: ''
-        });
-      }
+        if (title) {
+          clauses.push({
+            id: `clause-${index + 1}`,
+            title: title || `Klausel ${index + 1}`,
+            text: section.length > title.length ? section.substring(title.length).trim() : '[Klauseltext konnte nicht extrahiert werden]',
+            analysis: 'Automatische Analyse nicht verfügbar',
+            risk: 'Rechtlich fraglich',
+            lawReference: {
+              text: 'Keine gesetzliche Referenz verfügbar',
+              link: ''
+            },
+            recommendation: 'Manuelle Überprüfung empfohlen'
+          });
+        }
+      });
       
-      console.log(`Alternative Extraktion: ${clauses.length} Klauseln gefunden.`);
+      console.log(`Fallback-Extraktion: ${clauses.length} Klauseln gefunden.`);
     } catch (e) {
-      console.error("Alternative Klausel-Extraktion fehlgeschlagen:", e);
+      console.error("Fallback-Klausel-Extraktion fehlgeschlagen:", e);
       throw new Error("Keine Klauseln konnten in der Antwort identifiziert werden");
     }
   }
   
   // Gesamtrisiko bestimmen
-  const unzulassigCount = clauses.filter(c => c.risk === 'Rechtlich unzulässig' || c.risk === 'hoch').length;
-  const fraglichCount = clauses.filter(c => c.risk === 'Rechtlich fraglich' || c.risk === 'mittel').length;
+  const unzulassigCount = clauses.filter(c => 
+    c.risk === 'Rechtlich unzulässig' || c.risk === 'hoch'
+  ).length;
+  const fraglichCount = clauses.filter(c => 
+    c.risk === 'Rechtlich fraglich' || c.risk === 'mittel'
+  ).length;
   
   let overallRisk: 'niedrig' | 'mittel' | 'hoch' | 'Rechtskonform' | 'Rechtlich fraglich' | 'Rechtlich unzulässig';
   
@@ -160,7 +202,10 @@ export function parseClausesFromText(responseText: string): AnalysisResult {
     unzulassigCount === 0 && fraglichCount === 0 ? 'Alle Klauseln sind rechtskonform. ' : ''
   }`;
   
-  console.log(`Analyse abgeschlossen. Gesamtrisiko: ${overallRisk}, ${clauses.length} Klauseln gefunden.`);
+  console.log(`\n=== FINAL RESULT ===`);
+  console.log(`Gesamtrisiko: ${overallRisk}`);
+  console.log(`Zusammenfassung: ${summary}`);
+  console.log("=== CLAUSE PARSER END ===\n");
 
   return {
     clauses,
