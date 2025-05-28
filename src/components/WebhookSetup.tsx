@@ -7,7 +7,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Settings } from 'lucide-react';
 
-const DEFAULT_WEBHOOK_URL = "https://vertrags.app.n8n.cloud/webhook-test/3277c1f9-d2d0-48e5-b4b8-2cb84381f86e";
+const DEFAULT_WEBHOOK_URL = "https://vertrags.app.n8n.cloud/webhook/3277c1f9-d2d0-48e5-b4b8-2cb84381f86e";
 
 const WebhookSetup: React.FC = () => {
   const [webhookUrl, setWebhookUrl] = useState('');
