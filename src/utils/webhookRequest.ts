@@ -1,4 +1,3 @@
-
 import { WebhookResponse } from '../types/webhookTypes';
 import { WEBHOOK_CONFIG } from './webhookConfig';
 import { createWebhookError } from './webhookErrorHandler';
@@ -79,6 +78,9 @@ export async function sendFileToWebhook(
       };
     }
     
+    // Validate response format before calling onSuccess
+    let hasValidData = false;
+    
     // Try to parse as JSON first
     try {
       const jsonData = JSON.parse(responseText);
@@ -95,50 +97,47 @@ export async function sendFileToWebhook(
         if (firstItem.output && typeof firstItem.output === 'string' && firstItem.output.trim()) {
           console.log("=== VALID JSON ARRAY WITH OUTPUT FOUND ===");
           console.log("Output preview:", firstItem.output.substring(0, 300));
-          
-          // Reset error state on successful response
-          onSuccess();
-          
-          // Return the raw JSON text for parsing by clauseParser
-          return { 
-            success: true, 
-            data: responseText // Pass the raw JSON string
-          };
+          hasValidData = true;
         }
       }
       
       // Handle other JSON formats
       if (jsonData && !Array.isArray(jsonData) && (jsonData.output || jsonData.rawText)) {
         console.log("=== NON-ARRAY JSON WITH CONTENT ===");
-        onSuccess();
-        return { 
-          success: true, 
-          data: responseText
-        };
+        hasValidData = true;
       }
       
-      // If JSON doesn't contain expected data
-      console.error("=== JSON WITHOUT EXPECTED CONTENT ===");
-      const errorMsg = "JSON-Antwort enthält keine erwarteten Daten";
+    } catch (jsonError) {
+      // Not valid JSON, check if it looks like valid text content
+      console.log("=== NOT JSON, CHECKING AS PLAIN TEXT ===");
+      console.log("JSON parse error:", jsonError);
+      
+      // Basic validation for plain text response
+      if (responseText.trim().length > 100 && responseText.includes('###')) {
+        console.log("=== VALID PLAIN TEXT FORMAT DETECTED ===");
+        hasValidData = true;
+      }
+    }
+    
+    // Only call onSuccess if we have valid, parseable data
+    if (hasValidData) {
+      console.log("=== VALID DATA CONFIRMED - DO NOT CALL onSuccess YET ===");
+      console.log("Success will be called after successful parsing in useN8nWebhook");
+    } else {
+      const errorMsg = "Antwort enthält keine gültigen, verarbeitbaren Daten";
+      console.error("=== INVALID RESPONSE FORMAT ===");
       onError(errorMsg, Date.now(), false);
       return { 
         success: false, 
         error: errorMsg 
       };
-      
-    } catch (jsonError) {
-      // Not valid JSON, treat as plain text
-      console.log("=== NOT JSON, TREATING AS PLAIN TEXT ===");
-      console.log("JSON parse error:", jsonError);
-      
-      // Reset error state on successful response
-      onSuccess();
-      
-      return {
-        success: true,
-        data: responseText,
-      };
     }
+    
+    // Return success but don't call onSuccess yet - that will happen after parsing
+    return {
+      success: true,
+      data: responseText,
+    };
     
   } catch (error) {
     clearTimeout(timeoutId);

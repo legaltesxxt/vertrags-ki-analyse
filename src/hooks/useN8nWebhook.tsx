@@ -71,7 +71,7 @@ export function useN8nWebhook() {
     };
 
     const handleSuccess = () => {
-      console.log("=== SUCCESS HANDLER CALLED ===");
+      console.log("=== SUCCESS HANDLER CALLED - ANALYSIS COMPLETE ===");
       setError(null);
       setErrorTimeStamp(null);
       setIsLoading(false);
@@ -95,7 +95,12 @@ export function useN8nWebhook() {
           await new Promise(resolve => setTimeout(resolve, delay));
         }
 
-        const response = await sendFileToWebhook(file, webhookUrl, handleError, handleSuccess);
+        // Note: handleSuccess is NOT passed to webhookRequest anymore
+        // It will be called only after successful parsing
+        const response = await sendFileToWebhook(file, webhookUrl, handleError, () => {
+          console.log("=== WEBHOOK RESPONSE RECEIVED - STARTING PARSING ===");
+          // Don't call handleSuccess here - wait for parsing to complete
+        });
         
         if (response.success && response.data) {
           console.log("=== WEBHOOK SUCCESS - PARSING RESPONSE ===");
@@ -111,6 +116,8 @@ export function useN8nWebhook() {
             console.log("Number of clauses:", analysisResult.clauses.length);
             
             setAnalysisResult(analysisResult);
+            
+            // NOW call handleSuccess after successful parsing
             handleSuccess();
             
             return {
