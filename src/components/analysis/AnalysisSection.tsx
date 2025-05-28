@@ -52,11 +52,31 @@ const AnalysisSection: React.FC<AnalysisSectionProps> = ({
     return (
       <div className="bg-white rounded-xl shadow-sm p-8 border border-border/50 mb-10 animate-fade-in">
         <AnalysisProgress getAnalysisElapsedTime={getAnalysisElapsedTime} />
+        {webhookError && webhookError.includes('Erneuter Versuch') && (
+          <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-md text-blue-700">
+            <p className="text-sm font-medium">🔄 {webhookError}</p>
+            <p className="text-xs mt-1">Die Analyse läuft weiter im Hintergrund...</p>
+          </div>
+        )}
       </div>
     );
   }
 
   if (webhookError && !isAnalyzing) {
+    // Check if this is a retry message - if so, show different UI
+    const isRetryMessage = webhookError.includes('Erneuter Versuch');
+    
+    if (isRetryMessage) {
+      return (
+        <div className="bg-white rounded-xl shadow-sm p-8 border border-border/50 mb-10 animate-fade-in">
+          <div className="p-6 bg-blue-50 rounded-lg text-center">
+            <p className="text-blue-700 font-medium mb-2">🔄 {webhookError}</p>
+            <p className="text-blue-600 text-sm">Die Analyse läuft weiter im Hintergrund. Bitte warten Sie...</p>
+          </div>
+        </div>
+      );
+    }
+
     return (
       <div className="bg-white rounded-xl shadow-sm p-8 border border-border/50 mb-10 animate-fade-in">
         <Alert variant="destructive" className="mb-6">
@@ -77,7 +97,7 @@ const AnalysisSection: React.FC<AnalysisSectionProps> = ({
             <li>Das PDF-Format konnte nicht korrekt verarbeitet werden</li>
             <li>Der Vertrag enthält Inhalte, die nicht erkannt werden konnten</li>
             <li>Es besteht ein temporäres Verbindungsproblem</li>
-            <li>Die Analyse dauerte zu lange (über 10 Minuten)</li>
+            <li>Die Analyse dauerte zu lange (über 25 Minuten)</li>
           </ul>
           
           {remainingTime > 0 && (

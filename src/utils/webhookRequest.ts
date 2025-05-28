@@ -1,3 +1,4 @@
+
 import { WebhookResponse } from '../types/webhookTypes';
 import { WEBHOOK_CONFIG } from './webhookConfig';
 import { createWebhookError } from './webhookErrorHandler';
@@ -5,16 +6,16 @@ import { createWebhookError } from './webhookErrorHandler';
 export async function sendFileToWebhook(
   file: File, 
   webhookUrl: string,
-  onError: (error: string, timestamp: number) => void,
+  onError: (error: string, timestamp: number, isNetworkError?: boolean) => void,
   onSuccess: () => void
 ): Promise<WebhookResponse> {
   if (!webhookUrl) {
     const errorMsg = "Webhook URL ist nicht konfiguriert";
-    onError(errorMsg, Date.now());
+    onError(errorMsg, Date.now(), false);
     return { success: false, error: errorMsg };
   }
 
-  // Create AbortController with EXTENDED timeout (25 minutes for complex contracts)
+  // Create AbortController with 25 minute timeout
   const controller = new AbortController();
   const timeoutId = setTimeout(() => {
     console.log("=== TIMEOUT REACHED ===");
@@ -56,7 +57,10 @@ export async function sendFileToWebhook(
     if (!response.ok) {
       const errorMsg = `HTTP Error: ${response.status} - ${response.statusText}`;
       console.error("HTTP Error details:", errorMsg);
-      onError(errorMsg, Date.now());
+      
+      // Determine if this is a network error that should be retried
+      const isNetworkError = response.status >= 500 || response.status === 502 || response.status === 503 || response.status === 504;
+      onError(errorMsg, Date.now(), isNetworkError);
       throw new Error(errorMsg);
     }
     
@@ -68,7 +72,7 @@ export async function sendFileToWebhook(
     
     if (!responseText || responseText.trim() === "") {
       const errorMsg = "Leere Antwort vom Server erhalten";
-      onError(errorMsg, Date.now());
+      onError(errorMsg, Date.now(), false);
       return { 
         success: false, 
         error: errorMsg 
@@ -116,7 +120,7 @@ export async function sendFileToWebhook(
       // If JSON doesn't contain expected data
       console.error("=== JSON WITHOUT EXPECTED CONTENT ===");
       const errorMsg = "JSON-Antwort enthält keine erwarteten Daten";
-      onError(errorMsg, Date.now());
+      onError(errorMsg, Date.now(), false);
       return { 
         success: false, 
         error: errorMsg 
@@ -139,8 +143,18 @@ export async function sendFileToWebhook(
   } catch (error) {
     clearTimeout(timeoutId);
     
+    // Determine if this is a network error based on error type
+    const isNetworkError = error instanceof Error && (
+      error.name === 'AbortError' ||
+      error.message.includes('fetch') || 
+      error.message.includes('network') ||
+      error.message.includes('Failed to fetch') ||
+      error.message.includes('NetworkError') ||
+      error.message.includes('TypeError: Failed to fetch')
+    );
+    
     const errorMsg = createWebhookError(error, WEBHOOK_CONFIG.TIMEOUT_DURATION);
-    onError(errorMsg, Date.now());
+    onError(errorMsg, Date.now(), isNetworkError);
     return { success: false, error: errorMsg };
   }
 }
