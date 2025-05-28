@@ -1,4 +1,3 @@
-
 import { useState, useCallback } from 'react';
 import { useToast } from '@/components/ui/use-toast';
 import { parseClausesFromText } from '../utils/clauseParser';
@@ -29,22 +28,50 @@ export function useN8nWebhook() {
     setAnalysisStartTime(Date.now());
     setIsRetrying(false);
 
+    const isTemporaryError = (errorMsg: string): boolean => {
+      const temporaryIndicators = [
+        'Netzwerkfehler',
+        'Verbindung',
+        'Timeout',
+        'abgebrochen',
+        'Failed to fetch',
+        'NetworkError',
+        'Connection',
+        'ERR_NETWORK',
+        'ERR_INTERNET_DISCONNECTED',
+        'Load failed',
+        'Server nicht erreichbar'
+      ];
+      
+      return temporaryIndicators.some(indicator => 
+        errorMsg.toLowerCase().includes(indicator.toLowerCase())
+      );
+    };
+
     const handleError = (errorMsg: string, timestamp: number, isNetworkError: boolean = false) => {
       console.log("=== ERROR HANDLER CALLED ===");
       console.log("Error message:", errorMsg);
       console.log("Is network error:", isNetworkError);
+      console.log("Is temporary error:", isTemporaryError(errorMsg));
       
       setError(errorMsg);
       setErrorTimeStamp(timestamp);
       
-      // Only stop loading for non-network errors or final failures
-      if (!isNetworkError) {
+      // Only stop loading for truly final errors
+      const isTempError = isNetworkError || isTemporaryError(errorMsg);
+      if (!isTempError) {
+        console.log("=== STOPPING LOADING - FINAL ERROR ===");
         setIsLoading(false);
         setAnalysisStartTime(null);
+        setIsRetrying(false);
+      } else {
+        console.log("=== KEEPING LOADING ACTIVE - TEMPORARY ERROR ===");
+        // Keep loading active for temporary errors
       }
     };
 
     const handleSuccess = () => {
+      console.log("=== SUCCESS HANDLER CALLED ===");
       setError(null);
       setErrorTimeStamp(null);
       setIsLoading(false);
@@ -58,8 +85,14 @@ export function useN8nWebhook() {
           setIsRetrying(true);
           console.log(`=== RETRY ATTEMPT ${retryCount} ===`);
           
-          // Wait a bit before retrying
-          await new Promise(resolve => setTimeout(resolve, 5000));
+          // Show user we're retrying but keep analysis active
+          const retryMsg = `Verbindungsproblem erkannt. Erneuter Versuch ${retryCount}/5...`;
+          setError(retryMsg);
+          setErrorTimeStamp(Date.now());
+          
+          // Wait before retrying (progressive backoff)
+          const delay = Math.min(5000 + (retryCount - 1) * 2000, 15000);
+          await new Promise(resolve => setTimeout(resolve, delay));
         }
 
         const response = await sendFileToWebhook(file, webhookUrl, handleError, handleSuccess);
@@ -99,26 +132,25 @@ export function useN8nWebhook() {
             };
           }
         } else if (!response.success && response.error) {
-          // Check if this is a network/timeout error that we should retry
-          const isNetworkError = response.error.includes('Netzwerkfehler') || 
-                                response.error.includes('Verbindung') || 
-                                response.error.includes('Timeout') ||
-                                response.error.includes('abgebrochen');
+          // Enhanced error classification
+          const isNetworkError = isTemporaryError(response.error);
           
-          if (isNetworkError && retryCount < 3) {
-            console.log(`=== NETWORK ERROR - WILL RETRY (${retryCount + 1}/3) ===`);
+          if (isNetworkError && retryCount < 5) { // Increased max retries from 3 to 5
+            console.log(`=== NETWORK ERROR - WILL RETRY (${retryCount + 1}/5) ===`);
             console.log("Error:", response.error);
             
-            // Show user we're retrying
-            const retryMsg = `Verbindungsproblem erkannt. Erneuter Versuch ${retryCount + 1}/3...`;
-            handleError(retryMsg, Date.now(), true);
-            
-            // Retry the analysis
+            // Continue the analysis with retry message
             return attemptAnalysis(retryCount + 1);
           } else {
-            // Final error or non-network error
-            console.log("=== FINAL ERROR OR NON-NETWORK ERROR ===");
-            handleError(response.error, Date.now(), false);
+            // Final error or max retries reached
+            console.log("=== FINAL ERROR OR MAX RETRIES REACHED ===");
+            
+            let finalErrorMsg = response.error;
+            if (retryCount >= 5) {
+              finalErrorMsg = `Nach 5 Versuchen konnte die Verbindung nicht hergestellt werden. Letzter Fehler: ${response.error}`;
+            }
+            
+            handleError(finalErrorMsg, Date.now(), false);
             return response;
           }
         }
@@ -130,12 +162,18 @@ export function useN8nWebhook() {
         console.error("Unexpected error:", unexpectedError);
         
         const errorMsg = `Unerwarteter Fehler: ${unexpectedError instanceof Error ? unexpectedError.message : String(unexpectedError)}`;
-        handleError(errorMsg, Date.now(), false);
         
-        return {
-          success: false,
-          error: errorMsg
-        };
+        // Check if this is a temporary error that should be retried
+        if (isTemporaryError(errorMsg) && retryCount < 5) {
+          console.log(`=== UNEXPECTED BUT TEMPORARY ERROR - WILL RETRY (${retryCount + 1}/5) ===`);
+          return attemptAnalysis(retryCount + 1);
+        } else {
+          handleError(errorMsg, Date.now(), false);
+          return {
+            success: false,
+            error: errorMsg
+          };
+        }
       }
     };
 
