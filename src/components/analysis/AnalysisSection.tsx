@@ -15,6 +15,7 @@ interface AnalysisSectionProps {
   onReset: () => void;
   getRemainingErrorTime?: () => number;
   canResetError?: () => boolean;
+  getAnalysisElapsedTime?: () => number;
 }
 
 const AnalysisSection: React.FC<AnalysisSectionProps> = ({
@@ -25,6 +26,7 @@ const AnalysisSection: React.FC<AnalysisSectionProps> = ({
   onReset,
   getRemainingErrorTime = () => 0,
   canResetError = () => true,
+  getAnalysisElapsedTime,
 }) => {
   const [remainingTime, setRemainingTime] = useState(0);
   
@@ -49,7 +51,7 @@ const AnalysisSection: React.FC<AnalysisSectionProps> = ({
   if (isAnalyzing) {
     return (
       <div className="bg-white rounded-xl shadow-sm p-8 border border-border/50 mb-10 animate-fade-in">
-        <AnalysisProgress />
+        <AnalysisProgress getAnalysisElapsedTime={getAnalysisElapsedTime} />
       </div>
     );
   }
@@ -75,6 +77,7 @@ const AnalysisSection: React.FC<AnalysisSectionProps> = ({
             <li>Das PDF-Format konnte nicht korrekt verarbeitet werden</li>
             <li>Der Vertrag enthält Inhalte, die nicht erkannt werden konnten</li>
             <li>Es besteht ein temporäres Verbindungsproblem</li>
+            <li>Die Analyse dauerte zu lange (über 10 Minuten)</li>
           </ul>
           
           {remainingTime > 0 && (

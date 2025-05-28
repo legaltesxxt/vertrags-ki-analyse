@@ -10,6 +10,7 @@ export function useN8nWebhook() {
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [errorTimeStamp, setErrorTimeStamp] = useState<number | null>(null);
+  const [analysisStartTime, setAnalysisStartTime] = useState<number | null>(null);
   const { toast } = useToast();
 
   // Get the stored webhook URL or use the test URL as fallback
@@ -30,6 +31,13 @@ export function useN8nWebhook() {
     setAnalysisResult(null);
     setError(null);
     setErrorTimeStamp(null);
+    setAnalysisStartTime(Date.now());
+
+    // Create AbortController with extended timeout (10 minutes)
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => {
+      controller.abort();
+    }, 10 * 60 * 1000); // 10 minutes timeout
 
     try {
       // FormData erstellen für den Datei-Upload
@@ -39,15 +47,26 @@ export function useN8nWebhook() {
       console.log(`=== SENDING TO WEBHOOK ===`);
       console.log(`File: ${file.name} (${file.size} bytes)`);
       console.log(`Webhook URL: ${webhookUrl}`);
+      console.log(`Request started at: ${new Date().toISOString()}`);
       
-      // Hier wird die tatsächliche API-Anfrage an n8n gesendet
+      // Hier wird die tatsächliche API-Anfrage an n8n gesendet mit erweitertem Timeout
       const response = await fetch(webhookUrl, {
         method: 'POST',
         body: formData,
+        signal: controller.signal,
+        headers: {
+          // Keep-alive headers for better connection stability
+          'Connection': 'keep-alive',
+          'Keep-Alive': 'timeout=600, max=1000'
+        }
       });
+      
+      // Clear timeout since request completed
+      clearTimeout(timeoutId);
       
       console.log(`=== WEBHOOK RESPONSE ===`);
       console.log(`Status: ${response.status} ${response.statusText}`);
+      console.log(`Response received at: ${new Date().toISOString()}`);
       console.log(`Headers:`, Object.fromEntries(response.headers.entries()));
       
       if (!response.ok) {
@@ -144,14 +163,28 @@ export function useN8nWebhook() {
       }
       
     } catch (error) {
-      const errorMsg = String(error);
+      clearTimeout(timeoutId);
+      
+      let errorMsg = String(error);
+      
+      // Handle different error types
+      if (error instanceof Error) {
+        if (error.name === 'AbortError') {
+          errorMsg = "Die Analyse dauert länger als erwartet. Bitte versuchen Sie es erneut oder kontaktieren Sie den Support, falls das Problem weiterhin besteht.";
+        } else if (error.message.includes('fetch')) {
+          errorMsg = "Verbindungsfehler zum Analyse-Server. Bitte überprüfen Sie Ihre Internetverbindung und versuchen Sie es erneut.";
+        }
+      }
+      
       console.error("=== WEBHOOK ERROR ===");
       console.error("Error details:", error);
+      console.error("Error type:", error instanceof Error ? error.name : typeof error);
       setError(errorMsg);
       setErrorTimeStamp(Date.now());
       return { success: false, error: errorMsg };
     } finally {
       setIsLoading(false);
+      setAnalysisStartTime(null);
     }
   }, [webhookUrl]); 
 
@@ -190,5 +223,24 @@ export function useN8nWebhook() {
     return timeElapsed >= minTimeMs;
   }, [errorTimeStamp]);
 
-  return { sendToN8n, isLoading, analysisResult, error, resetError, getRemainingErrorTime, canResetError };
+  const getAnalysisElapsedTime = useCallback(() => {
+    if (!analysisStartTime) return 0;
+    
+    const currentTime = Date.now();
+    const elapsedMs = currentTime - analysisStartTime;
+    
+    return Math.floor(elapsedMs / 1000); // Return elapsed time in seconds
+  }, [analysisStartTime]);
+
+  return { 
+    sendToN8n, 
+    isLoading, 
+    analysisResult, 
+    error, 
+    resetError, 
+    getRemainingErrorTime, 
+    canResetError,
+    getAnalysisElapsedTime,
+    analysisStartTime
+  };
 }

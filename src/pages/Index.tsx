@@ -24,7 +24,8 @@ const Index = () => {
     error: webhookError, 
     resetError,
     getRemainingErrorTime,
-    canResetError
+    canResetError,
+    getAnalysisElapsedTime
   } = useN8nWebhook();
   const [useRealAnalysis, setUseRealAnalysis] = useState(true);
   const { toast } = useToast();
@@ -110,6 +111,7 @@ const Index = () => {
           onReset={handleReset}
           getRemainingErrorTime={getRemainingErrorTime}
           canResetError={canResetError}
+          getAnalysisElapsedTime={getAnalysisElapsedTime}
         />
       </main>
       

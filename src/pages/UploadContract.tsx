@@ -19,7 +19,8 @@ const UploadContract = () => {
     error, 
     resetError, 
     getRemainingErrorTime, 
-    canResetError 
+    canResetError,
+    getAnalysisElapsedTime
   } = useN8nWebhook();
 
   const handleFileSelected = useCallback(async (file: File) => {
@@ -164,6 +165,7 @@ const UploadContract = () => {
           onReset={resetError}
           getRemainingErrorTime={getRemainingErrorTime}
           canResetError={canResetError}
+          getAnalysisElapsedTime={getAnalysisElapsedTime}
         />
         
         <div className="text-sm text-slate-500 text-center max-w-xl mx-auto">
