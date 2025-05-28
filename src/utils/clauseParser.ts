@@ -11,7 +11,7 @@ import { generateSummary, countClausesByRisk } from './summaryGenerator';
 export function parseClausesFromText(responseText: string): AnalysisResult {
   console.log("=== CLAUSE PARSER START ===");
   console.log("Input text length:", responseText.length);
-  console.log("Input text preview:", responseText.substring(0, 300));
+  console.log("Input text preview:", responseText.substring(0, 500));
   
   // Check if response is empty or invalid
   if (!responseText || responseText.trim() === "") {
@@ -23,24 +23,32 @@ export function parseClausesFromText(responseText: string): AnalysisResult {
   // Handle JSON array format [{"output": "..."}]
   try {
     const parsed = JSON.parse(responseText);
+    console.log("=== JSON PARSING ATTEMPT ===");
+    console.log("Parsed type:", typeof parsed);
+    console.log("Is array:", Array.isArray(parsed));
+    
     if (Array.isArray(parsed) && parsed.length > 0 && parsed[0].output) {
       actualText = parsed[0].output;
       console.log("=== EXTRACTED FROM JSON ARRAY ===");
       console.log("Extracted text length:", actualText.length);
-      console.log("Extracted text preview:", actualText.substring(0, 300));
+      console.log("Extracted text preview:", actualText.substring(0, 500));
+    } else {
+      console.log("JSON structure doesn't match expected format");
     }
   } catch (e) {
-    // Not JSON, use as is
     console.log("Input is not JSON, using as plain text");
   }
 
   const clauses: AnalysisResult['clauses'] = [];
   
-  // Split text into sections
+  // Split text into sections using --- separator
   const sections = splitIntoSections(actualText);
+  console.log(`=== SECTION SPLITTING COMPLETE ===`);
+  console.log(`Found ${sections.length} sections`);
   
   sections.forEach((section, index) => {
     console.log(`\n=== PROCESSING SECTION ${index + 1} ===`);
+    console.log(`Section preview: ${section.substring(0, 200)}...`);
     
     const extracted = extractClauseFromSection(section, index);
     if (!extracted) {
@@ -52,7 +60,7 @@ export function parseClausesFromText(responseText: string): AnalysisResult {
     
     // Classify risk level
     const risk = classifyRisk(extractedRisk || 'Rechtskonform');
-    console.log(`Final risk: ${risk}`);
+    console.log(`Risk classification: ${extractedRisk} → ${risk}`);
     
     // Create clause if minimum data is available
     if (title && (text.length > 10 || analysis.length > 10)) {
@@ -75,9 +83,7 @@ export function parseClausesFromText(responseText: string): AnalysisResult {
         title: clause.title,
         textLength: clause.text.length,
         analysisLength: clause.analysis.length,
-        risk: clause.risk,
-        lawRefLength: clause.lawReference.text.length,
-        recommendationLength: clause.recommendation.length
+        risk: clause.risk
       });
     } else {
       console.log(`❌ Clause ${index + 1} skipped - incomplete data:`, {
@@ -91,8 +97,16 @@ export function parseClausesFromText(responseText: string): AnalysisResult {
   console.log(`\n=== PARSING COMPLETED ===`);
   console.log(`✅ Successfully extracted ${clauses.length} clauses.`);
   
-  // If no clauses found, show error (remove fallback)
+  // If no clauses found, show error
   if (clauses.length === 0) {
+    console.log("=== DEBUG INFO FOR EMPTY RESULT ===");
+    console.log("Original response text preview:", responseText.substring(0, 1000));
+    console.log("Actual text preview:", actualText.substring(0, 1000));
+    console.log("Sections found:", sections.length);
+    sections.forEach((section, i) => {
+      console.log(`Section ${i + 1} preview:`, section.substring(0, 200));
+    });
+    
     throw new Error("Keine gültigen Klauseln in der Antwort gefunden. Das Format entspricht nicht den Erwartungen.");
   }
   
