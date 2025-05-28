@@ -40,7 +40,7 @@ export function parseClausesFromText(responseText: string): AnalysisResult {
     console.log(`Final risk: ${risk}`);
     
     // Create clause if minimum data is available
-    if (title && (text!.length > 10 || analysis!.length > 10)) {
+    if (title && (text.length > 10 || analysis.length > 10)) {
       const clause = {
         id: `clause-${index + 1}`,
         title: title || `Klausel ${index + 1}`,

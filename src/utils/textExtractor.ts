@@ -1,10 +1,20 @@
 
 import { AnalysisClause } from '../types/analysisTypes';
 
+// Interface for temporary extraction data during parsing
+interface ExtractionResult {
+  title: string;
+  text: string;
+  analysis: string;
+  extractedRisk: string;
+  lawRefText: string;
+  recommendation: string;
+}
+
 /**
  * Extracts structured data from a text section using German format patterns
  */
-export function extractClauseFromSection(section: string, index: number): Partial<AnalysisClause> | null {
+export function extractClauseFromSection(section: string, index: number): ExtractionResult | null {
   console.log(`\n=== EXTRACTING CLAUSE ${index + 1} ===`);
   console.log(`Section preview: ${section.substring(0, 200)}...`);
   
