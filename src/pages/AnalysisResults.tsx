@@ -5,6 +5,7 @@ import AnalysisLayout from '@/components/analysis/AnalysisLayout';
 import AnalysisHeader from '@/components/analysis/AnalysisHeader';
 import AnalysisContent from '@/components/analysis/AnalysisContent';
 import AnalysisFooter from '@/components/analysis/AnalysisFooter';
+import FeedbackForm from '@/components/FeedbackForm';
 import { useAnalysisData } from '@/hooks/useAnalysisData';
 import { generatePDF } from '@/utils/pdfUtils';
 
@@ -81,6 +82,17 @@ const AnalysisResults = () => {
         structuredResult={structuredResult} 
         onDownloadPDF={downloadFullAnalysisPDF} 
       />
+
+      {/* Feedback Section */}
+      <div className="max-w-4xl mx-auto mt-16 mb-8">
+        <div className="text-center mb-8">
+          <h2 className="text-2xl font-light text-legal-primary mb-3">Feedback zur Analyse</h2>
+          <p className="text-slate-600 max-w-2xl mx-auto">
+            Wie war Ihre Erfahrung mit der Vertragsanalyse? Ihr Feedback hilft uns, unseren Service kontinuierlich zu verbessern.
+          </p>
+        </div>
+        <FeedbackForm />
+      </div>
     </AnalysisLayout>
   );
 };
