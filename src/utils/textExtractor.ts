@@ -1,4 +1,3 @@
-
 // Interface for temporary extraction data during parsing
 interface ExtractionResult {
   title: string;
@@ -26,26 +25,29 @@ export function extractClauseFromSection(section: string, index: number): Extrac
   const title = titleMatch ? titleMatch[1].trim() : `Klausel ${index + 1}`;
   console.log(`Found title: "${title}"`);
   
-  // EXACT REGEX PATTERNS for the German format from the real webhook response
+  // ENHANCED REGEX PATTERNS for better newline handling
   
   // 1. Klauseltext - between **Klauseltext** and **Analyse**
-  const textPattern = /\*\*Klauseltext\*\*\s*\n(.*?)(?=\n\*\*Analyse\*\*)/s;
+  // More flexible with whitespace and newlines
+  const textPattern = /\*\*Klauseltext\*\*\s*\n+(.*?)(?=\n+\*\*Analyse\*\*)/s;
   const textMatch = cleanSection.match(textPattern);
   
   // 2. Analyse - between **Analyse** and **Risiko-Einstufung**
-  const analysisPattern = /\*\*Analyse\*\*\s*\n(.*?)(?=\n\*\*Risiko-Einstufung\*\*)/s;
+  // Handle multiple newlines before next section
+  const analysisPattern = /\*\*Analyse\*\*\s*\n+(.*?)(?=\n+\*\*Risiko-Einstufung\*\*)/s;
   const analysisMatch = cleanSection.match(analysisPattern);
   
   // 3. Risiko-Einstufung - between **Risiko-Einstufung** and **Gesetzliche Referenz**
-  const riskPattern = /\*\*Risiko-Einstufung\*\*\s*\n(.*?)(?=\n\*\*Gesetzliche Referenz\*\*)/s;
+  const riskPattern = /\*\*Risiko-Einstufung\*\*\s*\n+(.*?)(?=\n+\*\*Gesetzliche Referenz\*\*)/s;
   const riskMatch = cleanSection.match(riskPattern);
   
   // 4. Gesetzliche Referenz - between **Gesetzliche Referenz** and **Empfehlung**
-  const lawRefPattern = /\*\*Gesetzliche Referenz\*\*\s*\n(.*?)(?=\n\*\*Empfehlung\*\*)/s;
+  const lawRefPattern = /\*\*Gesetzliche Referenz\*\*\s*\n+(.*?)(?=\n+\*\*Empfehlung\*\*)/s;
   const lawRefMatch = cleanSection.match(lawRefPattern);
   
-  // 5. Empfehlung - after **Empfehlung** until end or next ---
-  const recommendationPattern = /\*\*Empfehlung\*\*\s*\n(.*?)(?=\n---|$)/s;
+  // 5. Empfehlung - after **Empfehlung** until end
+  // Enhanced to handle end of section more reliably
+  const recommendationPattern = /\*\*Empfehlung\*\*\s*\n+(.*?)(?:\n+###|$)/s;
   const recommendationMatch = cleanSection.match(recommendationPattern);
   
   // Detailed logging for debugging
@@ -91,57 +93,84 @@ export function extractClauseFromSection(section: string, index: number): Extrac
 }
 
 /**
- * Splits response text into processable sections for German format
- * Handles the exact format from the webhook response using --- separators
+ * Enhanced function to split response text into processable sections
+ * Handles both --- separators and \n\n+### patterns flexibly
  */
 export function splitIntoSections(responseText: string): string[] {
-  console.log("=== SPLITTING TEXT INTO SECTIONS ===");
+  console.log("=== ENHANCED SPLITTING TEXT INTO SECTIONS ===");
   console.log("Input text length:", responseText.length);
   console.log("Input text preview:", responseText.substring(0, 500));
   
-  // Split on "---" separators between clauses (as shown in real example)
-  // Use \n---\n to ensure we split on standalone --- lines
-  const sections = responseText.split(/\n---\n/).filter(section => {
+  let sections: string[] = [];
+  
+  // Strategy 1: Try splitting on "---" separators first (original format)
+  console.log("=== TRYING --- SEPARATOR SPLITTING ===");
+  const dashSections = responseText.split(/\n---\n/).filter(section => {
     const trimmed = section.trim();
-    // Must contain ### for title and have reasonable length
     return trimmed.length > 50 && trimmed.includes('###');
   });
   
-  console.log(`Found sections after --- splitting: ${sections.length}`);
+  console.log(`Found sections with --- splitting: ${dashSections.length}`);
   
-  // Enhanced debugging for section splitting
-  sections.forEach((section, i) => {
-    console.log(`Section ${i + 1}:`, {
-      length: section.length,
-      startsWithHash: section.trim().startsWith('###'),
-      containsKlauseltext: section.includes('**Klauseltext**'),
-      containsAnalyse: section.includes('**Analyse**'),
-      preview: section.substring(0, 200)
-    });
-  });
-  
-  // If no sections found with ---, try alternative splitting
-  if (sections.length === 0) {
-    console.log("No --- separators found, trying alternative splitting...");
+  if (dashSections.length > 1) {
+    console.log("Using --- separator splitting");
+    sections = dashSections;
+  } else {
+    // Strategy 2: Try splitting on multiple newlines before ### (new format)
+    console.log("=== TRYING \\n\\n+### PATTERN SPLITTING ===");
     
-    // Try splitting on ### headers
-    const alternativeSections = responseText.split(/(?=###\s)/).filter(section => {
+    // Split on pattern: 2 or more newlines followed by ###
+    // Use positive lookahead to keep the ### with each section
+    const newlineSections = responseText.split(/\n{2,}(?=###)/).filter(section => {
       const trimmed = section.trim();
       return trimmed.length > 50 && trimmed.includes('###');
     });
     
-    console.log(`Alternative splitting found: ${alternativeSections.length} sections`);
+    console.log(`Found sections with \\n\\n+### splitting: ${newlineSections.length}`);
     
-    if (alternativeSections.length > 0) {
-      return alternativeSections;
-    }
-    
-    // Last resort: treat entire text as one section if it contains ###
-    if (responseText.includes('###')) {
-      console.log("Treating entire text as single section");
-      return [responseText];
+    if (newlineSections.length > 1) {
+      console.log("Using \\n\\n+### pattern splitting");
+      sections = newlineSections;
+    } else {
+      // Strategy 3: Fallback - split on ### headers directly
+      console.log("=== FALLBACK: SPLITTING ON ### HEADERS ===");
+      
+      const headerSections = responseText.split(/(?=###\s)/).filter(section => {
+        const trimmed = section.trim();
+        return trimmed.length > 50 && trimmed.includes('###');
+      });
+      
+      console.log(`Found sections with ### header splitting: ${headerSections.length}`);
+      
+      if (headerSections.length > 0) {
+        sections = headerSections;
+      } else {
+        // Last resort: treat entire text as one section if it contains ###
+        if (responseText.includes('###')) {
+          console.log("Treating entire text as single section");
+          sections = [responseText];
+        }
+      }
     }
   }
+  
+  // Enhanced debugging for section splitting
+  console.log(`=== FINAL SECTION SPLITTING RESULT ===`);
+  console.log(`Total sections found: ${sections.length}`);
+  
+  sections.forEach((section, i) => {
+    const trimmed = section.trim();
+    console.log(`Section ${i + 1}:`, {
+      length: trimmed.length,
+      startsWithHash: trimmed.startsWith('###'),
+      containsKlauseltext: trimmed.includes('**Klauseltext**'),
+      containsAnalyse: trimmed.includes('**Analyse**'),
+      containsRisiko: trimmed.includes('**Risiko-Einstufung**'),
+      containsGesetzlich: trimmed.includes('**Gesetzliche Referenz**'),
+      containsEmpfehlung: trimmed.includes('**Empfehlung**'),
+      preview: trimmed.substring(0, 200)
+    });
+  });
   
   return sections;
 }

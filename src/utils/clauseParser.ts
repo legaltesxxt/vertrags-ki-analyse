@@ -5,11 +5,11 @@ import { classifyRisk, calculateOverallRisk } from './riskClassifier';
 import { generateSummary, countClausesByRisk } from './summaryGenerator';
 
 /**
- * Parses webhook response (JSON array format) into structured AnalysisResult
+ * Enhanced parser for webhook responses supporting multiple formats
  * Handles format: [{"output": "### Title\n**Klauseltext**\n..."}]
  */
 export function parseClausesFromText(responseText: string): AnalysisResult {
-  console.log("=== CLAUSE PARSER START ===");
+  console.log("=== ENHANCED CLAUSE PARSER START ===");
   console.log("Input text length:", responseText.length);
   console.log("Input text preview:", responseText.substring(0, 500));
   
@@ -41,10 +41,10 @@ export function parseClausesFromText(responseText: string): AnalysisResult {
 
   const clauses: AnalysisResult['clauses'] = [];
   
-  // Split text into sections using --- separator
+  // Use enhanced section splitting that handles multiple formats
   const sections = splitIntoSections(actualText);
-  console.log(`=== SECTION SPLITTING COMPLETE ===`);
-  console.log(`Found ${sections.length} sections`);
+  console.log(`=== ENHANCED SECTION SPLITTING COMPLETE ===`);
+  console.log(`Found ${sections.length} sections using flexible parsing`);
   
   sections.forEach((section, index) => {
     console.log(`\n=== PROCESSING SECTION ${index + 1} ===`);
@@ -83,7 +83,8 @@ export function parseClausesFromText(responseText: string): AnalysisResult {
         title: clause.title,
         textLength: clause.text.length,
         analysisLength: clause.analysis.length,
-        risk: clause.risk
+        risk: clause.risk,
+        recommendationLength: clause.recommendation.length
       });
     } else {
       console.log(`❌ Clause ${index + 1} skipped - incomplete data:`, {
@@ -94,17 +95,19 @@ export function parseClausesFromText(responseText: string): AnalysisResult {
     }
   });
   
-  console.log(`\n=== PARSING COMPLETED ===`);
-  console.log(`✅ Successfully extracted ${clauses.length} clauses.`);
+  console.log(`\n=== ENHANCED PARSING COMPLETED ===`);
+  console.log(`✅ Successfully extracted ${clauses.length} clauses with flexible parser.`);
   
-  // If no clauses found, show error
+  // If no clauses found, show detailed debug info
   if (clauses.length === 0) {
     console.log("=== DEBUG INFO FOR EMPTY RESULT ===");
     console.log("Original response text preview:", responseText.substring(0, 1000));
     console.log("Actual text preview:", actualText.substring(0, 1000));
     console.log("Sections found:", sections.length);
     sections.forEach((section, i) => {
-      console.log(`Section ${i + 1} preview:`, section.substring(0, 200));
+      console.log(`Section ${i + 1} preview:`, section.substring(0, 300));
+      console.log(`Section ${i + 1} contains ###:`, section.includes('###'));
+      console.log(`Section ${i + 1} contains **Klauseltext**:`, section.includes('**Klauseltext**'));
     });
     
     throw new Error("Keine gültigen Klauseln in der Antwort gefunden. Das Format entspricht nicht den Erwartungen.");
@@ -115,11 +118,11 @@ export function parseClausesFromText(responseText: string): AnalysisResult {
   const { unzulassigCount, fraglichCount } = countClausesByRisk(clauses);
   const summary = generateSummary(clauses.length, unzulassigCount, fraglichCount);
   
-  console.log(`\n=== FINAL RESULT ===`);
+  console.log(`\n=== FINAL ENHANCED RESULT ===`);
   console.log(`📊 Overall risk: ${overallRisk}`);
   console.log(`📝 Summary: ${summary}`);
-  console.log(`✅ Successfully processed ${clauses.length} clauses`);
-  console.log("=== CLAUSE PARSER END ===\n");
+  console.log(`✅ Successfully processed ${clauses.length} clauses with enhanced parser`);
+  console.log("=== ENHANCED CLAUSE PARSER END ===\n");
 
   return {
     clauses,
