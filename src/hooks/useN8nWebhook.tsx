@@ -33,11 +33,14 @@ export function useN8nWebhook() {
     setErrorTimeStamp(null);
     setAnalysisStartTime(Date.now());
 
-    // Create AbortController with extended timeout (10 minutes)
+    // Create AbortController with EXTENDED timeout (20 minutes for complex contracts)
     const controller = new AbortController();
+    const timeoutDuration = 20 * 60 * 1000; // 20 minutes timeout
     const timeoutId = setTimeout(() => {
+      console.log("=== TIMEOUT REACHED ===");
+      console.log(`Request timed out after ${timeoutDuration / 1000} seconds`);
       controller.abort();
-    }, 10 * 60 * 1000); // 10 minutes timeout
+    }, timeoutDuration);
 
     try {
       // FormData erstellen für den Datei-Upload
@@ -48,23 +51,24 @@ export function useN8nWebhook() {
       console.log(`File: ${file.name} (${file.size} bytes)`);
       console.log(`Webhook URL: ${webhookUrl}`);
       console.log(`Request started at: ${new Date().toISOString()}`);
+      console.log(`Timeout set to: ${timeoutDuration / 1000} seconds (${timeoutDuration / 60000} minutes)`);
       
-      // Hier wird die tatsächliche API-Anfrage an n8n gesendet mit erweitertem Timeout
+      // Extended timeout fetch with robust headers
       const response = await fetch(webhookUrl, {
         method: 'POST',
         body: formData,
         signal: controller.signal,
         headers: {
-          // Keep-alive headers for better connection stability
+          // Extended keep-alive headers for very long requests
           'Connection': 'keep-alive',
-          'Keep-Alive': 'timeout=600, max=1000'
+          'Keep-Alive': 'timeout=1200, max=1000' // 20 minutes keep-alive
         }
       });
       
-      // Clear timeout since request completed
+      // Clear timeout since request completed successfully
       clearTimeout(timeoutId);
       
-      console.log(`=== WEBHOOK RESPONSE ===`);
+      console.log(`=== WEBHOOK RESPONSE RECEIVED ===`);
       console.log(`Status: ${response.status} ${response.statusText}`);
       console.log(`Response received at: ${new Date().toISOString()}`);
       console.log(`Headers:`, Object.fromEntries(response.headers.entries()));
@@ -77,72 +81,89 @@ export function useN8nWebhook() {
         throw new Error(errorMsg);
       }
       
-      // Prüfe, ob die Antwort JSON ist
+      // Check content type
       const contentType = response.headers.get('content-type');
       console.log(`Content-Type: ${contentType}`);
       
       if (contentType && contentType.includes('application/json')) {
-        // Wenn es JSON ist, parsen wir es als JSON
+        // Parse JSON response
         const data = await response.json();
         console.log("=== JSON RESPONSE PARSED ===");
         console.log("Full JSON response:", data);
+        console.log("Response structure analysis:", {
+          isArray: Array.isArray(data),
+          length: Array.isArray(data) ? data.length : 'Not an array',
+          dataType: typeof data,
+          firstItemKeys: Array.isArray(data) && data.length > 0 ? Object.keys(data[0]) : 'No first item'
+        });
         
-        // Prüfen, ob die Antwort eine leere Analyse enthält
-        if (!data || (Array.isArray(data) && (!data.length || !data[0]?.output))) {
-          const errorMsg = "Keine gültige Analyse vom Server erhalten";
-          console.error("Empty analysis error:", { data, isArray: Array.isArray(data), length: data?.length });
-          setError(errorMsg);
-          setErrorTimeStamp(Date.now());
-          return { 
-            success: false, 
-            error: errorMsg 
-          };
-        }
-        
-        // Protokolliere die genaue Struktur der JSON-Antwort für bessere Fehleranalyse
-        if (Array.isArray(data) && data.length > 0 && data[0].output) {
-          console.log("=== VALID JSON RESPONSE STRUCTURE ===");
-          console.log("Response analysis:", {
-            isArray: Array.isArray(data),
-            length: data.length,
-            firstItemKeys: Object.keys(data[0]),
-            hasOutput: !!data[0].output,
-            outputLength: data[0].output?.length,
-            outputPreview: data[0].output?.substring(0, 300) + "..."
+        // IMPROVED: Handle JSON array format specifically  
+        if (Array.isArray(data) && data.length > 0) {
+          console.log("=== PROCESSING JSON ARRAY RESPONSE ===");
+          const firstItem = data[0];
+          console.log("First item analysis:", {
+            hasOutput: !!firstItem.output,
+            outputType: typeof firstItem.output,
+            outputLength: firstItem.output?.length || 0,
+            outputPreview: firstItem.output?.substring(0, 200) + "..."
           });
           
-          // Check for specific content indicators
-          const output = data[0].output;
-          const hasClauseHeaders = output.includes("### Klausel") || output.includes("###");
-          const hasLawRefs = output.includes("**Gesetzliche Referenz**");
-          const hasRiskAssessment = output.includes("**Risiko-Einstufung**");
-          
-          console.log("Content indicators:", {
-            hasClauseHeaders,
-            hasLawRefs,
-            hasRiskAssessment,
-            sectionCount: (output.match(/###/g) || []).length
-          });
-          
-          // Reset error state on successful response
-          setError(null);
-          setErrorTimeStamp(null);
+          if (firstItem.output && typeof firstItem.output === 'string' && firstItem.output.trim()) {
+            console.log("=== VALID JSON ARRAY WITH OUTPUT ===");
+            
+            // Reset error state on successful response
+            setError(null);
+            setErrorTimeStamp(null);
+            
+            // Return the structured response for parsing
+            return { 
+              success: true, 
+              data: data
+            };
+          } else {
+            console.error("=== INVALID OUTPUT IN JSON ARRAY ===");
+            const errorMsg = "Leere oder ungültige Analyse im JSON-Array erhalten";
+            setError(errorMsg);
+            setErrorTimeStamp(Date.now());
+            return { 
+              success: false, 
+              error: errorMsg 
+            };
+          }
         }
         
-        // Direkte Weiterleitung der unveränderten Response
+        // Handle other JSON formats
+        if (data && !Array.isArray(data)) {
+          console.log("=== NON-ARRAY JSON RESPONSE ===");
+          if (data.output || data.rawText) {
+            setError(null);
+            setErrorTimeStamp(null);
+            return { 
+              success: true, 
+              data: data
+            };
+          }
+        }
+        
+        // If we reach here, the JSON doesn't contain expected data
+        console.error("=== UNEXPECTED JSON FORMAT ===");
+        const errorMsg = "Unerwartetes JSON-Format vom Server erhalten";
+        setError(errorMsg);
+        setErrorTimeStamp(Date.now());
         return { 
-          success: true, 
-          data, 
+          success: false, 
+          error: errorMsg 
         };
+        
       } else {
-        // Andernfalls versuchen wir, die Antwort als Text zu behandeln
+        // Handle text response
         const responseText = await response.text();
         console.log("=== TEXT RESPONSE ===");
         console.log("Text response length:", responseText.length);
         console.log("Text response preview:", responseText.substring(0, 300));
         
         if (!responseText || responseText.trim() === "") {
-          const errorMsg = "Leere Antwort vom Server erhalten";
+          const errorMsg = "Leere Textantwort vom Server erhalten";
           setError(errorMsg);
           setErrorTimeStamp(Date.now());
           return { 
@@ -155,7 +176,6 @@ export function useN8nWebhook() {
         setError(null);
         setErrorTimeStamp(null);
         
-        // Text-Antwort in ein strukturiertes Format umwandeln oder direkt zurückgeben
         return {
           success: true,
           data: { rawText: responseText },
@@ -167,18 +187,26 @@ export function useN8nWebhook() {
       
       let errorMsg = String(error);
       
-      // Handle different error types
+      // Enhanced error handling with specific timeout detection
       if (error instanceof Error) {
         if (error.name === 'AbortError') {
-          errorMsg = "Die Analyse dauert länger als erwartet. Bitte versuchen Sie es erneut oder kontaktieren Sie den Support, falls das Problem weiterhin besteht.";
-        } else if (error.message.includes('fetch')) {
-          errorMsg = "Verbindungsfehler zum Analyse-Server. Bitte überprüfen Sie Ihre Internetverbindung und versuchen Sie es erneut.";
+          errorMsg = `Die Analyse dauerte länger als ${timeoutDuration / 60000} Minuten und wurde abgebrochen. Dies kann bei sehr komplexen Verträgen vorkommen. Bitte versuchen Sie es erneut oder kontaktieren Sie den Support.`;
+          console.error("=== TIMEOUT ERROR ===");
+          console.error(`Analysis timed out after ${timeoutDuration / 1000} seconds`);
+        } else if (error.message.includes('fetch') || error.message.includes('network')) {
+          errorMsg = "Netzwerkfehler beim Verbinden zum Analyse-Server. Bitte überprüfen Sie Ihre Internetverbindung und versuchen Sie es erneut.";
+          console.error("=== NETWORK ERROR ===");
+        } else if (error.message.includes('Failed to fetch')) {
+          errorMsg = "Verbindung zum Server unterbrochen. Dies kann bei sehr langen Analysen vorkommen. Bitte versuchen Sie es erneut.";
+          console.error("=== FETCH ERROR ===");
         }
       }
       
       console.error("=== WEBHOOK ERROR ===");
       console.error("Error details:", error);
       console.error("Error type:", error instanceof Error ? error.name : typeof error);
+      console.error("Error message:", error instanceof Error ? error.message : error);
+      
       setError(errorMsg);
       setErrorTimeStamp(Date.now());
       return { success: false, error: errorMsg };
