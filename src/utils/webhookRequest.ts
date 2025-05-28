@@ -14,7 +14,7 @@ export async function sendFileToWebhook(
     return { success: false, error: errorMsg };
   }
 
-  // Create AbortController with EXTENDED timeout (20 minutes for complex contracts)
+  // Create AbortController with EXTENDED timeout (25 minutes for complex contracts)
   const controller = new AbortController();
   const timeoutId = setTimeout(() => {
     console.log("=== TIMEOUT REACHED ===");
@@ -41,7 +41,7 @@ export async function sendFileToWebhook(
       headers: {
         // Extended keep-alive headers for very long requests
         'Connection': 'keep-alive',
-        'Keep-Alive': 'timeout=1200, max=1000' // 20 minutes keep-alive
+        'Keep-Alive': 'timeout=1500, max=1000' // 25 minutes keep-alive
       }
     });
     
@@ -60,98 +60,79 @@ export async function sendFileToWebhook(
       throw new Error(errorMsg);
     }
     
-    // Check content type
-    const contentType = response.headers.get('content-type');
-    console.log(`Content-Type: ${contentType}`);
+    // Get response as text first for logging
+    const responseText = await response.text();
+    console.log("=== RAW RESPONSE TEXT ===");
+    console.log("Response text length:", responseText.length);
+    console.log("Response text preview:", responseText.substring(0, 500));
     
-    if (contentType && contentType.includes('application/json')) {
-      // Parse JSON response
-      const data = await response.json();
-      console.log("=== JSON RESPONSE PARSED ===");
-      console.log("Full JSON response:", data);
-      console.log("Response structure analysis:", {
-        isArray: Array.isArray(data),
-        length: Array.isArray(data) ? data.length : 'Not an array',
-        dataType: typeof data,
-        firstItemKeys: Array.isArray(data) && data.length > 0 ? Object.keys(data[0]) : 'No first item'
+    if (!responseText || responseText.trim() === "") {
+      const errorMsg = "Leere Antwort vom Server erhalten";
+      onError(errorMsg, Date.now());
+      return { 
+        success: false, 
+        error: errorMsg 
+      };
+    }
+    
+    // Try to parse as JSON first
+    try {
+      const jsonData = JSON.parse(responseText);
+      console.log("=== JSON PARSING SUCCESSFUL ===");
+      console.log("Parsed JSON structure:", {
+        isArray: Array.isArray(jsonData),
+        length: Array.isArray(jsonData) ? jsonData.length : 'Not an array',
+        firstItemKeys: Array.isArray(jsonData) && jsonData.length > 0 ? Object.keys(jsonData[0]) : 'No first item'
       });
       
-      // IMPROVED: Handle JSON array format specifically  
-      if (Array.isArray(data) && data.length > 0) {
-        console.log("=== PROCESSING JSON ARRAY RESPONSE ===");
-        const firstItem = data[0];
-        console.log("First item analysis:", {
-          hasOutput: !!firstItem.output,
-          outputType: typeof firstItem.output,
-          outputLength: firstItem.output?.length || 0,
-          outputPreview: firstItem.output?.substring(0, 200) + "..."
-        });
-        
+      // Handle JSON array format [{"output": "..."}]
+      if (Array.isArray(jsonData) && jsonData.length > 0) {
+        const firstItem = jsonData[0];
         if (firstItem.output && typeof firstItem.output === 'string' && firstItem.output.trim()) {
-          console.log("=== VALID JSON ARRAY WITH OUTPUT ===");
+          console.log("=== VALID JSON ARRAY WITH OUTPUT FOUND ===");
+          console.log("Output preview:", firstItem.output.substring(0, 300));
           
           // Reset error state on successful response
           onSuccess();
           
-          // Return the structured response for parsing
+          // Return the raw JSON text for parsing by clauseParser
           return { 
             success: true, 
-            data: data
-          };
-        } else {
-          console.error("=== INVALID OUTPUT IN JSON ARRAY ===");
-          const errorMsg = "Leere oder ungültige Analyse im JSON-Array erhalten";
-          onError(errorMsg, Date.now());
-          return { 
-            success: false, 
-            error: errorMsg 
+            data: responseText // Pass the raw JSON string
           };
         }
       }
       
       // Handle other JSON formats
-      if (data && !Array.isArray(data)) {
-        console.log("=== NON-ARRAY JSON RESPONSE ===");
-        if (data.output || data.rawText) {
-          onSuccess();
-          return { 
-            success: true, 
-            data: data
-          };
-        }
+      if (jsonData && !Array.isArray(jsonData) && (jsonData.output || jsonData.rawText)) {
+        console.log("=== NON-ARRAY JSON WITH CONTENT ===");
+        onSuccess();
+        return { 
+          success: true, 
+          data: responseText
+        };
       }
       
-      // If we reach here, the JSON doesn't contain expected data
-      console.error("=== UNEXPECTED JSON FORMAT ===");
-      const errorMsg = "Unerwartetes JSON-Format vom Server erhalten";
+      // If JSON doesn't contain expected data
+      console.error("=== JSON WITHOUT EXPECTED CONTENT ===");
+      const errorMsg = "JSON-Antwort enthält keine erwarteten Daten";
       onError(errorMsg, Date.now());
       return { 
         success: false, 
         error: errorMsg 
       };
       
-    } else {
-      // Handle text response
-      const responseText = await response.text();
-      console.log("=== TEXT RESPONSE ===");
-      console.log("Text response length:", responseText.length);
-      console.log("Text response preview:", responseText.substring(0, 300));
-      
-      if (!responseText || responseText.trim() === "") {
-        const errorMsg = "Leere Textantwort vom Server erhalten";
-        onError(errorMsg, Date.now());
-        return { 
-          success: false, 
-          error: errorMsg 
-        };
-      }
+    } catch (jsonError) {
+      // Not valid JSON, treat as plain text
+      console.log("=== NOT JSON, TREATING AS PLAIN TEXT ===");
+      console.log("JSON parse error:", jsonError);
       
       // Reset error state on successful response
       onSuccess();
       
       return {
         success: true,
-        data: { rawText: responseText },
+        data: responseText,
       };
     }
     

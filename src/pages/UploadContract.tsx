@@ -7,7 +7,6 @@ import { useN8nWebhook } from '@/hooks/useN8nWebhook';
 import AnalysisLayout from '@/components/analysis/AnalysisLayout';
 import FileUpload from '@/components/FileUpload';
 import AnalysisSection from '@/components/analysis/AnalysisSection';
-import { parseClausesFromText } from '@/utils/clauseParser';
 
 const UploadContract = () => {
   const navigate = useNavigate();
@@ -33,104 +32,25 @@ const UploadContract = () => {
     
     console.log("=== WEBHOOK RESPONSE RECEIVED ===");
     console.log("Response success:", response.success);
-    console.log("Response data:", response.data);
       
-    if (response.success && response.data) {
-      console.log("Webhook response received in UploadContract:", response.data);
-      
-      // Handle JSON array response format
-      if (Array.isArray(response.data) && response.data.length > 0 && response.data[0].output) {
-        const outputText = response.data[0].output;
-        console.log("=== EXTRACTED OUTPUT TEXT ===");
-        console.log("Output text length:", outputText.length);
-        console.log("Output text preview:", outputText.substring(0, 500));
-        
-        try {
-          // Use the parsing logic from clauseParser
-          const analysisResult = parseClausesFromText(outputText);
-          
-          console.log("=== PARSING SUCCESSFUL ===");
-          console.log("Structured analysis result:", analysisResult);
-          console.log("Number of clauses:", analysisResult.clauses.length);
-          
-          if (analysisResult.clauses.length > 0) {
-            console.log("First clause preview:", {
-              id: analysisResult.clauses[0].id,
-              title: analysisResult.clauses[0].title,
-              textLength: analysisResult.clauses[0].text.length,
-              risk: analysisResult.clauses[0].risk
-            });
-          }
+    if (response.success && response.analysisResult) {
+      console.log("Analysis completed successfully in UploadContract");
+      console.log("Analysis result:", response.analysisResult);
+      console.log("Number of clauses:", response.analysisResult.clauses.length);
 
-          // Navigate to results page with structured data
-          navigate('/analyse-ergebnisse', { 
-            state: { 
-              analysisResult,
-              analysisOutput: outputText
-            }
-          });
-          return;
-        } catch (error) {
-          console.error("=== PARSING ERROR ===");
-          console.error("Error parsing clauses in UploadContract:", error);
-          
-          // Fallback: Navigate with raw text if parsing fails
-          console.log("Using fallback: navigating with raw output text");
-          navigate('/analyse-ergebnisse', { 
-            state: { 
-              analysisOutput: outputText
-            }
-          });
-          
-          toast({
-            title: "Teilweise Analyse verfügbar",
-            description: "Die Analyseergebnisse sind verfügbar, konnten aber nicht vollständig strukturiert werden.",
-            variant: "default",
-          });
-          return;
+      // Navigate to results page with structured data
+      navigate('/analyse-ergebnisse', { 
+        state: { 
+          analysisResult: response.analysisResult,
+          analysisOutput: response.data
         }
-      }
-      
-      // Handle other response formats
-      if (response.data.rawText) {
-        console.log("=== RAW TEXT RESPONSE ===");
-        console.log("Raw text length:", response.data.rawText.length);
-        
-        try {
-          const analysisResult = parseClausesFromText(response.data.rawText);
-          navigate('/analyse-ergebnisse', { 
-            state: { 
-              analysisResult,
-              analysisOutput: response.data.rawText
-            }
-          });
-          return;
-        } catch (error) {
-          console.error("Error parsing raw text:", error);
-          navigate('/analyse-ergebnisse', { 
-            state: { 
-              analysisOutput: response.data.rawText
-            }
-          });
-          return;
-        }
-      }
-      
-      // If no recognizable format, show error
-      console.error("=== UNRECOGNIZED RESPONSE FORMAT ===");
-      console.error("Response data:", response.data);
-      toast({
-        title: "Unbekanntes Antwortformat",
-        description: "Die Antwort vom Server konnte nicht verarbeitet werden.",
-        variant: "destructive",
       });
-      
     } else {
-      console.error("=== WEBHOOK ERROR ===");
-      console.error("Error sending file to n8n:", response.error);
+      console.error("=== ANALYSIS FAILED ===");
+      console.error("Error:", response.error);
       toast({
         title: "Fehler bei der Verarbeitung",
-        description: "Die Datei konnte nicht zur Analyse gesendet werden. Bitte versuchen Sie es später erneut.",
+        description: response.error || "Die Datei konnte nicht zur Analyse gesendet werden.",
         variant: "destructive",
       });
     }
@@ -156,7 +76,6 @@ const UploadContract = () => {
           <FileUpload onFileSelected={handleFileSelected} isAnalyzing={isSendingToN8n} />
         </div>
         
-        {/* Add AnalysisSection to show progress during analysis */}
         <AnalysisSection 
           isAnalyzing={isSendingToN8n}
           webhookError={error}

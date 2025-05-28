@@ -1,6 +1,4 @@
 
-import { AnalysisClause } from '../types/analysisTypes';
-
 // Interface for temporary extraction data during parsing
 interface ExtractionResult {
   title: string;
@@ -12,37 +10,38 @@ interface ExtractionResult {
 }
 
 /**
- * Extracts structured data from a text section using German format patterns
+ * Extracts structured data from a text section using the exact German format
+ * Handles format: ### Title, **Klauseltext**, **Analyse**, etc.
  */
 export function extractClauseFromSection(section: string, index: number): ExtractionResult | null {
   console.log(`\n=== EXTRACTING CLAUSE ${index + 1} ===`);
   console.log(`Section preview: ${section.substring(0, 200)}...`);
   
-  // Extract title after ### (can also have spaces)
+  // Extract title after ### (German format)
   const titleMatch = section.match(/###\s*(.+?)(?:\n|$)/);
   const title = titleMatch ? titleMatch[1].trim() : `Klausel ${index + 1}`;
   
   console.log(`Found title: "${title}"`);
   
-  // PRECISE REGEX PATTERNS for exact German format
+  // EXACT REGEX PATTERNS for the German format shown in example
   
-  // 1. Clause text extraction - between **Klauseltext** and **Analyse**
+  // 1. Klauseltext - between **Klauseltext** and **Analyse**
   const textPattern = /\*\*Klauseltext\*\*\s*\n([\s\S]*?)(?=\n\*\*Analyse\*\*)/i;
   const textMatch = section.match(textPattern);
   
-  // 2. Analysis extraction - between **Analyse** and **Risiko-Einstufung**
+  // 2. Analyse - between **Analyse** and **Risiko-Einstufung**
   const analysisPattern = /\*\*Analyse\*\*\s*\n([\s\S]*?)(?=\n\*\*Risiko-Einstufung\*\*)/i;
   const analysisMatch = section.match(analysisPattern);
   
-  // 3. Risk extraction - between **Risiko-Einstufung** and **Gesetzliche Referenz**
+  // 3. Risiko-Einstufung - between **Risiko-Einstufung** and **Gesetzliche Referenz**
   const riskPattern = /\*\*Risiko-Einstufung\*\*\s*\n([\s\S]*?)(?=\n\*\*Gesetzliche Referenz\*\*)/i;
   const riskMatch = section.match(riskPattern);
   
-  // 4. Legal reference extraction - between **Gesetzliche Referenz** and **Empfehlung**
+  // 4. Gesetzliche Referenz - between **Gesetzliche Referenz** and **Empfehlung**
   const lawRefPattern = /\*\*Gesetzliche Referenz\*\*\s*\n([\s\S]*?)(?=\n\*\*Empfehlung\*\*)/i;
   const lawRefMatch = section.match(lawRefPattern);
   
-  // 5. Recommendation extraction - after **Empfehlung** until end or next ---
+  // 5. Empfehlung - after **Empfehlung** until end or next ---
   const recommendationPattern = /\*\*Empfehlung\*\*\s*\n([\s\S]*?)(?=\n---|\s*$)/i;
   const recommendationMatch = section.match(recommendationPattern);
   
@@ -80,21 +79,32 @@ export function extractClauseFromSection(section: string, index: number): Extrac
 }
 
 /**
- * Splits response text into processable sections
+ * Splits response text into processable sections for German format
+ * Handles the exact format from the webhook response
  */
 export function splitIntoSections(responseText: string): string[] {
   console.log("=== SPLITTING TEXT INTO SECTIONS ===");
   console.log("Input text length:", responseText.length);
   console.log("Input text preview:", responseText.substring(0, 300));
   
-  // OPTIMIZED clause separation for German format
-  // Split between clauses using "---" between sections
+  // Split on "---" separators between clauses (as shown in example)
   const sections = responseText.split(/\n---\n/).filter(section => {
     const trimmed = section.trim();
-    return trimmed.length > 20 && trimmed.includes('###'); // Minimum length for valid clauses
+    return trimmed.length > 50 && trimmed.includes('###'); // Minimum length for valid clauses
   });
   
   console.log(`Found sections after --- splitting: ${sections.length}`);
+  
+  // If no sections found with ---, try alternative splitting
+  if (sections.length === 0) {
+    console.log("No --- separators found, trying alternative splitting...");
+    const alternativeSections = responseText.split(/(?=###\s)/).filter(section => {
+      const trimmed = section.trim();
+      return trimmed.length > 50 && trimmed.includes('###');
+    });
+    console.log(`Alternative splitting found: ${alternativeSections.length} sections`);
+    return alternativeSections;
+  }
   
   return sections;
 }

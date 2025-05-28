@@ -2,12 +2,11 @@
 import { AnalysisResult } from "../types/analysisTypes";
 import { splitIntoSections, extractClauseFromSection } from './textExtractor';
 import { classifyRisk, calculateOverallRisk } from './riskClassifier';
-import { handleFallbackParsing } from './fallbackHandler';
 import { generateSummary, countClausesByRisk } from './summaryGenerator';
 
 /**
- * Parses a text response from webhook into a structured AnalysisResult object
- * Optimized for German format with ### headings and **Section** markings
+ * Parses webhook response (JSON array format) into structured AnalysisResult
+ * Handles format: [{"output": "### Title\n**Klauseltext**\n..."}]
  */
 export function parseClausesFromText(responseText: string): AnalysisResult {
   console.log("=== CLAUSE PARSER START ===");
@@ -19,10 +18,26 @@ export function parseClausesFromText(responseText: string): AnalysisResult {
     throw new Error("Die erhaltene Antwort ist leer oder ungültig");
   }
 
+  let actualText = responseText;
+  
+  // Handle JSON array format [{"output": "..."}]
+  try {
+    const parsed = JSON.parse(responseText);
+    if (Array.isArray(parsed) && parsed.length > 0 && parsed[0].output) {
+      actualText = parsed[0].output;
+      console.log("=== EXTRACTED FROM JSON ARRAY ===");
+      console.log("Extracted text length:", actualText.length);
+      console.log("Extracted text preview:", actualText.substring(0, 300));
+    }
+  } catch (e) {
+    // Not JSON, use as is
+    console.log("Input is not JSON, using as plain text");
+  }
+
   const clauses: AnalysisResult['clauses'] = [];
   
   // Split text into sections
-  const sections = splitIntoSections(responseText);
+  const sections = splitIntoSections(actualText);
   
   sections.forEach((section, index) => {
     console.log(`\n=== PROCESSING SECTION ${index + 1} ===`);
@@ -76,10 +91,9 @@ export function parseClausesFromText(responseText: string): AnalysisResult {
   console.log(`\n=== PARSING COMPLETED ===`);
   console.log(`✅ Successfully extracted ${clauses.length} clauses.`);
   
-  // Handle fallback if no clauses found
+  // If no clauses found, show error (remove fallback)
   if (clauses.length === 0) {
-    const fallbackClauses = handleFallbackParsing(responseText);
-    clauses.push(...fallbackClauses);
+    throw new Error("Keine gültigen Klauseln in der Antwort gefunden. Das Format entspricht nicht den Erwartungen.");
   }
   
   // Calculate overall risk and summary

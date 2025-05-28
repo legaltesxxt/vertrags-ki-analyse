@@ -12,7 +12,6 @@ import ProcessSteps from '@/components/home/ProcessSteps';
 import AnalysisSection from '@/components/analysis/AnalysisSection';
 import FlipCardsGrid from '@/components/home/FlipCardsGrid';
 import FAQ from '@/components/home/FAQ';
-import { parseClausesFromText } from '@/utils/clauseParser';
 
 const Index = () => {
   const navigate = useNavigate();
@@ -27,7 +26,6 @@ const Index = () => {
     canResetError,
     getAnalysisElapsedTime
   } = useN8nWebhook();
-  const [useRealAnalysis, setUseRealAnalysis] = useState(true);
   const { toast } = useToast();
 
   const handleFileSelected = useCallback(async (file: File) => {
@@ -35,45 +33,21 @@ const Index = () => {
     
     const response = await sendToN8n(file);
       
-    if (response.success && response.data) {
-      console.log("Webhook response received:", response.data);
+    if (response.success && response.analysisResult) {
+      console.log("Analysis completed successfully, navigating to results...");
       
-      // Parse the response into structured analysis result
-      if (Array.isArray(response.data) && response.data.length > 0 && response.data[0].output) {
-        const outputText = response.data[0].output;
-        console.log("Raw output text to parse:", outputText);
-        
-        try {
-          // Use the unified parsing logic from clauseParser
-          const analysisResult = parseClausesFromText(outputText);
-          
-          console.log("Structured analysis result:", analysisResult);
-          if (analysisResult.clauses.length > 0) {
-            console.log("First clause text length:", analysisResult.clauses[0]?.text?.length);
-            console.log("First clause text preview:", analysisResult.clauses[0]?.text?.substring(0, 200));
-          }
-
-          navigate('/analyse-ergebnisse', { 
-            state: { 
-              analysisResult,
-              analysisOutput: outputText
-            }
-          });
-          return;
-        } catch (error) {
-          console.error("Error parsing clauses:", error);
-          toast({
-            title: "Fehler bei der Analyse",
-            description: "Die Analyseergebnisse konnten nicht korrekt verarbeitet werden.",
-            variant: "destructive",
-          });
+      // Navigate with the structured analysis result
+      navigate('/analyse-ergebnisse', { 
+        state: { 
+          analysisResult: response.analysisResult,
+          analysisOutput: response.data
         }
-      }
+      });
     } else {
-      console.error("Error sending file to n8n:", response.error);
+      console.error("Analysis failed:", response.error);
       toast({
         title: "Fehler bei der Verarbeitung",
-        description: "Die Datei konnte nicht zur Analyse gesendet werden. Bitte versuchen Sie es später erneut.",
+        description: response.error || "Die Datei konnte nicht zur Analyse gesendet werden.",
         variant: "destructive",
       });
     }
@@ -82,7 +56,6 @@ const Index = () => {
   const handleReset = useCallback(() => {
     setSelectedFile(null);
     resetError();
-    setUseRealAnalysis(true);
   }, [resetError]);
 
   return (
@@ -107,7 +80,7 @@ const Index = () => {
           isAnalyzing={isSendingToN8n}
           webhookError={webhookError}
           webhookResult={webhookResult}
-          useRealAnalysis={useRealAnalysis}
+          useRealAnalysis={true}
           onReset={handleReset}
           getRemainingErrorTime={getRemainingErrorTime}
           canResetError={canResetError}

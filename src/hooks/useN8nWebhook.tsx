@@ -1,4 +1,3 @@
-
 import { useState, useCallback } from 'react';
 import { useToast } from '@/components/ui/use-toast';
 import { parseClausesFromText } from '../utils/clauseParser';
@@ -39,6 +38,42 @@ export function useN8nWebhook() {
 
     try {
       const response = await sendFileToWebhook(file, webhookUrl, handleError, handleSuccess);
+      
+      if (response.success && response.data) {
+        console.log("=== WEBHOOK SUCCESS - PARSING RESPONSE ===");
+        console.log("Response data type:", typeof response.data);
+        console.log("Response data preview:", response.data.substring ? response.data.substring(0, 300) : response.data);
+        
+        try {
+          // Parse the response using the updated parser that handles JSON arrays
+          const analysisResult = parseClausesFromText(response.data);
+          
+          console.log("=== PARSING SUCCESSFUL ===");
+          console.log("Analysis result:", analysisResult);
+          console.log("Number of clauses:", analysisResult.clauses.length);
+          
+          setAnalysisResult(analysisResult);
+          
+          return {
+            success: true,
+            data: response.data,
+            analysisResult
+          };
+          
+        } catch (parseError) {
+          console.error("=== PARSING ERROR ===");
+          console.error("Parse error:", parseError);
+          
+          const errorMsg = `Fehler beim Verarbeiten der Analyseergebnisse: ${parseError instanceof Error ? parseError.message : String(parseError)}`;
+          handleError(errorMsg, Date.now());
+          
+          return {
+            success: false,
+            error: errorMsg
+          };
+        }
+      }
+      
       return response;
     } finally {
       setIsLoading(false);
