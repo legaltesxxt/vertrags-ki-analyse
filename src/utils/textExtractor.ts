@@ -15,8 +15,8 @@ interface ExtractionResult {
 export function extractClauseFromSection(section: string, index: number): ExtractionResult | null {
   console.log(`\n=== EXTRACTING CLAUSE ${index + 1} ===`);
   
-  // Clean the section - remove extra whitespace but preserve structure
-  const cleanSection = section.trim();
+  // Sanitize and clean the section
+  const cleanSection = section.replace(/\u00A0/g, ' ').replace(/\r\n?/g, '\n').trim();
   console.log(`Section length: ${cleanSection.length}`);
   console.log(`Section start: ${cleanSection.substring(0, 100)}...`);
   
@@ -25,29 +25,28 @@ export function extractClauseFromSection(section: string, index: number): Extrac
   const title = titleMatch ? titleMatch[1].trim() : `Klausel ${index + 1}`;
   console.log(`Found title: "${title}"`);
   
-  // ENHANCED REGEX PATTERNS for better newline handling
+  // ENHANCED REGEX PATTERNS - tolerant to colons and variable whitespace
   
-  // 1. Klauseltext - between **Klauseltext** and **Analyse**
-  // More flexible with whitespace and newlines
-  const textPattern = /\*\*Klauseltext\*\*\s*\n+(.*?)(?=\n+\*\*Analyse\*\*)/s;
+  // 1. Klauseltext - between **Klauseltext:** and **Analyse:**
+  // Tolerant to optional colons and NBSPs
+  const textPattern = /\*\*Klauseltext(?::)?\*\*[:\s\u00A0]*\n+(.*?)(?=\n+\*\*Analyse(?::)?\*\*)/s;
   const textMatch = cleanSection.match(textPattern);
   
-  // 2. Analyse - between **Analyse** and **Risiko-Einstufung**
-  // Handle multiple newlines before next section
-  const analysisPattern = /\*\*Analyse\*\*\s*\n+(.*?)(?=\n+\*\*Risiko-Einstufung\*\*)/s;
+  // 2. Analyse - between **Analyse:** and **Risiko-Einstufung**
+  // Handle multiple newlines and optional colons
+  const analysisPattern = /\*\*Analyse(?::)?\*\*[:\s\u00A0]*\n+(.*?)(?=\n+\*\*Risiko[- ]Einstufung(?::)?\*\*)/s;
   const analysisMatch = cleanSection.match(analysisPattern);
   
-  // 3. Risiko-Einstufung - between **Risiko-Einstufung** and **Gesetzliche Referenz**
-  const riskPattern = /\*\*Risiko-Einstufung\*\*\s*\n+(.*?)(?=\n+\*\*Gesetzliche Referenz\*\*)/s;
+  // 3. Risiko-Einstufung - tolerant to hyphens and colons
+  const riskPattern = /\*\*Risiko[- ]Einstufung(?::)?\*\*[:\s\u00A0]*\n+(.*?)(?=\n+\*\*Gesetzliche Referenz(?::)?\*\*)/s;
   const riskMatch = cleanSection.match(riskPattern);
   
-  // 4. Gesetzliche Referenz - between **Gesetzliche Referenz** and **Empfehlung**
-  const lawRefPattern = /\*\*Gesetzliche Referenz\*\*\s*\n+(.*?)(?=\n+\*\*Empfehlung\*\*)/s;
+  // 4. Gesetzliche Referenz - tolerant to colons
+  const lawRefPattern = /\*\*Gesetzliche Referenz(?::)?\*\*[:\s\u00A0]*\n+(.*?)(?=\n+\*\*Empfehlung(?::)?\*\*)/s;
   const lawRefMatch = cleanSection.match(lawRefPattern);
   
-  // 5. Empfehlung - after **Empfehlung** until end
-  // Enhanced to handle end of section more reliably
-  const recommendationPattern = /\*\*Empfehlung\*\*\s*\n+(.*?)(?:\n+###|$)/s;
+  // 5. Empfehlung - tolerant to colons and end patterns
+  const recommendationPattern = /\*\*Empfehlung(?::)?\*\*[:\s\u00A0]*\n+(.*?)(?:\n+###|$)/s;
   const recommendationMatch = cleanSection.match(recommendationPattern);
   
   // Detailed logging for debugging
@@ -101,11 +100,14 @@ export function splitIntoSections(responseText: string): string[] {
   console.log("Input text length:", responseText.length);
   console.log("Input text preview:", responseText.substring(0, 500));
   
+  // Sanitize input text first
+  const sanitizedText = responseText.replace(/\u00A0/g, ' ').replace(/\r\n?/g, '\n');
+  
   let sections: string[] = [];
   
   // Strategy 1: Try splitting on "---" separators first (original format)
   console.log("=== TRYING --- SEPARATOR SPLITTING ===");
-  const dashSections = responseText.split(/\n---\n/).filter(section => {
+  const dashSections = sanitizedText.split(/\n\s*---\s*\n/).filter(section => {
     const trimmed = section.trim();
     return trimmed.length > 50 && trimmed.includes('###');
   });
@@ -121,7 +123,7 @@ export function splitIntoSections(responseText: string): string[] {
     
     // Split on pattern: 2 or more newlines followed by ###
     // Use positive lookahead to keep the ### with each section
-    const newlineSections = responseText.split(/\n{2,}(?=###)/).filter(section => {
+    const newlineSections = sanitizedText.split(/\n{2,}(?=###)/).filter(section => {
       const trimmed = section.trim();
       return trimmed.length > 50 && trimmed.includes('###');
     });
@@ -135,7 +137,7 @@ export function splitIntoSections(responseText: string): string[] {
       // Strategy 3: Fallback - split on ### headers directly
       console.log("=== FALLBACK: SPLITTING ON ### HEADERS ===");
       
-      const headerSections = responseText.split(/(?=###\s)/).filter(section => {
+      const headerSections = sanitizedText.split(/(?=###\s)/).filter(section => {
         const trimmed = section.trim();
         return trimmed.length > 50 && trimmed.includes('###');
       });
@@ -146,9 +148,9 @@ export function splitIntoSections(responseText: string): string[] {
         sections = headerSections;
       } else {
         // Last resort: treat entire text as one section if it contains ###
-        if (responseText.includes('###')) {
+        if (sanitizedText.includes('###')) {
           console.log("Treating entire text as single section");
-          sections = [responseText];
+          sections = [sanitizedText];
         }
       }
     }
@@ -163,11 +165,11 @@ export function splitIntoSections(responseText: string): string[] {
     console.log(`Section ${i + 1}:`, {
       length: trimmed.length,
       startsWithHash: trimmed.startsWith('###'),
-      containsKlauseltext: trimmed.includes('**Klauseltext**'),
-      containsAnalyse: trimmed.includes('**Analyse**'),
-      containsRisiko: trimmed.includes('**Risiko-Einstufung**'),
-      containsGesetzlich: trimmed.includes('**Gesetzliche Referenz**'),
-      containsEmpfehlung: trimmed.includes('**Empfehlung**'),
+      containsKlauseltext: trimmed.includes('**Klauseltext') || trimmed.includes('**Klauseltext:**'),
+      containsAnalyse: trimmed.includes('**Analyse') || trimmed.includes('**Analyse:**'),
+      containsRisiko: trimmed.includes('**Risiko-Einstufung') || trimmed.includes('**Risiko-Einstufung:**'),
+      containsGesetzlich: trimmed.includes('**Gesetzliche Referenz') || trimmed.includes('**Gesetzliche Referenz:**'),
+      containsEmpfehlung: trimmed.includes('**Empfehlung') || trimmed.includes('**Empfehlung:**'),
       preview: trimmed.substring(0, 200)
     });
   });

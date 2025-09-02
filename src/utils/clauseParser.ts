@@ -20,7 +20,7 @@ export function parseClausesFromText(responseText: string): AnalysisResult {
 
   let actualText = responseText;
   
-  // Handle JSON array format [{"output": "..."}]
+  // Handle JSON array format [{"output": "..."}] or single object {"output": "..."}
   try {
     const parsed = JSON.parse(responseText);
     console.log("=== JSON PARSING ATTEMPT ===");
@@ -32,12 +32,22 @@ export function parseClausesFromText(responseText: string): AnalysisResult {
       console.log("=== EXTRACTED FROM JSON ARRAY ===");
       console.log("Extracted text length:", actualText.length);
       console.log("Extracted text preview:", actualText.substring(0, 500));
+    } else if (parsed && typeof parsed === 'object' && parsed.output) {
+      actualText = parsed.output;
+      console.log("=== EXTRACTED FROM JSON OBJECT ===");
+      console.log("Extracted text length:", actualText.length);
+      console.log("Extracted text preview:", actualText.substring(0, 500));
     } else {
       console.log("JSON structure doesn't match expected format");
     }
   } catch (e) {
     console.log("Input is not JSON, using as plain text");
   }
+
+  // Sanitize text: remove NBSPs and normalize line endings
+  actualText = actualText.replace(/\u00A0/g, ' ').replace(/\r\n?/g, '\n');
+  console.log("=== TEXT SANITIZATION COMPLETE ===");
+  console.log("Sanitized text length:", actualText.length);
 
   const clauses: AnalysisResult['clauses'] = [];
   
