@@ -18,7 +18,7 @@ const CookieConsent = () => {
       }, 800);
       
       // Disable Google Analytics until consent is given
-      window['ga-disable-G-SR9PMHBZ68'] = true;
+      window['ga-disable-G-9X9Q6SSCQW'] = true;
       
       return () => clearTimeout(timer);
     }
@@ -30,7 +30,7 @@ const CookieConsent = () => {
     document.cookie = 'cookie-consent=true; expires=Thu, 31 Dec 2099 23:59:59 UTC; path=/';
     
     // Enable Google Analytics
-    window['ga-disable-G-SR9PMHBZ68'] = false;
+    window['ga-disable-G-9X9Q6SSCQW'] = false;
     
     // Hide the banner
     setShowConsent(false);
@@ -42,7 +42,7 @@ const CookieConsent = () => {
     document.cookie = 'cookie-consent=false; expires=Thu, 31 Dec 2099 23:59:59 UTC; path=/';
     
     // Keep Google Analytics disabled
-    window['ga-disable-G-SR9PMHBZ68'] = true;
+    window['ga-disable-G-9X9Q6SSCQW'] = true;
     
     // Opt out of Google Analytics
     window.gaOptout();

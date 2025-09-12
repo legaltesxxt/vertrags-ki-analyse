@@ -7,7 +7,7 @@ import './index.css'
 declare global {
   interface Window {
     gaOptout: () => void;
-    ['ga-disable-G-SR9PMHBZ68']: boolean;
+    ['ga-disable-G-9X9Q6SSCQW']: boolean;
   }
 }
 
@@ -32,8 +32,8 @@ window.addEventListener('load', () => {
   
   // Google Analytics opt-out function
   window.gaOptout = function() {
-    document.cookie = 'ga-disable-G-SR9PMHBZ68=true; expires=Thu, 31 Dec 2099 23:59:59 UTC; path=/';
-    window['ga-disable-G-SR9PMHBZ68'] = true;
+    document.cookie = 'ga-disable-G-9X9Q6SSCQW=true; expires=Thu, 31 Dec 2099 23:59:59 UTC; path=/';
+    window['ga-disable-G-9X9Q6SSCQW'] = true;
     alert('Google Analytics wurde für diese Webseite deaktiviert.');
   };
 });
