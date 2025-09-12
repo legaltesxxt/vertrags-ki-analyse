@@ -32,9 +32,9 @@ const Contact = () => {
           </div>
           
           <div className="flex flex-col items-center p-6 bg-white rounded-xl shadow-sm border border-border/50">
-            <MapPin className="h-8 w-8 text-legal-primary mb-2" />
-            <h3 className="text-lg font-medium mb-1">Adresse</h3>
-            <p className="text-slate-600 text-center">Schatzacher 16<br />2564 Bellmund<br />Schweiz</p>
+            <Mail className="h-8 w-8 text-legal-primary mb-2" />
+            <h3 className="text-lg font-medium mb-1">Sprachen</h3>
+            <p className="text-slate-600 text-center">Deutsch & Englisch<br />Schweizer Recht</p>
           </div>
         </div>
 
