@@ -1,0 +1,41 @@
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "Vertragsklar",
+  "url": "https://vertragsklar.ch",
+  "description": "Professionelle KI-gestützte Vertragsanalyse für Schweizer Verträge",
+  "publisher": {
+    "@type": "Organization",
+    "name": "Vertragsklar",
+    "url": "https://vertragsklar.ch",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://vertragsklar.ch/vertragsklar-logo.png"
+    }
+  },
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": "https://vertragsklar.ch/?q={search_term_string}",
+    "query-input": "required name=search_term_string"
+  },
+  "sameAs": [],
+  "mainEntity": {
+    "@type": "SoftwareApplication",
+    "name": "Vertragsklar Vertragsanalyse",
+    "applicationCategory": "LegalApplication",
+    "operatingSystem": "Web Browser",
+    "description": "KI-gestützte Vertragsanalyse für Schweizer Rechtsdokumente",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "CHF"
+    },
+    "featureList": [
+      "Automatische Vertragsanalyse",
+      "Risikobewertung",
+      "Klausel-Erkennung",
+      "PDF-Upload",
+      "Schweizer Rechtskonformität"
+    ]
+  }
+}
