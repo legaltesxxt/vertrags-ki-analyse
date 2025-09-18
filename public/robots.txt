@@ -2,4 +2,27 @@
 User-agent: *
 Allow: /
 
+# High priority pages
+Allow: /
+Allow: /demo-analyse
+Allow: /faq
+Allow: /kontakt
+
+# Legal pages
+Allow: /impressum
+Allow: /datenschutz
+Allow: /agb
+Allow: /werte-ethik
+
+# Disallow analysis results (private/dynamic)
+Disallow: /analyse-ergebnisse
+Disallow: /analysis-results
+
+# Disallow API routes
+Disallow: /api/
+
+# Crawl delay
+Crawl-delay: 1
+
+# Sitemap location
 Sitemap: https://vertragsklar.ch/sitemap.xml
