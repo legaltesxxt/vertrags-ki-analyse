@@ -17,26 +17,10 @@ const Blog = () => {
           </p>
         </div>
 
-        <div className="space-y-6">
-          {/* Platzhalter für zukünftige Blog-Posts */}
-          <div className="bg-white rounded-xl shadow-sm p-8 border border-border/50">
-            <div className="flex items-start gap-4">
-              <div className="flex-1">
-                <div className="text-sm text-slate-500 mb-2">
-                  {new Date().toLocaleDateString('de-DE', { year: 'numeric', month: 'long', day: 'numeric' })}
-                </div>
-                <h2 className="text-2xl font-semibold text-legal-primary mb-4">
-                  Willkommen bei Vertragsklar
-                </h2>
-                <p className="text-slate-600 mb-4">
-                  Hier werden wir regelmäßig Updates, Neuigkeiten und wichtige Informationen rund um Vertragsklar und Vertragsrecht veröffentlichen.
-                </p>
-                <p className="text-slate-500 italic">
-                  Weitere Blog-Artikel folgen in Kürze...
-                </p>
-              </div>
-            </div>
-          </div>
+        <div className="bg-white rounded-xl shadow-sm p-8 border border-border/50 mb-10">
+          <p className="text-center text-slate-500">
+            Unsere Blog-Artikel werden in Kürze verfügbar sein.
+          </p>
         </div>
       </div>
     </AnalysisLayout>
