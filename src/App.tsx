@@ -17,6 +17,8 @@ import AGB from "./pages/AGB";
 import FAQ from "./pages/FAQ";
 import Blog from "./pages/Blog";
 import WerteEthik from "./pages/WerteEthik";
+import Preise from "./pages/Preise";
+import AnalyseFreischalten from "./pages/AnalyseFreischalten";
 import CookieConsent from "./components/CookieConsent";
 
 const queryClient = new QueryClient();
@@ -42,6 +44,8 @@ const App = () => (
           <Route path="/faq" element={<FAQ />} />
           <Route path="/blog" element={<Blog />} />
           <Route path="/werte-ethik" element={<WerteEthik />} />
+          <Route path="/preise" element={<Preise />} />
+          <Route path="/analyse-freischalten" element={<AnalyseFreischalten />} />
           
           {/* Legacy routes for backward compatibility */}
           <Route path="/analysis-results" element={<AnalysisResults />} />

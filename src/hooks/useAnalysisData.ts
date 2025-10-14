@@ -39,10 +39,12 @@ export const useAnalysisData = () => {
   }, [location.state]);
 
   const hasContent = !!(analysisOutput || structuredResult);
+  const isPaidAnalysis = location.state?.isPaidAnalysis || false;
 
   return {
     analysisOutput,
     structuredResult,
-    hasContent
+    hasContent,
+    isPaidAnalysis
   };
 };

@@ -11,7 +11,7 @@ import { generatePDF } from '@/utils/pdfUtils';
 
 const AnalysisResults = () => {
   const toast = useToast(); // Get the full toast object
-  const { analysisOutput, structuredResult, hasContent } = useAnalysisData();
+  const { analysisOutput, structuredResult, hasContent, isPaidAnalysis } = useAnalysisData();
 
   // Log the structured result for debugging
   React.useEffect(() => {
@@ -80,7 +80,8 @@ const AnalysisResults = () => {
       <AnalysisFooter 
         hasContent={hasContent}
         structuredResult={structuredResult} 
-        onDownloadPDF={downloadFullAnalysisPDF} 
+        onDownloadPDF={downloadFullAnalysisPDF}
+        isPaidAnalysis={isPaidAnalysis}
       />
 
       {/* Feedback Section */}

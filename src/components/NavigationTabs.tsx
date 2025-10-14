@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Upload, Info, FileText, Mail, HelpCircle } from 'lucide-react';
+import { Upload, Info, FileText, Mail, HelpCircle, CreditCard, BookOpen } from 'lucide-react';
 
 const NavigationTabs = () => {
   const location = useLocation();
@@ -53,6 +53,17 @@ const NavigationTabs = () => {
             </TabsTrigger>
             
             <TabsTrigger 
+              value="/preise"
+              className="data-[state=active]:bg-legal-primary data-[state=active]:text-white"
+              asChild
+            >
+              <Link to="/preise" className="flex items-center gap-2 px-4 py-2">
+                <CreditCard size={18} />
+                <span className="whitespace-nowrap">Preise</span>
+              </Link>
+            </TabsTrigger>
+            
+            <TabsTrigger 
               value="/demo-analyse"
               className="data-[state=active]:bg-legal-primary data-[state=active]:text-white"
               asChild
@@ -60,6 +71,17 @@ const NavigationTabs = () => {
               <Link to="/demo-analyse" className="flex items-center gap-2 px-4 py-2">
                 <FileText size={18} />
                 <span className="whitespace-nowrap">Demo-Analyse</span>
+              </Link>
+            </TabsTrigger>
+            
+            <TabsTrigger 
+              value="/blog"
+              className="data-[state=active]:bg-legal-primary data-[state=active]:text-white"
+              asChild
+            >
+              <Link to="/blog" className="flex items-center gap-2 px-4 py-2">
+                <BookOpen size={18} />
+                <span className="whitespace-nowrap">Blog</span>
               </Link>
             </TabsTrigger>
             
