@@ -3,73 +3,67 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://vertragsklar.ch/</loc>
-    <lastmod>2024-12-21</lastmod>
+    <lastmod>2025-10-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://vertragsklar.ch/vertrag-hochladen</loc>
-    <lastmod>2024-12-21</lastmod>
+    <lastmod>2025-10-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://vertragsklar.ch/analyse-ergebnisse</loc>
-    <lastmod>2024-12-21</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>https://vertragsklar.ch/demo-analyse</loc>
-    <lastmod>2024-12-21</lastmod>
+    <lastmod>2025-10-15</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.9</priority>
   </url>
   <url>
     <loc>https://vertragsklar.ch/faq</loc>
-    <lastmod>2024-12-21</lastmod>
+    <lastmod>2025-10-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://vertragsklar.ch/blog</loc>
-    <lastmod>2024-12-21</lastmod>
+    <lastmod>2025-10-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://vertragsklar.ch/kontakt</loc>
-    <lastmod>2024-12-21</lastmod>
+    <lastmod>2025-10-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://vertragsklar.ch/rechtliches</loc>
-    <lastmod>2024-12-21</lastmod>
+    <lastmod>2025-10-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://vertragsklar.ch/werte-ethik</loc>
-    <lastmod>2024-12-21</lastmod>
+    <lastmod>2025-10-15</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://vertragsklar.ch/impressum</loc>
-    <lastmod>2024-12-21</lastmod>
+    <lastmod>2025-10-15</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://vertragsklar.ch/datenschutz</loc>
-    <lastmod>2024-12-21</lastmod>
+    <lastmod>2025-10-15</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://vertragsklar.ch/agb</loc>
-    <lastmod>2024-12-21</lastmod>
+    <lastmod>2025-10-15</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.6</priority>
   </url>
