@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Upload, Info, FileText, Mail, HelpCircle } from 'lucide-react';
+import { Upload, Info, FileText, Mail, HelpCircle, CreditCard } from 'lucide-react';
 
 const NavigationTabs = () => {
   const location = useLocation();
@@ -38,6 +38,17 @@ const NavigationTabs = () => {
               <Link to="/vertrag-hochladen" className="flex items-center gap-2 px-4 py-2">
                 <Upload size={18} />
                 <span className="whitespace-nowrap">Analyse starten</span>
+              </Link>
+            </TabsTrigger>
+            
+            <TabsTrigger 
+              value="/preise"
+              className="data-[state=active]:bg-legal-primary data-[state=active]:text-white"
+              asChild
+            >
+              <Link to="/preise" className="flex items-center gap-2 px-4 py-2">
+                <CreditCard size={18} />
+                <span className="whitespace-nowrap">Preise</span>
               </Link>
             </TabsTrigger>
             

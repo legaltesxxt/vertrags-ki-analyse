@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import AnalysisResults from "./pages/AnalysisResults";
 import DemoAnalysis from "./pages/DemoAnalysis";
 import UploadContract from "./pages/UploadContract";
+import Preise from "./pages/Preise";
 import Legal from "./pages/Legal";
 import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
@@ -32,6 +33,7 @@ const App = () => (
           <Route path="/analyse-ergebnisse" element={<AnalysisResults />} />
           <Route path="/demo-analyse" element={<DemoAnalysis />} />
           <Route path="/vertrag-hochladen" element={<UploadContract />} />
+          <Route path="/preise" element={<Preise />} />
           <Route path="/rechtliches" element={<Legal />} />
           <Route path="/kontakt" element={<Contact />} />
           
