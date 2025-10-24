@@ -31,17 +31,6 @@ const NavigationTabs = () => {
         <Tabs defaultValue={location.pathname} className="w-full">
           <TabsList className="w-full h-14 bg-white rounded-lg shadow-sm justify-between overflow-x-auto">
             <TabsTrigger 
-              value="/preise"
-              className="data-[state=active]:bg-legal-primary data-[state=active]:text-white"
-              asChild
-            >
-              <Link to="/preise" className="flex items-center gap-2 px-4 py-2">
-                <CreditCard size={18} />
-                <span className="whitespace-nowrap">Preise</span>
-              </Link>
-            </TabsTrigger>
-            
-            <TabsTrigger 
               value="/#how-it-works"
               className="data-[state=active]:bg-legal-primary data-[state=active]:text-white"
               asChild
@@ -50,6 +39,17 @@ const NavigationTabs = () => {
                 <Info size={18} />
                 <span className="whitespace-nowrap">So funktioniert's</span>
               </a>
+            </TabsTrigger>
+            
+            <TabsTrigger 
+              value="/preise"
+              className="data-[state=active]:bg-legal-primary data-[state=active]:text-white"
+              asChild
+            >
+              <Link to="/preise" className="flex items-center gap-2 px-4 py-2">
+                <CreditCard size={18} />
+                <span className="whitespace-nowrap">Preise</span>
+              </Link>
             </TabsTrigger>
             
             <TabsTrigger 
