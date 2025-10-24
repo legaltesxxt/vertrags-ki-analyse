@@ -44,10 +44,18 @@ const FAQ = () => {
       },
       {
         "@type": "Question",
+        "name": "Warum Vertragsklar?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Wir sind ein in der Schweiz gegründetes Unternehmen mit Sitz in Zürich und haben bereits über 150 Schweizer Verträge erfolgreich analysiert. Unsere KI ist spezialisiert auf Schweizer Arbeits- und Mietrecht und liefert präzise, verlässliche Ersteinschätzungen."
+        }
+      },
+      {
+        "@type": "Question",
         "name": "Was kostet die Vertragsanalyse?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Während der Beta-Phase ist die Nutzung kostenlos. Später wird die Analyse je nach Vertragstyp und Funktionsumfang zu einem fairen Preis angeboten (Pay-per-Use)."
+          "text": "Die Analyse wird je nach Anzahl der Vertragsseiten abgerechnet. Detaillierte Preisinformationen finden Sie auf unserer Preisseite."
         }
       }
     ]

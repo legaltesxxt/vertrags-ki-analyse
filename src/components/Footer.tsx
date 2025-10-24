@@ -38,8 +38,17 @@ const Footer = () => {
           </div>
         </div>
         
-        <div className="border-t border-white/20 pt-6 mt-2 text-center">
-          <p className="text-white/90">© 2025 Vertragsklar – Gegründet in der Schweiz 🇨🇭</p>
+        <div className="border-t border-white/20 pt-6 mt-2">
+          <div className="flex flex-wrap items-center justify-center gap-4 mb-4 text-sm">
+            <span className="text-white/80">🇨🇭 Schweizer Unternehmen</span>
+            <span className="text-white/80">|</span>
+            <span className="text-white/80">🔒 DSGVO-konform</span>
+            <span className="text-white/80">|</span>
+            <span className="text-white/80">✓ 150+ Analysen</span>
+          </div>
+          <p className="text-white/90 text-center">
+            © 2025 Vertragsklar – Proudly Made in Switzerland 🇨🇭 | In Zürich gegründet
+          </p>
         </div>
       </div>
     </footer>

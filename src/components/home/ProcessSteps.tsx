@@ -1,21 +1,20 @@
-
 import React from 'react';
-import { FileText, Search, CheckCircle } from 'lucide-react';
+import { CreditCard, Search, FileText } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 
 const ProcessSteps = () => {
   const steps = [{
-    icon: <FileText className="h-8 w-8 text-legal-primary" />,
-    title: "Vertrag hochladen",
-    description: "Laden Sie Ihren Vertrag im PDF-Format hoch"
+    icon: <CreditCard className="h-8 w-8 text-legal-primary" />,
+    title: "Plan wählen",
+    description: "Wählen Sie das passende Paket für Ihre Vertragsseiten"
   }, {
     icon: <Search className="h-8 w-8 text-legal-primary" />,
     title: "KI-Analyse",
     description: "Unsere KI analysiert den Vertrag nach Schweizer Recht"
   }, {
-    icon: <CheckCircle className="h-8 w-8 text-legal-primary" />,
-    title: "Ergebnis sofort erhalten",
-    description: "Erhalten Sie eine detaillierte rechtliche Empfehlung"
+    icon: <FileText className="h-8 w-8 text-legal-primary" />,
+    title: "Vertrag hochladen & Analyse",
+    description: "Laden Sie Ihren Vertrag hoch und erhalten Sie sofort eine detaillierte Analyse"
   }];
 
   return <section id="how-it-works" className="my-16">
