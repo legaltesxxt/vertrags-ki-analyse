@@ -31,11 +31,11 @@ const NavigationTabs = () => {
         <Tabs defaultValue={location.pathname} className="w-full">
           <TabsList className="w-full h-14 bg-white rounded-lg shadow-sm justify-between overflow-x-auto">
             <TabsTrigger 
-              value="/vertrag-hochladen"
+              value="/preise"
               className="data-[state=active]:bg-legal-primary data-[state=active]:text-white"
               asChild
             >
-              <Link to="/vertrag-hochladen" className="flex items-center gap-2 px-4 py-2">
+              <Link to="/preise" className="flex items-center gap-2 px-4 py-2">
                 <Upload size={18} />
                 <span className="whitespace-nowrap">Analyse starten</span>
               </Link>
