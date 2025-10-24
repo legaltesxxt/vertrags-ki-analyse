@@ -36,17 +36,6 @@ const NavigationTabs = () => {
               asChild
             >
               <Link to="/preise" className="flex items-center gap-2 px-4 py-2">
-                <Upload size={18} />
-                <span className="whitespace-nowrap">Analyse starten</span>
-              </Link>
-            </TabsTrigger>
-            
-            <TabsTrigger 
-              value="/preise"
-              className="data-[state=active]:bg-legal-primary data-[state=active]:text-white"
-              asChild
-            >
-              <Link to="/preise" className="flex items-center gap-2 px-4 py-2">
                 <CreditCard size={18} />
                 <span className="whitespace-nowrap">Preise</span>
               </Link>
