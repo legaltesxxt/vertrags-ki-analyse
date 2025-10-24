@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
@@ -8,40 +7,36 @@ import { useN8nWebhook } from '@/hooks/useN8nWebhook';
 import AnalysisLayout from '@/components/analysis/AnalysisLayout';
 import FileUpload from '@/components/FileUpload';
 import AnalysisSection from '@/components/analysis/AnalysisSection';
-
 const AnalyseGeheim = () => {
   const navigate = useNavigate();
-  const { toast } = useToast();
+  const {
+    toast
+  } = useToast();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const { 
-    sendToN8n, 
-    isLoading: isSendingToN8n, 
-    error, 
-    resetError, 
-    getRemainingErrorTime, 
+  const {
+    sendToN8n,
+    isLoading: isSendingToN8n,
+    error,
+    resetError,
+    getRemainingErrorTime,
     canResetError,
     getAnalysisElapsedTime
   } = useN8nWebhook();
-
   const handleFileSelected = useCallback(async (file: File) => {
     setSelectedFile(file);
-    
     console.log("=== FILE UPLOAD START ===");
     console.log("Selected file:", file.name, file.size, "bytes");
-    
     const response = await sendToN8n(file);
-    
     console.log("=== WEBHOOK RESPONSE RECEIVED ===");
     console.log("Response success:", response.success);
-      
     if (response.success && response.analysisResult) {
       console.log("Analysis completed successfully in AnalyseGeheim");
       console.log("Analysis result:", response.analysisResult);
       console.log("Number of clauses:", response.analysisResult.clauses.length);
 
       // Navigate to results page with structured data
-      navigate('/analyse-ergebnisse', { 
-        state: { 
+      navigate('/analyse-ergebnisse', {
+        state: {
           analysisResult: response.analysisResult,
           analysisOutput: response.data
         }
@@ -52,13 +47,11 @@ const AnalyseGeheim = () => {
       toast({
         title: "Fehler bei der Verarbeitung",
         description: response.error || "Die Datei konnte nicht zur Analyse gesendet werden.",
-        variant: "destructive",
+        variant: "destructive"
       });
     }
   }, [sendToN8n, toast, navigate]);
-
-  return (
-    <>
+  return <>
       <Helmet>
         <title>Analyse – Vertragsklar</title>
         <meta name="description" content="KI-Vertragsanalyse für Schweizer Miet- und Arbeitsverträge." />
@@ -69,17 +62,7 @@ const AnalyseGeheim = () => {
         <div className="max-w-3xl mx-auto">
           {/* Hinweis für zahlende Nutzer */}
           <div className="mb-6">
-            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 flex items-start gap-3">
-              <AlertTriangle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
-              <div>
-                <p className="text-sm text-yellow-800 font-medium">
-                  Hinweis: Diese Seite ist nur für zahlende Nutzer zugänglich.
-                </p>
-                <p className="text-xs text-yellow-700 mt-1">
-                  Direkter Zugriff ohne Zahlung ist nicht vorgesehen.
-                </p>
-              </div>
-            </div>
+            
           </div>
         <div className="text-center mb-10">
           <div className="inline-block bg-legal-tertiary p-4 rounded-full mb-4">
@@ -98,16 +81,7 @@ const AnalyseGeheim = () => {
           <FileUpload onFileSelected={handleFileSelected} isAnalyzing={isSendingToN8n} />
         </div>
         
-        <AnalysisSection 
-          isAnalyzing={isSendingToN8n}
-          webhookError={error}
-          webhookResult={null}
-          useRealAnalysis={true}
-          onReset={resetError}
-          getRemainingErrorTime={getRemainingErrorTime}
-          canResetError={canResetError}
-          getAnalysisElapsedTime={getAnalysisElapsedTime}
-        />
+        <AnalysisSection isAnalyzing={isSendingToN8n} webhookError={error} webhookResult={null} useRealAnalysis={true} onReset={resetError} getRemainingErrorTime={getRemainingErrorTime} canResetError={canResetError} getAnalysisElapsedTime={getAnalysisElapsedTime} />
         
         <div className="text-sm text-slate-500 text-center max-w-xl mx-auto">
           <p>Ihre Daten werden sicher verarbeitet und nach der Analyse automatisch gelöscht. 
@@ -115,8 +89,6 @@ const AnalyseGeheim = () => {
         </div>
         </div>
       </AnalysisLayout>
-    </>
-  );
+    </>;
 };
-
 export default AnalyseGeheim;
