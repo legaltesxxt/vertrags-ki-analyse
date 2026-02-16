@@ -34,7 +34,7 @@ const Contact = () => {
           <div className="flex flex-col items-center p-6 bg-white rounded-xl shadow-sm border border-border/50">
             <Mail className="h-8 w-8 text-legal-primary mb-2" />
             <h3 className="text-lg font-medium mb-1">Sprachen</h3>
-            <p className="text-slate-600 text-center">Deutsch & Englisch<br />Schweizer Recht</p>
+            <p className="text-slate-600 text-center">Deutsch & Englisch</p>
           </div>
         </div>
 
